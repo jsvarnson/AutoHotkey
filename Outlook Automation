@@ -1,0 +1,129 @@
+;====================================================================================================
+;	Outlook Automation
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Key Remapping
+2.	ComObj
+3.
+4.
+5.
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return
+
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+#IfWinActive, ahk_exe outlook.exe
+
+;---------------------------------------------------------------------------
+;	Key Remapping
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	F1 as Insert
+;--------------------------------------------------
+
+F1::
+	send, {insert}
+	return
+	
+;--------------------------------------------------
+;	F2 as Delete
+;--------------------------------------------------
+
+F2::
+	send, {delete}
+	return
+	
+;--------------------------------------------------
+;	F3 as Reply All
+;--------------------------------------------------
+
+F3::
+	send, ^+R
+	return
+	
+;--------------------------------------------------
+;	F4 as Reply
+;--------------------------------------------------
+	
+F4::
+	send, ^r
+	return
+
+;--------------------------------------------------
+;	F5 as New Mail
+;--------------------------------------------------
+
+F5::
+	send, ^n
+	return
+	
+;---------------------------------------------------------------------------
+;	ComObj
+;---------------------------------------------------------------------------
+	
+
+;====================================================================================================
+;	END
+;====================================================================================================	
+	
+	
+	
+	
+	
+	
+	
