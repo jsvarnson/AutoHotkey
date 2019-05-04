@@ -1,0 +1,249 @@
+;----------------------------------------------------------------------------------------------------
+;	Notepad++	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+/*
+-------------------------
+|	Main Directory		|
+-------------------------		
+1.	AutoExecute
+2.	Bracket - Large
+3.	Bracket - Medium	
+4.	Bracket - Small
+5.	Run Notepad++
+6.	Quality of Life
+-------------------------
+|		  END			|
+-------------------------
+*/
+;----------------------------------------------------------------------------------------------------
+;	Settings	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+	
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return	
+	
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;====================================================================================================
+
+#IfWinActive, ahk_class Notepad++
+
+;----------------------------------------------------------------------------------------------------
+;	AutoExecute	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+:*:-=::
+ClipSaved := ClipboardAll        ; save clipboard
+clipboard := ""                  ; empty clipboard
+clipboard =                      ; send this text to the clipboard:
+(
+;====================================================================================================
+;
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------		
+1.	
+2.	
+3.		
+4.
+5.
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+	
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return	
+	
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+
+)
+ClipWait, 1                    ; wait for the clipboard to contain data
+Send, ^v                       ; paste the clipboard content
+clipboard := ClipSaved         ; restore original clipboard
+return
+
+;----------------------------------------------------------------------------------------------------
+;	Bracketing - Large	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+:*:0-::
+	send,
+(
+;====================================================================================================
+;
+;====================================================================================================
+)
+	send, {up}
+	send, {tab}
+	return
+
+;----------------------------------------------------------------------------------------------------
+;	Bracketing - Medium		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+:*:-0::
+	send,
+(
+;---------------------------------------------------------------------------
+;
+;---------------------------------------------------------------------------
+)
+send, {up}
+send, {tab}
+return
+
+;----------------------------------------------------------------------------------------------------
+;	Bracketing - Small	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+:*:=-::
+	send,
+(
+;--------------------------------------------------
+;
+;--------------------------------------------------
+)
+	send, {up}
+	send, {tab}
+	return
+
+;----------------------------------------------------------------------------------------------------
+;	Run Notepad++	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+^!n::  ; Ctrl+Alt+N
+if WinExist("new 1 - Notepad++")
+    WinActivate
+else
+    Run "C:\Users\FM36\Downloads\npp.7.5.6.bin\notepad++.exe"
+	
+	;C:\Users\FM36\Downloads\npp.7.5.6.bin\notepad++.exe
+return
+
+;----------------------------------------------------------------------------------------------------
+;	Quality of Life	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+:*:(::
+	send, ()
+	send, {left}
+	return
+
+:*:'::
+	send, ''
+	send, {left}
+	return
+
+:*:"::
+	send, {" 2}
+	send, {left}
+	return
+	
+:*:{::
+	send, {shift down}
+	send, {[}{]}
+	send, {shift up}
+	send, {left}
+	return
+	
+:*:rr::
+	send, return
+	return
+	
+;----------------------------------------------------------------------------------------------------
+;	END		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;----------------------------------------------------------------------------------------------------
+
+
+
