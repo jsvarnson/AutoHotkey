@@ -1,0 +1,311 @@
+;====================================================================================================
+;	Excel Automation
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Key Mapping
+2.	Equations
+3.	ComObjects
+4.	
+5.	
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+	
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return	
+	
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+#IfWinActive, ahk_exe Excel.exe
+
+;---------------------------------------------------------------------------
+;	Key Mapping
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Function Keys
+;--------------------------------------------------
+
+;F1		-> still not sure what I should remap to
+
+;F2 enters a cell to edit
+	
+F3::
+	send, {F4 3}
+	return
+
+;F4 locks a rows and columns
+
+;---------------------------------------------------------------------------
+;	Equations
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Index Match
+;--------------------------------------------------
+
+:*:=inddm::
+	send, =index(,match(,,),match(,,)
+	send, {left}
+	send, {right}
+	send, {enter}
+	sleep, 1
+	send, {enter}
+	sleep, 1
+	send, {right}
+	send, {)}
+	sleep, 1
+	send, {left 21}
+	return
+
+:*:=indm::
+	send, =index(,match(,,)
+	send, {left}
+	send, {right}
+	send, {enter}
+	sleep, 1
+	send, {enter}
+	sleep, 1
+	send, {right}
+	send, {)}
+	sleep, 1
+	send, {left 11}
+	return
+
+;--------------------------------------------------
+;	Vlookup
+;--------------------------------------------------
+
+:*:=vl::
+	send, =vlookup(
+	send, {left}
+	return 
+	
+;--------------------------------------------------
+;	False
+;--------------------------------------------------
+	
+:*:fa::FALSE)
+
+;--------------------------------------------------
+;	Iferror
+;--------------------------------------------------	
+
+:*:ifer::
+	send, iferror(
+	send, {end}
+	send, {,}"-")
+	return
+	
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+;---------------------------------------------------------------------------
+;	Comobjects
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Shade - Dark Mode
+;--------------------------------------------------
+
+F5::
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
+	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
+	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=56)
+	 
+	;***********Shading function******************* 
+	XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	 PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	}
+	;  Function for connecting to Excel
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	return 
+
+;--------------------------------------------------
+;	Shade - Dark Gray
+;--------------------------------------------------
+
+F6::
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
+	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
+	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=16)
+	 /*
+	;***********Shading function******************* 
+	XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	 PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	}*/
+	;  Function for connecting to Excel
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	return 
+
+;--------------------------------------------------
+;	Format - comobj
+;--------------------------------------------------
+/*		;still working out the details on converting text to numbers
+F8::
+	XL_Handle(XL,1) ;1=Application 2=Workbook 3=Worksheet
+	 
+	;***********Examples ;#,##0   ;0,000   ;0,00.0  ;.0% ;$0 ;m/dd/yy ;m/dd ;dd/mm/yyyy
+	XL_Format_Number(XL,RG:="B:B",Format:= "000000000")
+	Sleep, 2000	
+	XL_Format_Number(XL,RG:="A1:B2",Format:="0,00.00")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:=".0%")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd/yy")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd")
+	 
+	;***********************Cell Number format********************************.
+	XL_Format_Number(PXL,RG="",format="#,##0"){
+	PXL.Application.ActiveSheet.Range(RG).NumberFormat := Format
+	}
+	
+	;  Function for connecting to Excel
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	return
+*/
+/*
+Formats ranges to specificed format		-> does not convert text to numbers though. not robust
+
+oExcel := ComObjActive("Excel.Application")
+msgbox % oExcel.range("A1").value
+if (oExcel.range("A1").value = "yes")
+{
+   oExcel.range("B:B").NumberFormat := "000000000"
+   oExcel.range("E:E").NumberFormat := "000000000"
+   oExcel.range("G:G").NumberFormat := "000000"
+   oExcel.range("H:H").NumberFormat := "00000"
+   oExcel.range("K:K").NumberFormat := "00000000"
+   oExcel.range("L:L").NumberFormat := "0000"
+   oExcel.range("AD:AD").NumberFormat := "00000000"
+   oExcel.range("AE:AE").NumberFormat := "0000000000"
+   oExcel.range("AF:AF").NumberFormat := "0000000"
+   oExcel.range("AS:AS").NumberFormat := "000000"
+   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
+}
+*/
+
+
+
+
+;====================================================================================================
+;	END
+;====================================================================================================
+
+
+;====================================================================================================
+;	Archive
+;====================================================================================================
+/*
+
+Formats ranges to specificed format		-> does not convert text to numbers though. not robust
+
+oExcel := ComObjActive("Excel.Application")
+msgbox % oExcel.range("A1").value
+if (oExcel.range("A1").value = "yes")
+{
+   oExcel.range("B:B").NumberFormat := "000000000"
+   oExcel.range("E:E").NumberFormat := "000000000"
+   oExcel.range("G:G").NumberFormat := "000000"
+   oExcel.range("H:H").NumberFormat := "00000"
+   oExcel.range("K:K").NumberFormat := "00000000"
+   oExcel.range("L:L").NumberFormat := "0000"
+   oExcel.range("AD:AD").NumberFormat := "00000000"
+   oExcel.range("AE:AE").NumberFormat := "0000000000"
+   oExcel.range("AF:AF").NumberFormat := "0000000"
+   oExcel.range("AS:AS").NumberFormat := "000000"
+   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
+}
+
+
+
+
+
