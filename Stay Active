@@ -2,34 +2,42 @@
 ;	Stay Active
 ;====================================================================================================
 /*
+
+	Directions
+----------------------------------------
+Type stay_active in notepad to activate
+Type im_back in notepad to deactivate
+Currently set to 10 second mouse move
+----------------------------------------
+
 -------------------------
-|	Main Directory	    	|
+|	Main Directory		|
 -------------------------
 1.	Activate Sequence
 2.	Return Sequence
 3.	MouseMove Subroutine
 -------------------------
-|		  END			          |
+|		  END			|
 -------------------------
 */
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force				     	;Recommended for all scripts to prevent old instances
-#NoEnv								             	;Recommended for all scripts to disable environment variables
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
 #MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000			    	;Recommended for all scripts to prevent error messages
-#KeyHistory 0							          ;Only useful for debugging purposes
-ListLines Off							          ;Only useful for debugging purposes
-Process, Priority, , A					    ;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						        ;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						      ;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						        ;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					    ;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							        ;Recommended to set sendinput as the default send method
-SetControlDelay, -1						      ;Recommended to set sendinput as the default send method
-SendMode Input							        ;Recommended to set sendinput as the default send method
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
 
 ;====================================================================================================
 ;	Universal
@@ -91,8 +99,7 @@ toggle := 0
 	send, Hey you're back{!}
 	sleep, 1000
 	send, {backspace 16}
-	SetTimer, UPDATEDSCRIPT, 1000
-	gosub, UPDATEDSCRIPT
+	reload, %A_ScriptFullPath%
 	return
 	
 ;---------------------------------------------------------------------------
@@ -101,20 +108,13 @@ toggle := 0
 
 MoveTheMouse:
 	Mousemove, 200, 200
-	SetTimer, MoveTheMouse, -2000 ;every 2 seconds
+	SetTimer, MoveTheMouse, -10000 ;every 10 seconds
 	MouseMove, %MouseX%, %MouseY%
 	return
 
 ;====================================================================================================
 ;	END
 ;====================================================================================================
-
-
-
-
-
-
-
 
 
 
