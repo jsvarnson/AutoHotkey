@@ -165,6 +165,223 @@ F3::
 48		-> Medium Gray
 15		-> Light Gray		
 */
+;---------------------------------------------------------------------------
+;	Shade - New Sheet Setup - Multicolor
+;---------------------------------------------------------------------------
+/*
+currently set to:
+	-dark gray A1:O1
+	-light gray A2:O5000
+	-dark mode P1:CZ100000
+	-dark mode A5001:O10000
+	-set A1:O1 as bold
+	-set whole worksheet to Inconsolata font
+*/
+;--------------------------------------------------
+;	Shading Activation and Range
+;--------------------------------------------------
+
+F7::
+	send, ^{home}		;moves cursor to cell A1 for convenience
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet	;get handle to Application
+	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
+	;56=dark mode	16=dark gray	48=medium gray	15=light gray
+	XL_Format_Cell_Shading(XL,RG:="A1:O1",Color:=16)
+	XL_Format_Cell_Shading(XL,RG:="A2:O5000",Color:=15)
+	XL_Format_Cell_Shading(XL,RG:="A5001:CZ100000",Color:=56)
+	XL_Format_Cell_Shading(XL,RG:="P1:CZ100000",Color:=56)
+	
+;--------------------------------------------------
+;	Function for connecting to Excel
+;--------------------------------------------------	
+	;used for all other excel ComObjects in this script
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	
+;--------------------------------------------------
+;	Shading function
+;--------------------------------------------------	
+	
+	XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	}
+
+;--------------------------------------------------
+;	Formatting Function
+;--------------------------------------------------	
+	
+	XL_Handle(XL,1) ;get handle to current Excel file
+	XL_Format_Font(XL,RG:="A1:CZ100000",Font:="Inconsolata",Size:=10) ;set font and size
+	XL_Format_Format(XL,RG:="A1:O1",Bold:=1,Italic:=0,Underline:=0) ;bold selected range
+	
+;--------------------------------------------------
+;	Set Font Size and Type
+;--------------------------------------------------	
+	
+	;***********************set size, type, ***********************************************
+	XL_Format_Font(PXL,RG="",Font="Arial",Size="11"){		;default selections. Do not change here
+	PXL.Application.ActiveSheet.Range(RG).Font.Name:=Font
+	PXL.Application.ActiveSheet.Range(RG).Font.Size:=Size
+	}
+	
+	;***********************bold, normal, italic, Underline********************************
+	XL_Format_Format(PXL,RG="",Bold=0,Italic=0,Underline=0){	;default selections. Do not change here
+	PXL.Application.ActiveSheet.Range(RG).Font.Bold:= bold
+	PXL.Application.ActiveSheet.Range(RG).Font.Italic:=Italic
+	(Underline="0")?(PXL.Application.ActiveSheet.Range(RG).Font.Underline:=-4142):(PXL.Application.ActiveSheet.Range(RG).Font.Underline:=Underline+1)
+	}
+	return
+	
+;---------------------------------------------------------------------------
+;	Autoformat Column Width
+;---------------------------------------------------------------------------	
+
+;currently set to autoformat width of columns A to O to autofit contents
+
+;--------------------------------------------------
+;	Column Activation and Range
+;--------------------------------------------------	
+	
+F8::	
+	XL_Handle(XL,1) ;1=Application 2=Workbook 3=Worksheet	;get handle to Application
+	 
+	;XL_Col_Width_Set(XL,RG:="A:B=-1|D:F=-1|H=15|K=3") ;-1 is auto	;use | to separate multiple arrays
+	XL_Col_Width_Set(XL,RG:="A:O=-1")
+	;XL_Col_Insert(XL,RG:="B:C",WD:=8)			;insert column(s) and set width
+	;XL_Col_Delete(XL,RG:="A|D:F|Z|BB:BC") 		;Delete columns
+	return
+
+;--------------------------------------------------
+;	Column Width Function
+;--------------------------------------------------	
+	
+	;***********column width*******************
+	XL_Col_Width_Set(PXL,RG=""){
+	 for k, v in StrSplit(rg,"|") ;Iterate over array
+		(StrSplit(v,"=").2="-1")?(PXL.Application.ActiveSheet.Columns(StrSplit(v,"=").1).AutoFit):(PXL.Application.ActiveSheet.Columns(StrSplit(v,"=").1).ColumnWidth:=StrSplit(v,"=").2)
+	}
+	
+;--------------------------------------------------
+;	Insert Column Function
+;--------------------------------------------------	
+/*	;specify range in the Column Activation and Range section
+	;***********************Column Insert********************************.
+	XL_Col_Insert(PXL,RG="",WD:="5"){ ;Default width is 5
+	PXL.Application.ActiveSheet.Columns(RG).Insert(-4161).Select
+	PXL.Application.ActiveSheet.Columns(RG).ColumnWidth:=WD
+	}
+*/	
+;--------------------------------------------------
+;	Delete Column Function
+;--------------------------------------------------	
+/*	;specify range in the Column Activation and Range section	
+	;***********************Column Delete********************************.
+	XL_Col_Delete(PXL,RG=""){
+		for j,k in StrSplit(rg,"|")
+	 (instr(k,":")=1)?list.=k ",":(list.=k ":" k ",") ;need to make for two if only 1 col
+	PXL.Application.ActiveSheet.Range(SubStr(list,1,(StrLen(list)-1))).Delete ;use list but remove final comma
+	}
+	return
+*/
+;====================================================================================================
+;	END 
+;====================================================================================================	
+	
+	
+	
+
+;====================================================================================================
+;	Archive
+;====================================================================================================
+/*
+
+Formats ranges to specificed format		-> does not convert text to numbers though. not robust
+
+oExcel := ComObjActive("Excel.Application")
+msgbox % oExcel.range("A1").value
+if (oExcel.range("A1").value = "yes")
+{
+   oExcel.range("B:B").NumberFormat := "000000000"
+   oExcel.range("E:E").NumberFormat := "000000000"
+   oExcel.range("G:G").NumberFormat := "000000"
+   oExcel.range("H:H").NumberFormat := "00000"
+   oExcel.range("K:K").NumberFormat := "00000000"
+   oExcel.range("L:L").NumberFormat := "0000"
+   oExcel.range("AD:AD").NumberFormat := "00000000"
+   oExcel.range("AE:AE").NumberFormat := "0000000000"
+   oExcel.range("AF:AF").NumberFormat := "0000000"
+   oExcel.range("AS:AS").NumberFormat := "000000"
+   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
+}
+
+;--------------------------------------------------
+;	Format - Set number formats
+;--------------------------------------------------
+/*		;still working out the details on converting text to numbers
+F8::
+	XL_Handle(XL,1) ;1=Application 2=Workbook 3=Worksheet
+	 
+	;***********Examples ;#,##0   ;0,000   ;0,00.0  ;.0% ;$0 ;m/dd/yy ;m/dd ;dd/mm/yyyy
+	XL_Format_Number(XL,RG:="B:B",Format:= "000000000")
+	Sleep, 2000	
+	XL_Format_Number(XL,RG:="A1:B2",Format:="0,00.00")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:=".0%")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd/yy")
+	Sleep, 2000
+	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd")
+	 
+	;***********************Cell Number format********************************.
+	XL_Format_Number(PXL,RG="",format="#,##0"){
+	PXL.Application.ActiveSheet.Range(RG).NumberFormat := Format
+	}
+	
+	;  Function for connecting to Excel
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	return
+*/
+/*
+Formats ranges to specificed format		-> does not convert text to numbers though. not robust
+
+oExcel := ComObjActive("Excel.Application")
+msgbox % oExcel.range("A1").value
+if (oExcel.range("A1").value = "yes")
+{
+   oExcel.range("B:B").NumberFormat := "000000000"
+   oExcel.range("E:E").NumberFormat := "000000000"
+   oExcel.range("G:G").NumberFormat := "000000"
+   oExcel.range("H:H").NumberFormat := "00000"
+   oExcel.range("K:K").NumberFormat := "00000000"
+   oExcel.range("L:L").NumberFormat := "0000"
+   oExcel.range("AD:AD").NumberFormat := "00000000"
+   oExcel.range("AE:AE").NumberFormat := "0000000000"
+   oExcel.range("AF:AF").NumberFormat := "0000000"
+   oExcel.range("AS:AS").NumberFormat := "000000"
+   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
+}
+*/
 ;--------------------------------------------------
 ;	Shade - Dark Mode
 ;--------------------------------------------------
@@ -224,8 +441,7 @@ F10::		;commented out because F5 and F6 are predetermined. Finding better access
 ;--------------------------------------------------
 ;	Shade - Medium Gray - Whole Sheet
 ;--------------------------------------------------
-
-#UseHook  ; Force the use of the hook for hotkeys after this point.
+/*
 F8::
 	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
 	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
@@ -249,129 +465,5 @@ F8::
 	 Return ComObjEnwrap(9,pacc,1)
 	}
 	return 
-#UseHook off	
-	
-;--------------------------------------------------
-;	Shade - New Sheet Setup - Multicolor
-;--------------------------------------------------
-
-;#UseHook  ; Force the use of the hook for hotkeys after this point.
-F7::
-	send, ^{home}
-	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
-	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
-	XL_Format_Cell_Shading(XL,RG:="A1:O1",Color:=16)
-	XL_Format_Cell_Shading(XL,RG:="A2:O5000",Color:=15)
-	XL_Format_Cell_Shading(XL,RG:="A5001:CZ100000",Color:=56)
-	XL_Format_Cell_Shading(XL,RG:="P1:CZ100000",Color:=56)
-	
-	;***********Shading function******************* 
-	XL_Format_Cell_Shading(PXL,RG="",Color=0){
-	 PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
-	}
-	;  Function for connecting to Excel
-	;XL_Handle(ByRef PXL,Sel){
-	;ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
-	;IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
-	;IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
-	;IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
-	;}
-	;***********adapted from ACC.ahk*******************
-	;ObjectFromWindow(hWnd, idObject = -4){
-	;(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
-	; If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
-	; Return ComObjEnwrap(9,pacc,1)
-	;}
-	;return 
-;#UseHook off
-	
-;--------------------------------------------------
-;	Format - comobj
-;--------------------------------------------------
-/*		;still working out the details on converting text to numbers
-F8::
-	XL_Handle(XL,1) ;1=Application 2=Workbook 3=Worksheet
-	 
-	;***********Examples ;#,##0   ;0,000   ;0,00.0  ;.0% ;$0 ;m/dd/yy ;m/dd ;dd/mm/yyyy
-	XL_Format_Number(XL,RG:="B:B",Format:= "000000000")
-	Sleep, 2000	
-	XL_Format_Number(XL,RG:="A1:B2",Format:="0,00.00")
-	Sleep, 2000
-	XL_Format_Number(XL,RG:="A1:B2",Format:=".0%")
-	Sleep, 2000
-	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd/yy")
-	Sleep, 2000
-	XL_Format_Number(XL,RG:="A1:B2",Format:="m/dd")
-	 
-	;***********************Cell Number format********************************.
-	XL_Format_Number(PXL,RG="",format="#,##0"){
-	PXL.Application.ActiveSheet.Range(RG).NumberFormat := Format
-	}
-	
-	;  Function for connecting to Excel
-	XL_Handle(ByRef PXL,Sel){
-	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
-	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
-	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
-	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
-	}
-	;***********adapted from ACC.ahk*******************
-	ObjectFromWindow(hWnd, idObject = -4){
-	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
-	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
-	 Return ComObjEnwrap(9,pacc,1)
-	}
-	return
 */
-/*
-Formats ranges to specificed format		-> does not convert text to numbers though. not robust
-
-oExcel := ComObjActive("Excel.Application")
-msgbox % oExcel.range("A1").value
-if (oExcel.range("A1").value = "yes")
-{
-   oExcel.range("B:B").NumberFormat := "000000000"
-   oExcel.range("E:E").NumberFormat := "000000000"
-   oExcel.range("G:G").NumberFormat := "000000"
-   oExcel.range("H:H").NumberFormat := "00000"
-   oExcel.range("K:K").NumberFormat := "00000000"
-   oExcel.range("L:L").NumberFormat := "0000"
-   oExcel.range("AD:AD").NumberFormat := "00000000"
-   oExcel.range("AE:AE").NumberFormat := "0000000000"
-   oExcel.range("AF:AF").NumberFormat := "0000000"
-   oExcel.range("AS:AS").NumberFormat := "000000"
-   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
-}
-*/
-;====================================================================================================
-;	END
-;====================================================================================================
-
-
-;====================================================================================================
-;	Archive
-;====================================================================================================
-/*
-
-Formats ranges to specificed format		-> does not convert text to numbers though. not robust
-
-oExcel := ComObjActive("Excel.Application")
-msgbox % oExcel.range("A1").value
-if (oExcel.range("A1").value = "yes")
-{
-   oExcel.range("B:B").NumberFormat := "000000000"
-   oExcel.range("E:E").NumberFormat := "000000000"
-   oExcel.range("G:G").NumberFormat := "000000"
-   oExcel.range("H:H").NumberFormat := "00000"
-   oExcel.range("K:K").NumberFormat := "00000000"
-   oExcel.range("L:L").NumberFormat := "0000"
-   oExcel.range("AD:AD").NumberFormat := "00000000"
-   oExcel.range("AE:AE").NumberFormat := "0000000000"
-   oExcel.range("AF:AF").NumberFormat := "0000000"
-   oExcel.range("AS:AS").NumberFormat := "000000"
-   ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
-}
-
-
-
 
