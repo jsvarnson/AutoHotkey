@@ -238,6 +238,8 @@ return
 :*:pcan::Peroni 6-pack cans
 :*:p5::Peroni 500ml loose cans
 :*:picc::Peroni 8.5oz Piccola bottles
+:*:pcel::Peroni Celebration pack
+:*:24p::Peroni 24-pack loose bottles
 
 :*:mp12::34361
 :*:mp14::36446
@@ -246,6 +248,8 @@ return
 :*:mpcan::43829
 :*:mp5::43865
 :*:mpicc::44021
+:*:mpcel::43647
+:*:m24p::43832
 
 :*:op12::701190
 :*:op14::701728
@@ -253,6 +257,8 @@ return
 :*:o12p::702241
 :*:opcan::703250
 :*:op5::703702
+:*:opcel::702370
+:*:o24p::702330
 
 :*:emp12::34361 (Peroni 1/2 barrels)
 :*:emp14::36446 (Peroni 1/4 barrels)
@@ -260,6 +266,8 @@ return
 :*:em12p::43827 (Peroni 12-pack bottles)
 :*:empcan::43829 (Peroni 6-pack cans)
 :*:emp5::43865 (Peroni 500ml loose cans)
+:*:empcel::43647 (Peroni Celebration pack)
+:*:em24p::43832 (Peroni 24-pack loose bottles)
 
 :*:omp12::701190 (Peroni 1/2 barrels)
 :*:omp14::701728 (Peroni 1/4 barrels)
@@ -267,7 +275,28 @@ return
 :*:om12p::702241 (Peroni 12-pack bottles)
 :*:ompcan::703250 (Peroni 6-pack cans)
 :*:omp5::703702 (Peroni 500ml loose cans)
+:*:ompcel::702370 (Peroni Celebration pack)
+:*:om24p::702330 (Peroni 24-pack loose bottles)
 
+:*:allps::
+	send,
+	(
+OSKU	MSKU	BPA	BPACLL	Package Description
+701190	34361	PN1525	PN1525	1/2BBL STD KEG
+701728	36446	PN1555	PN1555	1/4BBL SLM KEG
+702240	43834	PN21E5	PN21E5R54	4/6 330ML GBT LSTDGR BSK CTN
+702241	43827	PN22E5	PN22E5R54	2/12 330ML GBT LSTDGR CAR TRY
+703250	43829	PN33P5	PN33P5E54	24 4/6 330ML AL CAN SL CAR TRY
+703702	43865	PN37G5	PN37G5E54	24 LS 500ML AL CAN IS TRS
+702330	43832	PN23E5	PN23E5R54	24LS 330ML GBT LSTDGR HGC
+702370	43647	PN23G5	PN23G5R54	2/10 330ML GBT LSTDGR CAR TRY
+702832	43830	PN3855	PN3855E54	24 LS 330ML AL CAN SL TRS
+702240	43835	PN21E5	PN21E5R54P	4/6 330ML GBT LSTDGR BSK CTN
+702241	43828	PN22E5	PN22E5R54P	2/12 330ML GBT LSTDGR CAR TRY
+703841	44021	PN2AG5	PN2AG5R54P	24 4/6 8.5OZ GBT LSTDGR BSK CT
+	)
+	send, {right}
+	return
 
 ;--------------------------------------------------
 ;	Quality of Life
@@ -275,6 +304,7 @@ return
 
 :*:sku::SKU
 :*:msku::MSKU
+:*:osku::OSKU
 ::sto::STO
 ::stos::STOs
 :*:ipt::IPT
@@ -287,6 +317,7 @@ return
 :*:sap::SAP
 :*:bobj::BOBJ
 :*:distr::distributor
+:*:qty::QTY
 
 :*:peroni::Peroni
 :*:perni::Peroni
@@ -315,6 +346,7 @@ return
 
 :*:npp::Notepad++
 :*:run log::RUN LOG
+:*:validate log::VALIDATE LOG
 :*:comobj::ComObj
 
 ;--------------------------------------------------
@@ -339,10 +371,12 @@ return
 :*:??::As always, please let me know if you have any other questions so we may discuss them further.
 :*:?/::Please see the Ws Import Shared folder for full details.
 :*:pfa::Please find that file attached.
-::plmk::Please let me know at your earliest convenience
-:*:plmkw::Please let me know when you can
-:*:pluk::Please let us know when you can
-::paw::Please advise when you can
+:*:plmk::please let me know
+:*:plmka::Please let me know at your earliest convenience.
+:*:plmkw::Please let me know when you can.
+:*:pluk::Please let us know
+:*:plukw::Please let us know when you can.
+:*:paw::Please advise when you can.
 
 ;--------------------------------------------------
 ;	Names
