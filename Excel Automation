@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Excel Automation
+;	Excel
 ;====================================================================================================
 /*
 -------------------------
@@ -157,12 +157,19 @@ F3::
 ;---------------------------------------------------------------------------
 ;	Comobjects
 ;---------------------------------------------------------------------------
-
+/*
+	Colors
+--------------------------
+56		-> Super Dark Gray
+16		-> Dark Gray
+48		-> Medium Gray
+15		-> Light Gray		
+*/
 ;--------------------------------------------------
 ;	Shade - Dark Mode
 ;--------------------------------------------------
-
-F5::
+/*
+F11::		;commented out because F5 and F6 are predetermined. Finding better access for this color
 	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
 	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
 	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=56)
@@ -185,20 +192,20 @@ F5::
 	 Return ComObjEnwrap(9,pacc,1)
 	}
 	return 
-
+*/
 ;--------------------------------------------------
 ;	Shade - Dark Gray
 ;--------------------------------------------------
-
-F6::
+/*
+F10::		;commented out because F5 and F6 are predetermined. Finding better access for this color
 	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
 	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
 	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=16)
-	 /*
+	
 	;***********Shading function******************* 
-	XL_Format_Cell_Shading(PXL,RG="",Color=0){
-	 PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
-	}*/
+	;XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	; PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	;}
 	;  Function for connecting to Excel
 	XL_Handle(ByRef PXL,Sel){
 	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
@@ -213,7 +220,71 @@ F6::
 	 Return ComObjEnwrap(9,pacc,1)
 	}
 	return 
+*/
+;--------------------------------------------------
+;	Shade - Medium Gray - Whole Sheet
+;--------------------------------------------------
 
+#UseHook  ; Force the use of the hook for hotkeys after this point.
+F8::
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
+	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
+	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=48)
+	
+	;***********Shading function******************* 
+	;XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	; PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	;}
+	;  Function for connecting to Excel
+	XL_Handle(ByRef PXL,Sel){
+	ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	}
+	;***********adapted from ACC.ahk*******************
+	ObjectFromWindow(hWnd, idObject = -4){
+	(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	 If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	 Return ComObjEnwrap(9,pacc,1)
+	}
+	return 
+#UseHook off	
+	
+;--------------------------------------------------
+;	Shade - New Sheet Setup - Multicolor
+;--------------------------------------------------
+
+;#UseHook  ; Force the use of the hook for hotkeys after this point.
+F7::
+	send, ^{home}
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet
+	;0=clear 1=black 2=none 3=Red 4=Lt Grn 6=Brt Yel 7=Mag 8=brt blu 15=Grey 17=Lt purp  19=Lt Yel 20=Lt blu 22=Salm 26=Brt Pnk 28=Brt Blue
+	XL_Format_Cell_Shading(XL,RG:="A1:O1",Color:=16)
+	XL_Format_Cell_Shading(XL,RG:="A2:O5000",Color:=15)
+	XL_Format_Cell_Shading(XL,RG:="A5001:CZ100000",Color:=56)
+	XL_Format_Cell_Shading(XL,RG:="P1:CZ100000",Color:=56)
+	
+	;***********Shading function******************* 
+	XL_Format_Cell_Shading(PXL,RG="",Color=0){
+	 PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+	}
+	;  Function for connecting to Excel
+	;XL_Handle(ByRef PXL,Sel){
+	;ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN ;identify the hwnd for Excel
+	;IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application ;Handle to Excel Application
+	;IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent ;Handlle to active Workbook
+	;IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet ;Handle to Active Worksheet
+	;}
+	;***********adapted from ACC.ahk*******************
+	;ObjectFromWindow(hWnd, idObject = -4){
+	;(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+	; If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+	; Return ComObjEnwrap(9,pacc,1)
+	;}
+	;return 
+;#UseHook off
+	
 ;--------------------------------------------------
 ;	Format - comobj
 ;--------------------------------------------------
@@ -272,10 +343,6 @@ if (oExcel.range("A1").value = "yes")
    ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
 }
 */
-
-
-
-
 ;====================================================================================================
 ;	END
 ;====================================================================================================
@@ -304,7 +371,6 @@ if (oExcel.range("A1").value = "yes")
    oExcel.range("AS:AS").NumberFormat := "000000"
    ;oExcel.range("").NumberFormat := "yyyymmdd"	;saved as example of date formatting
 }
-
 
 
 
