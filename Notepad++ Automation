@@ -1,5 +1,5 @@
 ;----------------------------------------------------------------------------------------------------
-;	Notepad++	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Notepad++ Automation	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 /*
 -------------------------
@@ -72,11 +72,12 @@ SendMode Input							;Recommended to set sendinput as the default send method
 ;----------------------------------------------------------------------------------------------------
 ;	AutoExecute	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
-
-:*:-=::
-ClipSaved := ClipboardAll        ; save clipboard
-clipboard := ""                  ; empty clipboard
-clipboard =                      ; send this text to the clipboard:
+/*		;sendraw works but puts a bunch of unwanted indenting in the Universal section
+:*:===::
+;ClipSaved := ClipboardAll        ; save clipboard
+;clipboard := ""                  ; empty clipboard
+;clipboard =                      ; send this text to the clipboard:
+send, {raw}
 (
 ;====================================================================================================
 ;
@@ -97,7 +98,7 @@ clipboard =                      ; send this text to the clipboard:
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
-
+/*
 #Singleinstance, Force					;Recommended for all scripts to prevent old instances
 #NoEnv									;Recommended for all scripts to disable environment variables
 #MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
@@ -148,11 +149,11 @@ SendMode Input							;Recommended to set sendinput as the default send method
 
 
 )
-ClipWait, 1                    ; wait for the clipboard to contain data
-Send, ^v                       ; paste the clipboard content
-clipboard := ClipSaved         ; restore original clipboard
+;ClipWait, 1                    ; wait for the clipboard to contain data
+;Send, ^v                       ; paste the clipboard content
+;clipboard := ClipSaved         ; restore original clipboard
 return
-
+*/
 ;----------------------------------------------------------------------------------------------------
 ;	Bracketing - Large	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
