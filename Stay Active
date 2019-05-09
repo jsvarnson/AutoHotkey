@@ -99,7 +99,7 @@ toggle := 0
 	send, Hey you're back{!}
 	sleep, 1000
 	send, {backspace 16}
-	reload, %A_ScriptFullPath%
+	reload, %A_ScriptFullPath%	;replaced gosub
 	return
 	
 ;---------------------------------------------------------------------------
