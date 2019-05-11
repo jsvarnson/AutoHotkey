@@ -1,0 +1,396 @@
+;====================================================================================================
+;	Excel com test
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	
+2.	
+3.	
+4.	
+5.	
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return
+
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	ComObjects 
+;====================================================================================================
+/*
+-----------------------------------------------------------------------
+|||||||||||||||||||||||||||||| Variables ||||||||||||||||||||||||||||||
+-----------------------------------------------------------------------
+1.	active_header_rg			-> stores active header range
+2.	active_tbl_rg				-> stores active table range
+3.	active_col_rg				-> stores active column range
+4.	active_row_rg				-> stores active row range
+*/
+;---------------------------------------------------------------------------
+;	Autoformat Used Range of Active Sheet
+;---------------------------------------------------------------------------
+
+^+j::
+	send, ^{home}																								;moves cursor to cell A1 for convenience
+	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet														;get handle to Application	
+	active_header_rg	:= XL_First_Col_Alpha(XL)XL_First_Row(XL)":"XL_Last_Col_Alpha(XL)XL_First_Row(XL) 		;finds and stores active header range
+	active_tbl_rg		:= XL_Used_RG(XL,1)																		;finds and stores active table range
+	;active_col_rg		= %XL_First_Col_Alpha(XL)":"XL_Last_Col_Alpha(XL)%										;finds and stores active column range
+	;active_row_rg		= %XL_First_Row(XL)":"XL_Last_Row(XL)%													;finds and stores active row range
+	
+	XL_Col_Width_Set(XL,RG:="A:CZ=-1")																			;autofits active column range
+	XL_Row_Height(XL,RG:="1:100000=-1")																			;autofits active row range
+	;XL_Col_Width_Set(XL,RG:="%XL_First_Col_Alpha(XL)%:%XL_Last_Col_Alpha(XL)%=-1")								;autofits active column range
+	;XL_Row_Height(XL,RG:="%XL_First_Row(XL)%:%XL_Last_Row(XL)%=-1")											;autofits active row range
+	
+	XL_Format_Cell_Shading(XL,RG:="A1:CZ100000",Color:=56)														;shades whole sheet very dark gray
+	XL_Format_Wrap(XL,RG:= active_header_rg ,Wrap:=0)															;Unwraps all cells in active range
+	XL_Format_Font(XL,RG:="A1:CZ100000",Font:="Inconsolata",Size:=10)											;sets whole sheet font and size
+	XL_Format_Cell_Shading(XL,RG:= active_header_rg ,Color:=16)													;shades active header range medium gray
+	XL_Format_Format(XL,RG:= active_header_rg ,Bold:=1,Italic:=0,Underline:=0) 									;sets active header range bold, italic, or underline	;1 = on
+	XL_Format_Cell_Shading(XL,RG:= active_tbl_rg ,Color:=15)													;shades active table range light gray
+	return
+
+;====================================================================================================
+;	END
+;====================================================================================================	
+
+	
+	
+;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	FUNCTION LIBRARY
+;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\	
+/*
+-------------------------
+|	   Directory		|
+-------------------------
+1.	Connect to Excel
+2.	First Row
+3.	Used Row
+4.	Last Row
+5.	First Col Numeric
+6.	First Col Alpha
+7.	Used Col
+8.	Last Col Numeric
+9.	Last Col Alpha
+10.	Used Range
+11.	Shading
+12.	Font Type & Size
+13.	Char Formatting
+14.	Col Width
+15.	Row Height
+16.	Selected Range
+17.	First Selected Col 
+18.	First Selected Row
+19.	Number to String
+20.	Alpha to Number
+21.	Horiz Alignment
+22.	Vert Alignment
+23.	Wrap Text
+24.	
+25.		
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Function for connecting to Excel
+;====================================================================================================
+
+XL_Handle(ByRef PXL,Sel){													;used for all other excel ComObjects in this script
+ControlGet, hwnd, hwnd, , Excel71, ahk_class XLMAIN 						;identify the hwnd for Excel
+IfEqual,Sel,1, Return, PXL:= ObjectFromWindow(hwnd,-16).application			;Handle to Excel Application
+IfEqual,Sel,2, Return, PXL:= ObjectFromWindow(hwnd,-16).parent 				;Handlle to active Workbook
+IfEqual,Sel,3, Return, PXL:= ObjectFromWindow(hwnd,-16).activesheet			;Handle to Active Worksheet
+}
+;***********adapted from ACC.ahk*******************
+ObjectFromWindow(hWnd, idObject = -4){
+(if Not h)?h:=DllCall("LoadLibrary","Str","oleacc","Ptr")
+ If DllCall("oleacc\AccessibleObjectFromWindow","Ptr",hWnd,"UInt",idObject&=0xFFFFFFFF,"Ptr",-VarSetCapacity(IID,16)+NumPut(idObject==0xFFFFFFF0?0x46000000000000C0:0x719B3800AA000C81,NumPut(idObject==0xFFFFFFF0?0x0000000000020400:0x11CF3C3D618736E0,IID,"Int64"),"Int64"), "Ptr*", pacc)=0
+ Return ComObjEnwrap(9,pacc,1)
+}
+
+;====================================================================================================
+;	First Row Function
+;====================================================================================================
+
+;~ XL_First_Row(XL)
+XL_First_Row(PXL){
+ Return, PXL.Application.ActiveSheet.UsedRange.Rows(1).Row
+}
+
+;~ XL_First_Row(XL)
+;XL_First_Row(PXL){
+; Return, PXL.Application.ActiveSheet.UsedRange.Rows(1).Row
+;}
+
+;====================================================================================================
+;	Used Row Function
+;====================================================================================================
+
+XL_Used_rows(PXL){
+ Return,PXL.Application.ActiveSheet.UsedRange.Rows.Count
+}
+
+;~ Rows:=XL_Used_Rows(XL)
+;XL_Used_rows(PXL){
+;  To do						;old excel library
+;}
+
+;====================================================================================================
+;	Last Row Function
+;====================================================================================================
+
+;~ LR:=XL_Last_Row(XL)
+XL_Last_Row(PXL){
+ Return PXL.Application.ActiveSheet.UsedRange.Rows(PXL.Application.ActiveSheet.UsedRange.Rows.Count).Row
+}
+
+;====================================================================================================
+;	First Column Numeric Function
+;====================================================================================================
+
+;~ XL_First_Col_Nmb(XL)
+XL_First_Col_Nmb(PXL){
+ Return, PXL.Application.ActiveSheet.UsedRange.Columns(1).Column
+}
+
+;====================================================================================================
+;	First Column Alpha Function
+;====================================================================================================
+
+;~ XL_Last_Col_Alpha(XL)
+XL_First_Col_Alpha(PXL){
+ FirstCol:=PXL.Application.ActiveSheet.UsedRange.Columns(1).Column
+ IfLessOrEqual,LastCol,26, Return, (Chr(64+FirstCol))
+ Else IfGreater,LastCol,26, return, Chr((FirstCol-1)/26+64) . Chr(mod((FirstCol- 1),26)+65)
+}
+
+;====================================================================================================
+;	Used Column Function
+;====================================================================================================
+
+;~ LC:=XL_Used_Cols_Nmb(XL)
+XL_Used_Cols_Nmb(PXL){
+ Return, PXL.Application.ActiveSheet.UsedRange.Columns.Count
+}
+
+;====================================================================================================
+;	Last Column Numeric Function
+;====================================================================================================
+
+;~ LC:=XL_Last_Col_Nmb(XL)
+XL_Last_Col_Nmb(PXL){
+ Return, PXL.Application.ActiveSheet.UsedRange.Columns(PXL.Application.ActiveSheet.UsedRange.Columns.Count).Column
+}
+
+;====================================================================================================
+;	Last Column Alpha Function
+;====================================================================================================
+
+;~ XL_Last_Col_Alpha(XL)		;Needs Workbook
+XL_Last_Col_Alpha(PXL){
+ LastCol:=XL_Last_Col_Nmb(PXL)
+ IfLessOrEqual,LastCol,26, Return, (Chr(64+LastCol))
+ Else IfGreater,LastCol,26, return, Chr((LastCol-1)/26+64) . Chr(mod((LastCol- 1),26)+65)
+}
+
+;====================================================================================================
+;	Used Range Function
+;====================================================================================================	
+
+;~ RG:=XL_Used_RG(XL,Header:=1) ;Use header to include/skip first row
+XL_Used_RG(PXL,Header=1){
+ IfEqual,Header,0,Return, XL_First_Col_Alpha(PXL) . XL_First_Row(PXL) ":" XL_Last_Col_Alpha(PXL) . XL_Last_Row(PXL)
+ IfEqual,Header,1,Return, XL_First_Col_Alpha(PXL) . XL_First_Row(PXL)+1 ":" XL_Last_Col_Alpha(PXL) . XL_Last_Row(PXL)
+}	
+	
+;====================================================================================================
+;	Shading Function
+;====================================================================================================
+	
+XL_Format_Cell_Shading(PXL,RG="",Color=0){
+PXL.Application.ActiveSheet.Range(RG).Interior.ColorIndex :=Color
+}
+
+;====================================================================================================
+;	Font Size and Type Function
+;====================================================================================================
+
+XL_Format_Font(PXL,RG="",Font="Arial",Size="11"){		;default selections. Do not change here
+PXL.Application.ActiveSheet.Range(RG).Font.Name:=Font
+PXL.Application.ActiveSheet.Range(RG).Font.Size:=Size
+}
+
+;====================================================================================================
+;	Font Bold Italic Underline Function
+;====================================================================================================
+
+XL_Format_Format(PXL,RG="",Bold=0,Italic=0,Underline=0){	;default selections. Do not change here
+PXL.Application.ActiveSheet.Range(RG).Font.Bold:= bold
+PXL.Application.ActiveSheet.Range(RG).Font.Italic:=Italic
+(Underline="0")?(PXL.Application.ActiveSheet.Range(RG).Font.Underline:=-4142):(PXL.Application.ActiveSheet.Range(RG).Font.Underline:=Underline+1)
+}
+
+;====================================================================================================
+;	Column Width Function
+;====================================================================================================
+
+;~ XL_Col_Width_Set(XL,RG:="A:CZ=-1")
+XL_Col_Width_Set(PXL,RG=""){
+ for k, v in StrSplit(rg,"|") ;Iterate over array
+	(StrSplit(v,"=").2="-1")?(PXL.Application.ActiveSheet.Columns(StrSplit(v,"=").1).AutoFit):(PXL.Application.ActiveSheet.Columns(StrSplit(v,"=").1).ColumnWidth:=StrSplit(v,"=").2)
+}
+
+;====================================================================================================
+;	Row Height Function
+;====================================================================================================
+
+;~ XL_Row_Height(XL,RG:="1:4=-1|10:13=50|21=15") ;rows first then height -1 is auto
+XL_Row_Height(PXL,RG=""){
+ for k, v in StrSplit(rg,"|") ;Iterate over array
+ (StrSplit(v,"=").2="-1")?(PXL.Application.ActiveSheet.rows(StrSplit(v,"=").1).AutoFit):(PXL.Application.ActiveSheet.rows(StrSplit(v,"=").1).RowHeight:=StrSplit(v,"=").2)
+}
+
+;====================================================================================================
+;	Get Selected Range Function
+;====================================================================================================
+
+;(set absolute to 1 if you want $)
+;~ Range:=XL_Get_Selected_Range(XL,0)
+XL_Get_Selected_Range(PXL,Absolute=0){
+ if Absolute
+ Address:=PXL.Selection.address ;;~  Selected range with $ in them
+ Else
+ Address:=PXL.Selection.address(0,0) ;;Selected range without $ in them
+ return Address
+}
+
+;====================================================================================================
+;	Get First Selected Column Function
+;====================================================================================================
+
+;~ XL_Get_First_Selected_Col(XL)
+XL_Get_First_Selected_Col(PXL){
+ return XL_Col_To_Char(PXL.Selection.column)
+}
+ 
+;====================================================================================================
+;	Get First Selected Row Function
+;====================================================================================================
+
+XL_Get_First_Selected_Row(PXL){
+ return PXL.Selection.row
+}
+	
+;====================================================================================================
+;	Numeric Column to String Function
+;====================================================================================================
+
+;~ XL_Col_To_Char(26)
+XL_Col_To_Char(index){ ;Converting Columns to Numeric for Excel
+ IfLessOrEqual,index,26, Return, (Chr(64+index))
+ Else IfGreater,index,26, return, Chr((index-1)/26+64) . Chr(mod((index - 1),26)+65)
+}
+
+;====================================================================================================
+;	Alpha Column to Number Function
+;====================================================================================================
+
+;~ XL_String_To_Number("ab")
+XL_String_To_Number(Column){
+ StringUpper, Column, Column
+ Index := 0
+ Loop, Parse, Column  ;loop for each character
+ {ascii := asc(A_LoopField)
+     if (ascii >= 65 && ascii <= 90)
+ index := index * 26 + ascii - 65 + 1    ;Base = 26 (26 letters)
+ else { return
+ } }
+return, index
+}
+	
+;====================================================================================================
+;	Horizontal Alignment
+;====================================================================================================
+	
+;~ XL_Format_HAlign(XL,RG:="A1:A10",h:=2) ;1=Left 2=Center 3=Right
+XL_Format_HAlign(PXL,RG="",h="1"){ ;defaults are Right bottom
+ IfEqual,h,1,Return,PXL.Application.ActiveSheet.Range(RG).HorizontalAlignment:=-4131 ;Left
+ IfEqual,h,2,Return,PXL.Application.ActiveSheet.Range(RG).HorizontalAlignment:=-4108 ;Center
+ IfEqual,h,3,Return,PXL.Application.ActiveSheet.Range(RG).HorizontalAlignment:=-4152 ;Right
+}
+
+;====================================================================================================
+;	Vertical Alignment
+;====================================================================================================
+
+;~ XL_Format_VAlign(XL,RG:="A1:A10",v:=4) ;1=Top 2=Center 3=Distrib 4=Bottom
+XL_Format_VAlign(PXL,RG="",v="1"){
+ IfEqual,v,1,Return,PXL.Application.ActiveSheet.Range(RG).VerticalAlignment:=-4160 ;Top
+ IfEqual,v,2,Return,PXL.Application.ActiveSheet.Range(RG).VerticalAlignment:=-4108 ;Center
+ IfEqual,v,3,Return,PXL.Application.ActiveSheet.Range(RG).VerticalAlignment:=-4117 ;Distributed
+ IfEqual,v,4,Return,PXL.Application.ActiveSheet.Range(RG).VerticalAlignment:=-4107 ;Bottom
+}
+
+;====================================================================================================
+;	Wrap Text
+;====================================================================================================
+
+;~ XL_Format_Wrap(XL,RG:="A1:B4",Wrap:=0) ;1=Wrap text, 0=no
+XL_Format_Wrap(PXL,RG="",Wrap="1"){ ;defaults to Wrapping
+ PXL.Application.ActiveSheet.Range(RG).WrapText:=Wrap
+}
+
+;====================================================================================================
+;	
+;====================================================================================================
+
