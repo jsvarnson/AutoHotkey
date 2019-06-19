@@ -1,0 +1,285 @@
+;====================================================================================================
+;	Global
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------		
+1.	Systems
+2.	Key Mapping
+3.		
+4.
+5.
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					;Recommended for all scripts to prevent old instances
+#NoEnv									;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
+#KeyHistory 0							;Only useful for debugging purposes
+ListLines Off							;Only useful for debugging purposes
+Process, Priority, , A					;Recommended to set a higher priority to improve speed
+SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
+SetWinDelay, -1							;Recommended to set sendinput as the default send method
+SetControlDelay, -1						;Recommended to set sendinput as the default send method
+SendMode Input							;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+	
+~^!#+R::
+	Suspend, off
+	Pause, off
+	return	
+	
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+	
+;====================================================================================================
+;	Main
+;====================================================================================================
+/*
+
+*/
+;---------------------------------------------------------------------------
+;	Systems
+;---------------------------------------------------------------------------
+/*
+LAlt	x2					->	Run Windows Explorer
+RCtrl	x2					->	Run Calculator
+
+*/
+;--------------------------------------------------
+;	Run Explorer
+;--------------------------------------------------
+/*
+LAlt::		;Right Alt x2
+	if A_priorhotkey = LAlt
+	{
+		if A_timesincepriorhotkey < 300
+		{
+			if WinExist("Libraries")
+			WinClose
+			else
+			Run explorer.exe
+			WinActivate
+			return
+		}	
+	}
+	return	
+*/
+;--------------------------------------------------
+;	Run Calculator
+;--------------------------------------------------
+
+^!#+/::
+	if WinExist("Calculator")
+	WinClose
+	else
+	Run calc.exe
+	WinActivate
+	return
+	
+;--------------------------------------------------
+;	Run Notepad++
+;--------------------------------------------------	
+	
+^!#+n::
+	if WinExist("ahk_class Notepad++")
+	WinClose
+	else
+	Run notepad++.exe
+	WinActivate
+	return
+
+;--------------------------------------------------
+;	Always On Top
+;--------------------------------------------------
+
+^!space::  Winset, Alwaysontop, , A
+	return
+
+;-------------------------------------------------------------------------------------
+;	Key Mapping
+;-------------------------------------------------------------------------------------
+/*
+Capslock					->	Enter
+`							->	Shift+Tab
+Numlock						->	Always on
+*/
+;--------------------------------------------------
+;	Capslock as Enter
+;--------------------------------------------------
+
+Capslock::
+	send, {enter}
+	return
+	
+;--------------------------------------------------
+;	Tilde as Backwards Tab
+;--------------------------------------------------
+
+`::
+	send, {shift down}
+	send, {tab}
+	send, {shift up}
+	return
+
+;--------------------------------------------------
+;	Numlock Always On
+;--------------------------------------------------
+
+SetNumLockState , on
+return
+
+
+;-------------------------------------------------------------------------------------
+;	Ditto Assist
+;-------------------------------------------------------------------------------------
+/*
+
+
+*/
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+/*
+!^Numpad1::
+	sleep, 1
+	send, {ctrl down}
+	send, {v}
+	send, {ctrl up}
+	return
+*/
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+;-------------------------------------------------------------------------------------
+;	
+;-------------------------------------------------------------------------------------
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+
+;-------------------------------------------------------------------------------------
+;	
+;-------------------------------------------------------------------------------------
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+;--------------------------------------------------
+;	
+;--------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+;====================================================================================================
+;	Archive
+;====================================================================================================
+
+;--------------------------------------------------
+;	Run Calculator
+;--------------------------------------------------
+/*
+RControl::		;Right control x2
+	if A_priorhotkey = RControl
+	{
+		if A_timesincepriorhotkey < 200
+		{
+			if WinExist("Calculator")
+			WinClose
+			else
+			Run calc.exe
+			WinActivate
+			suspend on
+			suspend off
+			return
+		}	
+	}
+	return
+*/
+
