@@ -142,7 +142,7 @@ Return
 ;------------------------------------------------------------------------------
 ; Win+H to enter misspelling correction.  It will be added to this script.
 ;------------------------------------------------------------------------------
-!#+h::
+^!#+A::
 ; Get the selected text. The clipboard is used instead of "ControlGet Selected"
 ; as it works in more editors and word processors, java apps, etc. Save the
 ; current clipboard contents to be restored later.
@@ -231,6 +231,16 @@ return
 ;	SKUs
 ;--------------------------------------------------
 
+:*:pn1525::PN1525
+:*:pn1555::PN1555
+:*:pn21e5::PN21E5
+:*:pn22e5::PN22E5
+:*:pn33p5::PN33P5
+:*:pn37g5::PN37G5
+:*:pn2ag5::PN2AG5
+:*:pn23e5::PN23E5
+:*:pn23g5::PN23G5
+
 :*:p12::Peroni 1/2 barrels
 :*:p14::Peroni 1/4 barrels
 :*:6p::Peroni 6-pack bottles
@@ -269,31 +279,57 @@ return
 :*:empcel::43647 (Peroni Celebration pack)
 :*:em24p::43832 (Peroni 24-pack loose bottles)
 
-:*:omp12::701190 (Peroni 1/2 barrels)
-:*:omp14::701728 (Peroni 1/4 barrels)
-:*:om6p::702240 (Peroni 6-pack bottles)
-:*:om12p::702241 (Peroni 12-pack bottles)
-:*:ompcan::703250 (Peroni 6-pack cans)
-:*:omp5::703702 (Peroni 500ml loose cans)
-:*:ompcel::702370 (Peroni Celebration pack)
-:*:om24p::702330 (Peroni 24-pack loose bottles)
+:*:eop12::701190 (Peroni 1/2 barrels)
+:*:eop14::701728 (Peroni 1/4 barrels)
+:*:eo6p::702240 (Peroni 6-pack bottles)
+:*:eo12p::702241 (Peroni 12-pack bottles)
+:*:eopcan::703250 (Peroni 6-pack cans)
+:*:eop5::703702 (Peroni 500ml loose cans)
+:*:eopcel::702370 (Peroni Celebration pack)
+:*:eo24p::702330 (Peroni 24-pack loose bottles)
 
 :*:allps::
 	send,
 	(
-OSKU	MSKU	BPA	BPACLL	Package Description
-701190	34361	PN1525	PN1525	1/2BBL STD KEG
-701728	36446	PN1555	PN1555	1/4BBL SLM KEG
-702240	43834	PN21E5	PN21E5R54	4/6 330ML GBT LSTDGR BSK CTN
-702241	43827	PN22E5	PN22E5R54	2/12 330ML GBT LSTDGR CAR TRY
-703250	43829	PN33P5	PN33P5E54	24 4/6 330ML AL CAN SL CAR TRY
-703702	43865	PN37G5	PN37G5E54	24 LS 500ML AL CAN IS TRS
-702330	43832	PN23E5	PN23E5R54	24LS 330ML GBT LSTDGR HGC
-702370	43647	PN23G5	PN23G5R54	2/10 330ML GBT LSTDGR CAR TRY
-702832	43830	PN3855	PN3855E54	24 LS 330ML AL CAN SL TRS
-702240	43835	PN21E5	PN21E5R54P	4/6 330ML GBT LSTDGR BSK CTN
-702241	43828	PN22E5	PN22E5R54P	2/12 330ML GBT LSTDGR CAR TRY
-703841	44021	PN2AG5	PN2AG5R54P	24 4/6 8.5OZ GBT LSTDGR BSK CT
+Birra Peroni	OSKU	MSKU	BPA	BPACLL	Package Description
+896	701190	34361	PN1525	PN1525	1/2BBL STD KEG
+184	701728	36446	PN1555	PN1555	1/4BBL SLM KEG
+1436	701728	36446	PN1555	PN1555	1/4BBL SLM KEG
+1393	702240	43834	PN21E5	PN21E5R54	4/6 330ML GBT LSTDGR BSK CTN
+1394	702241	43827	PN22E5	PN22E5R54	2/12 330ML GBT LSTDGR CAR TRY
+1403	703250	43829	PN33P5	PN33P5E54	24 4/6 330ML AL CAN SL CAR TRY
+1437	703702	43865	PN37G5	PN37G5E54	24 LS 500ML AL CAN IS TRS
+	702330	43832	PN23E5	PN23E5R54	24LS 330ML GBT LSTDGR HGC
+	702370	43647	PN23G5	PN23G5R54	2/10 330ML GBT LSTDGR CAR TRY
+	702832	43830	PN3855	PN3855E54	24 LS 330ML AL CAN SL TRS
+1393	702240	43835	PN21E5	PN21E5R54P	4/6 330ML GBT LSTDGR BSK CTN
+1394	702241	43828	PN22E5	PN22E5R54P	2/12 330ML GBT LSTDGR CAR TRY
+	703841	44021	PN2AG5	PN2AG5R54P	24 4/6 8.5OZ GBT LSTDGR BSK CT
+	)
+	send, {right}
+	return
+	
+:*:allplts::
+	send,
+	(
+Legacy ID	SAP ID	Location Name
+1	1010	Milwaukee
+4	1030	Fort Worth
+6	1070	Irwindale
+7	1060	Albany
+8	1020	Trenton
+27	2060	Albany Distribution Center
+28	2070	FORT WORTH DC
+35	6870	BIRRA PERONI Â SPA
+43	6850	BAVARIA S.A.
+44	6800	BACKUS Y JOHNSTON S.A.A.
+61	6860	GROLSCH BREWERY
+61	6860	GROLSCH BREWERY
+65	6880	PLZENSKY PRAZDROJ BREWERY
+65	6880	PLZENSKY PRAZDROJ BREWERY
+66	6810	TYSKIE BROWARY
+72	2030	EAST COAST WAREHOUSE
+329	2080	Milwaukee DC
 	)
 	send, {right}
 	return
@@ -301,6 +337,15 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 ;--------------------------------------------------
 ;	Quality of Life
 ;--------------------------------------------------
+
+:*:uu3::ugh ugh ugh
+:*:uu4::ugh ugh ugh ugh
+:*:uu5::ugh ugh ugh ugh ugh
+:*:uu6::ugh ugh ugh ugh ugh ugh
+
+:*:pp1::*praise hands*
+:*:pp2::*praise hands**praise hands*
+:*:pp3::*praise hands**praise hands**praise hands*
 
 :*:sku::SKU
 :*:msku::MSKU
@@ -318,6 +363,14 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 :*:bobj::BOBJ
 :*:distr::distributor
 :*:qty::QTY
+:*:woq::WOQ
+::eta::ETA
+:*:vsz::V. Suarez
+::doi::DOI
+:*:nj::New Jersey
+::tm::TM
+:*:tcode::t-code
+::fo::FO
 
 :*:peroni::Peroni
 :*:perni::Peroni
@@ -336,13 +389,15 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 :*:proni::Peroni
 
 ::ty::thank you
-::t::thanks
+::t,::thanks,
 ::ht,::Hello team,
 ::c::cheers
 ::g::grazie
 ::gm::grazie mille
 ::ct::ciao tutti
 :*:tyvm::thank you very much
+;::am::AM						;commented out because it's a word too
+::pm::PM
 
 :*:npp::Notepad++
 :*:run log::RUN LOG
@@ -354,9 +409,12 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 ;--------------------------------------------------
 
 ::i::I
-::dont::don't
-::cant::can't
-::wont::won't
+::ill::I'll
+::ive::I've
+:*:arent::aren't
+:*:dont::don't
+:*:cant::can't
+:*:wont::won't
 :*:shouldnt::shouldn't
 :*:wouldnt::wouldn't
 :*:couldnt::couldn't
@@ -370,6 +428,8 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 :*://::Please let me know if you have any questions or concerns.
 :*:??::As always, please let me know if you have any other questions so we may discuss them further.
 :*:?/::Please see the Ws Import Shared folder for full details.
+:*:\\::Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+:*:/?::Please let me know if you have any further questions or concerns so we may discuss them further.
 :*:pfa::Please find that file attached.
 :*:plmk::please let me know
 :*:plmka::Please let me know at your earliest convenience.
@@ -415,6 +475,7 @@ OSKU	MSKU	BPA	BPACLL	Package Description
 :*:pc18::PC18
 :*:vj64::VJ64
 :*:pa81::PA81
+:*:qy82::QY82
 
 
 
@@ -3579,7 +3640,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::odouriferous::odoriferous
 ::odourous::odorous
 ::ouevre::oeuvre
-::fo::of
+;::fo::of			;commented out for Freight Order acronym
 :C:fo::of
 :C:od::of
 ::ofits::of its
@@ -5591,3 +5652,25 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :*:wehre::where
 
 
+
+:*:attachement::attachment
+:*:bop::BOP
+:*:activies::activities
+:*:cni::C&I
+:*:youll::you'll
+:*:itll::it'll
+:*:heres::here's
+:*:abscence::absence
+:*:deliovery::delivery
+:*:gatp::gATP
+::inv::INV
+:*:calcutions::calculations
+::lmk::let me know
+:*:bogo::BOGO
+::apo::APO
+:*:annalisa::Annalisa
+::cob::COB
+:*:1on1::1-on-1
+:*:1 on 1::1-on-1
+::ecc::ECC
+:*:sled::SLED 
