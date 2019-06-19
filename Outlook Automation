@@ -118,6 +118,37 @@ F6::
 	return
 	
 ;---------------------------------------------------------------------------
+;	Key Remapping
+;---------------------------------------------------------------------------	
+	
+	
+;--------------------------------------------------
+;	Date Change Email
+;--------------------------------------------------	
+	
+:*:datechange::
+	send,
+	(	
+Hello everyone,
+
+I have processed the below date changes for all inbound import shipments.
+
+
+
+Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
+
+Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+
+Cheers,
+)
+send, {up 50}
+sleep, 3
+send, {down 4}
+sleep, 3
+send, ^v
+return
+	
+;---------------------------------------------------------------------------
 ;	ComObj
 ;---------------------------------------------------------------------------
 	
@@ -130,6 +161,12 @@ F6::
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
+	
+	
+	
+	
+	
+	
 	
 	
 	
