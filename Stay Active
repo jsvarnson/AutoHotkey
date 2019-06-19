@@ -7,7 +7,7 @@
 ----------------------------------------
 Type stay_active in notepad to activate
 Type im_back in notepad to deactivate
-Currently set to 10 second mouse move
+Currently set to two seconds mouse move
 ----------------------------------------
 
 -------------------------
@@ -99,7 +99,7 @@ toggle := 0
 	send, Hey you're back{!}
 	sleep, 1000
 	send, {backspace 16}
-	reload, %A_ScriptFullPath%	;replaced gosub
+	reload, %A_ScriptFullPath%
 	return
 	
 ;---------------------------------------------------------------------------
@@ -108,13 +108,20 @@ toggle := 0
 
 MoveTheMouse:
 	Mousemove, 200, 200
-	SetTimer, MoveTheMouse, -10000 ;every 10 seconds
+	SetTimer, MoveTheMouse, -2000 ;every 2 seconds
 	MouseMove, %MouseX%, %MouseY%
 	return
 
 ;====================================================================================================
 ;	END
 ;====================================================================================================
+
+
+
+
+
+
+
 
 
 
