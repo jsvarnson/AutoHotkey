@@ -1,0 +1,265 @@
+;====================================================================================================
+;	DashMail
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory	    	|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+	i. 		Cesar's Dashboard
+	ii..	Sample 2
+	iii.	Sample 3
+	
+4.	Subroutines
+	i. 		Cesar's Dashboard
+	ii..	Sample 2
+	iii.	Sample 3
+	
+5.	Archive
+-------------------------
+|		  END	          		|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force				    	;Recommended for all scripts to prevent old instances
+#NoEnv									            ;Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000			    	;Recommended for all scripts to prevent error messages
+#KeyHistory 0					          		;Only useful for debugging purposes
+ListLines Off				          			;Only useful for debugging purposes
+Process, Priority, , A		    			;Recommended to set a higher priority to improve speed
+SetBatchLines, -1					        	;Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1				      		;Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1					        	;Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0			    		;Recommended to remove the default delayed mouse move
+SetWinDelay, -1						        	;Recommended to set sendinput as the default send method
+SetControlDelay, -1				      		;Recommended to set sendinput as the default send method
+SendMode Input						        	;Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+
+~^+Esc::
+	Exitapp
+	return
+
+~^Esc::
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+r::
+	Suspend, off
+	Pause, off
+	return	
+	
+~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+;---------------------------------------------------------------------------
+;	Cesar's Dashboard
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Send @ Interval - Cesar's Dashboard
+;--------------------------------------------------
+
+^+j::																											                      ; launches GUI
+	GUI, Add, Text,, DashMail Summary																		        	; names GUI
+	;GUI, Add, Edit, vedit, Your Text to send should be entered here
+	GUI, Add, Text,, Enter time inverval (in minutes)															; determines the interval 	-> user input
+	GUI, Add, Edit, x+10 +number w33 vtime, 5																    	; creates time variable
+	GUI, Add, Checkbox, checked xm vsend, Send with OK														; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer
+	GUI, Add, Button, x+10, OK																				          	; Button OK control 		-> using default/hitting enter DOES NOT activate interval timer
+	GUI, Add, Button, x+40, Cancel																			        	; Button Cancel control
+	GUI, Show																								                    	; displays GUI
+	return
+	
+;--------------------------------------------------
+;	Send Once Now - Cesar's Dashboard
+;--------------------------------------------------	
+	
+^+k::
+	gosub, Dash_mail_send																				              		; activates the action subroutine
+	gosub, SendMsg																							                	; activates the msgbox subroutine
+	return	
+	
+;--------------------------------------------------
+;	Button - OK
+;--------------------------------------------------	
+	
+ButtonOK:
+	GUI, Submit
+		if send
+		gosub, 	Dash_mail_send																					            ; activates the action subroutine
+	SetTimer, period, % time * 1000 * 60																		      ; creates an interval timer
+	return	
+
+;--------------------------------------------------
+;	Button - Cancel
+;--------------------------------------------------	
+
+ButtonCancel:
+	GUI, Hide
+	return
+	
+;====================================================================================================
+;	Subroutines
+;====================================================================================================
+
+;---------------------------------------------------------------------------
+;	Success Message Subroutine
+;---------------------------------------------------------------------------
+
+SendMsg:
+	msgbox, 0, File Sent, File has been sent successfully. , 1											; sends message upon subroutine completion
+	return
+
+;---------------------------------------------------------------------------
+;	Cesar's Dashboard Subroutines
+;---------------------------------------------------------------------------
+	
+Period:																										                      	; create new gosubs for each different file you want to send out
+	Gosub, Dash_mail_send																				                		; function triggered by the interval above, triggering action subroutine
+	return
+
+Dash_mail_send:
+	xlCSV = 6
+	CSVFILENAME := "Cesars Dashboard.csv"																	        	; name file to be saved
+	;FileSelectFile, FilePath
+	oExcel := ComObjCreate("Excel.Application") 														    		; Creates excel object
+	oExcel.Workbooks.Open("C:\Users\FM36\Desktop\export.XLSX")			                ; sample, please change					; Opens the selected existing file
+	oExcel.Visible := False																						              ; set to false if you don't need excel to be seen
+	oExcel.DisplayAlerts := False																			              ; this is Set to False to suppress prompts and alert messages 
+	oExcel.ActiveWorkbook.SaveAs("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv", xlCSV)					; saves file as CSV with chosen name
+	;oExcel.ActiveWorkbook.SaveAs("C:\Users\FM36\Desktop\DashMail\DashMail Archive\Cesars Dashboard",%TodayDateFile%, xlCSV)	; saves file as CSV with chosen name with time stamp to create archive
+	oExcel.Quit()																								                    ; closes the excel object
+	;exitapp	
+	
+	;FormatTime, CurrentDateTime,, MMDDYYYY h:mm 	;tt  														  ; format date as such 06-26-2019 9:32
+	
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()														  	; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)					; create new email
+	MailItem.BodyFormat := 2 																			              		; olFormatHTML	
+	MailItem.TO :="joseph.arnson@MillerCoors.com;"															  	; Add recipients 	-> use ; between email names inside the outer quotes
+	;MailItem.CC :="joseph.arnson@MillerCoors.com"															  	; Add recipients to the CC line
+	;~ MailItem.Replyto :="joejunkemail@yahoo.com"															  	; create a reply email
+	
+	TodayDateSubject 	:= A_YYYY . "-" . A_MM . "-" . A_DD . " at " . A_Hour . ":" . A_Min						; stores subject line date formatting
+	TodayDateBody 		:= A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min	; stores email body date formatting
+	TodayDateFile	 	:= A_YYYY . "-" . A_MM . "-" . A_DD . "  " . A_Hour . ":" . A_Min						; stores subject line date formatting	
+
+	MailItem.Subject 	:= "Cesar's Dashboard " TodayDateSubject											; Subject line of email
+;																											                          	; create body of email
+;																												; <H2 style='BACKGROUND-COLOR: red'><br></H2>       ; Added as first line under MailItem.HTMLBody :=
+	MailItem.HTMLBody := "																							
+	<HTML>Please find your report updated as of "(TodayDateBody)" <br><br>
+	<span style='color:black'>As always, please let me know if you have any questions or concerns.
+	<br><br><a href='mailto:joseph.arnson@MillerCoors.com'>Joseph Arnson</a> 
+	<br>Import Supply Chain Analyst
+	<br>MillerCoors
+	<br>Milwaukee, WI
+	<br>414-931-2347
+	</HTML>"
+
+	MailItem.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")
+
+	;~ MailItem.Display 																					                	; Make email visible
+	;~ mailItem.Close(0) 																					                	; Creates draft version in default folder
+	MailItem.Send() 																					                  		; Sends the email								; activates the msgbox subroutine
+	Return
+
+;--------------------------------------------------
+;	GUI Controls
+;--------------------------------------------------
+
+^+m::
+	GUI, Show
+	return
+
+GUIClose:
+	Exitapp
+	
+;====================================================================================================
+;	END
+;====================================================================================================	
+	
+
+;====================================================================================================
+;	Archive
+;====================================================================================================
+
+/*
+	;Myself = %AUMailAdress%
+	Recipient := "joseph.arnson@MillerCoors.com"
+	Subject := "Cesars Dashboard %CurrentDateTime%"
+	Body := "Please find Cesars Dashboard attached as of %CurrentDateTime%"
+	Recipient5 = "jsvarnson@gmail.com"
+
+	DocumentLocation = C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv
+
+	olMailItem := 0
+	MailItem := ComObjCreate("Outlook.Application").CreateItem(olMailItem)
+	olFormatHTML := 2
+	MailItem.BodyFormat := olFormatHTML
+	MailItem.Subject := Subject
+	MailItem.HTMLBody := Body
+	Recipient := MailItem.Recipients.Add(Recipient)
+	Recipient.Type := 1 
+	Loop, %DocumentLocation%	;\*.*
+	MailItem.Attachments.Add(A_LoopFileLongPath)
+	MailItem.cc := Recipient5
+	MailItem.Send()
+	return
+*/
+/*
+	olMailItem := ComObjCreate("Outlook.Application")
+	;olMailItem := ComObjActive("Outlook.Application")
+	;olMailItem := 0
+	olMailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)
+	olMailItem.To := "joseph.arnson@MillerCoors.com"																; choose recipients of email
+	olMailItem.Subject := "Cesars Dashboard %CurrentDateTime%"	;%CurrentDateTime%" 								; choose subject line of email
+	olMailItem.Body := "Please find Cesars Dashboard attached as of "												; choose main body of email
+	send, %CurrentDateTime%																							; Adds date time stamp to body of email
+	olMailItem.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv",1,1,"C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")	; attaches the predetermined file to the email
+	olMailItem.Display(true)																						; visually display the email
+	olMailItem.Send()																								; send the email
+	return
+*/
+
+
+	;oMailItem.BodyFormat := olFormatHTML
+	;oMailItem.HTMLBody := "<HTML><H2>The body of this message will appear in HTML.</H2><BODY> Please enter the message text here. </BODY></HTML>"
+	;oMailItem.Display
+	
+/*	
+	outlook := ComObjectactive("Outlook.Application")																; connects to outlook
+	email := Outlook.Application.CreateObject("Outlook.Application")												; creates new email
+	email.To := "joseph.arnson@MillerCoors.com"																		; choose recipients of email
+	email.Subject := "Cesars Dashboard %CurrentTime%"	;%CurrentDateTime%" 										; choose subject line of email
+	email.Body := "Please find Cesars Dashboard attached as of "													; choose main body of email
+	send, %CurrentDateTime%																							; Adds date time stamp to body of email
+	email.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv",1,1,"C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")	; attaches the predetermined file to the email
+	email.Display(true)																								; visually display the email
+	email.Send()																									; send the email
+	return
+*/
