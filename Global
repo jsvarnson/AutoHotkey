@@ -46,7 +46,7 @@ SendMode Input							;Recommended to set sendinput as the default send method
 	Pause, on
 	return
 	
-~^!#+R::
+~^!#+r::
 	Suspend, off
 	Pause, off
 	return	
@@ -76,6 +76,7 @@ ctrl + alt + win + shift + b		->	Run File Explorer
 ctrl + alt + win + shift + i		->	Run/Cycle Excel
 ctrl + alt + win + shift + /		->  Run Calculator
 ctrl + alt + win + shift + n		->  Run Notepad++
+ctrl + alt + win + shift + d		->  Run Notepad
 ctrl + alt + win + shift + Space	->  Always On Top
 ctrl + alt + win + shift + F1		->  Protect
 */
@@ -141,6 +142,21 @@ ctrl + alt + win + shift + F1		->  Protect
 	return
 
 ;--------------------------------------------------
+;	Run Notepad
+;--------------------------------------------------
+
+^!#+d::
+	if WinExist("ahk_class Notepad") {
+		WinClose
+		}
+	else
+		{
+		Run Notepad.exe
+		WinActivate
+		}
+	return
+	
+;--------------------------------------------------
 ;	Always On Top
 ;--------------------------------------------------
 
@@ -173,6 +189,19 @@ Capslock::
 	return
 	
 ;--------------------------------------------------
+;	Set Capslock
+;--------------------------------------------------	
+	
+^CapsLock::
+    GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
+    if capsstate = U
+        SetCapsLockState, AlwaysOn
+    else
+        SetCapsLockState, AlwaysOff
+    return
+	
+	
+;--------------------------------------------------
 ;	Tilde as Backwards Tab
 ;--------------------------------------------------
 
@@ -190,11 +219,31 @@ SetNumLockState , on
 return
 
 ;-------------------------------------------------------------------------------------
-;	
+;	File Explorer
 ;-------------------------------------------------------------------------------------
 
+#IfWinActive, ahk_exe Explorer.exe
 
+;--------------------------------------------------
+;	Get File Path
+;--------------------------------------------------
 
+F1::
+	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
+	Clipboard := FullPath
+	return
+
+Explorer_GetSelection(hwnd="") {
+	hwnd := hwnd ? hwnd : WinExist("A")
+	WinGetClass class, ahk_id %hwnd%
+	if (class="CabinetWClass" or class="ExploreWClass" or class="Progman")
+		for window in ComObjCreate("Shell.Application").Windows
+			if (window.hwnd==hwnd)
+    sel := window.Document.SelectedItems
+	for item in sel
+	ToReturn .= item.path "`n"
+	return Trim(ToReturn,"`n")
+}
 
 ;--------------------------------------------------
 ;	
@@ -210,15 +259,7 @@ return
 
 
 
-
-
-;--------------------------------------------------
-;	
-;--------------------------------------------------
-
-
-
-
+#IfWinActive
 
 ;====================================================================================================
 ;	Archive
@@ -248,6 +289,5 @@ RControl::		;Right control x2
 ;--------------------------------------------------
 ;	
 ;--------------------------------------------------
-
 
 
