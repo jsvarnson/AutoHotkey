@@ -36,7 +36,7 @@ SendMode Input							;Recommended to set sendinput as the default send method
 	Pause, on
 	return
 	
-~^!#+R::
+~^!#+r::
 	Suspend, off
 	Pause, off
 	return	
@@ -388,6 +388,7 @@ Legacy ID	SAP ID	Location Name
 :*:preoni:Peroni
 :*:proni::Peroni
 
+#IfWinActive, ahk_exe outlook.exe
 ::ty::thank you
 ::t,::thanks,
 ::ht,::Hello team,
@@ -398,6 +399,7 @@ Legacy ID	SAP ID	Location Name
 :*:tyvm::thank you very much
 ;::am::AM						;commented out because it's a word too
 ::pm::PM
+#IfWinActive
 
 :*:npp::Notepad++
 :*:run log::RUN LOG
@@ -448,6 +450,7 @@ Legacy ID	SAP ID	Location Name
 :*:andrea::Andrea
 :*:justiney::Justiney
 :*:brian::Brian
+:*:andrew::Andrew
 
 :*:cesar:: 
 	send, C
@@ -476,6 +479,7 @@ Legacy ID	SAP ID	Location Name
 :*:vj64::VJ64
 :*:pa81::PA81
 :*:qy82::QY82
+:*:kh56::KH56
 
 
 
@@ -5674,15 +5678,14 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :*:1 on 1::1-on-1
 ::ecc::ECC
 :*:sled::SLED 
-
-
-
-
-
-
-
-
-
-
-
-
+:*:mci::MCI
+:*:gold coast::Gold Coast
+:*:msc::MSC
+:*:jfh::JFH
+:*:me80fn::ME80FN
+:*:valentina::Valentina
+:*:protetc::protect
+:*:url::URL
+:*:gui::GUI
+:*:inputbox::InputBox
+:*:unforunately::unfortunately
