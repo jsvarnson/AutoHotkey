@@ -1,7 +1,7 @@
 ;====================================================================================================
-;	DashMail	v1.01
+;	DashMail	v1.02
 ;====================================================================================================
-/*
+/*☻
 -------------------------
 |	Main Directory		|
 -------------------------
@@ -136,10 +136,26 @@ SendMsg:
 ;---------------------------------------------------------------------------
 ;	Cesar's Dashboard Subroutines
 ;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Interval Trigger
+;--------------------------------------------------
 	
 Period:																											; create new gosubs for each different file you want to send out
 	Gosub, Dash_mail_send																						; function triggered by the interval above, triggering action subroutine
 	return
+
+;--------------------------------------------------
+;	Archive CSV w/ Timestamp
+;--------------------------------------------------		
+/*	
+Dash_mail_archive:
+	subroutine that does that takes the same file, converts to csv, and saves with timestamp to location
+*/
+
+;--------------------------------------------------
+;	Sends email of CSV
+;--------------------------------------------------
 
 Dash_mail_send:
 	xlCSV = 6
