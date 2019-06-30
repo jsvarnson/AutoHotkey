@@ -1,9 +1,9 @@
 ;====================================================================================================
-;	DashMail	v2.03
+;	DashMail	v2.04
 ;====================================================================================================
-/*
+/*☻
 -------------------------
-|	Main Directory	|
+|	Main Directory		|
 -------------------------
 1.	Settings
 2.	Universal
@@ -11,24 +11,24 @@
 4.	Subroutines
 5.	Archive
 -------------------------
-|	END		|
+|		  END			|
 -------------------------
 */
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force						; Recommended for all scripts to prevent old instances
-#NoEnv								; Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000					; Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000					; Recommended for all scripts to prevent error messages
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
 #KeyHistory 0							; Only useful for debugging purposes
 ListLines Off							; Only useful for debugging purposes
-Process, Priority, , A						; Recommended to set a higher priority to improve speed
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
 SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
 SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
 SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
 SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
@@ -152,12 +152,12 @@ GUIClose:
 	Gui, Margin, 16, 16
 	Gui, Color, 1d1f21, 282a2e
 	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
-	Gui, Font, s24 cf0c674, Segoe UI																			; choses font size and color
+	Gui, Font, s48 cf0c674, Rage Italic																		; choses font size and color
 	GUI, Add, Text,, DashMail																					; names GUI
 	;GUI, Add, Edit, vedit, Your Text to send should be entered here
 	Gui, Font, s11 cf0c674, Segoe UI																			; launches GUI
 	GUI, Add, Text,, Enter time interval (min)																	; determines the interval 	-> user input
-	GUI, Add, Edit, x+45 +number w33 vtime, 5																	; creates time variable
+	GUI, Add, Edit, x+45 +number w33 vtime, 15																	; creates time variable
 	GUI, Add, Checkbox, checked xm vsend, Send with OK															; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer
 	;Gui, Font, s10, Segoe UI																					
 	GUI, Add, Button, default gButtonOK x+10, OK																; Button OK control 		
@@ -183,13 +183,13 @@ GUIClose:
 ;	Variables
 ;---------------------------------------------------------------------------
 /*
-CSVName			- Desired name of file to be saved and used as email subject - DO NOT include date/time or .csv
-CSVNameTime		- Desired name of file to be saved + date/time stamped
-FilePath		- Source file to be converted to CSV
-FileDest		- Destination of converted CSV file
-CSVFILENAME		- FileDest & CSVNameTime - new file full path
-EmailTo			- Desired email recipients in the To line
-EmailCC			- Desired email recipients in the CC line
+CSVName				- Desired name of file to be saved and used as email subject - DO NOT include date/time or .csv
+CSVNameTime			- Desired name of file to be saved + date/time stamped
+FilePath			- Source file to be converted to CSV
+FileDest			- Destination of converted CSV file
+CSVFILENAME			- FileDest & CSVNameTime - new file full path
+EmailTo				- Desired email recipients in the To line
+EmailCC				- Desired email recipients in the CC line
 TodayDateSubject	- Date formatted for subject line
 TodayDateBody		- Date formatted for email body
 TodayDateFile		- Date formatted for file saving 
