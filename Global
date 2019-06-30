@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Global
+;	Global	v1.04
 ;====================================================================================================
 /*
 -------------------------
@@ -7,8 +7,8 @@
 -------------------------		
 1.	Systems
 2.	Key Mapping
-3.		
-4.
+3.	File Explorer	
+4.	Adv Win Snap
 5.
 -------------------------
 |		  END			|
@@ -18,40 +18,41 @@
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
 
 ;====================================================================================================
-;	Universal
+;	Universal	
 ;====================================================================================================
 
-~^+Esc::
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
-	
-~^!#+r::
+
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -256,10 +257,144 @@ Explorer_GetSelection(hwnd="") {
 ;--------------------------------------------------
 ;	
 ;--------------------------------------------------
-
-
-
 #IfWinActive
+
+;====================================================================================================
+;	Advanced Window Snap
+;====================================================================================================
+/**
+ * Advanced Window Snap
+ * Snaps the Active Window to one of nine different window positions.
+ *
+ * @author Andrew Moore <andrew+github@awmoore.com>
+ * @version 1.0
+ */
+
+/**
+ * SnapActiveWindow resizes and moves (snaps) the active window to a given position.
+ * @param {string} winPlaceVertical   The vertical placement of the active window.
+ *                                    Expecting "bottom" or "middle", otherwise assumes
+ *                                    "top" placement.
+ * @param {string} winPlaceHorizontal The horizontal placement of the active window.
+ *                                    Expecting "left" or "right", otherwise assumes
+ *                                    window should span the "full" width of the monitor.
+ * @param {string} winSizeHeight      The height of the active window in relation to
+ *                                    the active monitor's height. Expecting "half" size,
+ *                                    otherwise will resize window to a "third".
+ */
+;---------------------------------------------------------------------------
+;	Sizing
+;---------------------------------------------------------------------------
+
+SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
+    WinGet activeWin, ID, A
+    activeMon := GetMonitorIndexFromWindow(activeWin)
+
+    SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
+
+    if (winSizeHeight == "half") {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
+    } else {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
+    }
+
+    if (winPlaceHorizontal == "left") {
+        posX  := MonitorWorkAreaLeft
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else if (winPlaceHorizontal == "right") {
+        posX  := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else {
+        posX  := MonitorWorkAreaLeft
+        width := MonitorWorkAreaRight - MonitorWorkAreaLeft
+    }
+
+    if (winPlaceVertical == "bottom") {
+        posY := MonitorWorkAreaBottom - height
+    } else if (winPlaceVertical == "middle") {
+        posY := MonitorWorkAreaTop + height
+    } else {
+        posY := MonitorWorkAreaTop
+    }
+
+    WinMove,A,,%posX%,%posY%,%width%,%height%
+}
+
+;---------------------------------------------------------------------------
+;	Positioning
+;---------------------------------------------------------------------------
+
+/**
+ * GetMonitorIndexFromWindow retrieves the HWND (unique ID) of a given window.
+ * @param {Uint} windowHandle
+ * @author shinywong
+ * @link http://www.autohotkey.com/board/topic/69464-how-to-determine-a-window-is-in-which-monitor/?p=440355
+ */
+GetMonitorIndexFromWindow(windowHandle) {
+    ; Starts with 1.
+    monitorIndex := 1
+
+    VarSetCapacity(monitorInfo, 40)
+    NumPut(40, monitorInfo)
+
+    if (monitorHandle := DllCall("MonitorFromWindow", "uint", windowHandle, "uint", 0x2))
+        && DllCall("GetMonitorInfo", "uint", monitorHandle, "uint", &monitorInfo) {
+        monitorLeft   := NumGet(monitorInfo,  4, "Int")
+        monitorTop    := NumGet(monitorInfo,  8, "Int")
+        monitorRight  := NumGet(monitorInfo, 12, "Int")
+        monitorBottom := NumGet(monitorInfo, 16, "Int")
+        workLeft      := NumGet(monitorInfo, 20, "Int")
+        workTop       := NumGet(monitorInfo, 24, "Int")
+        workRight     := NumGet(monitorInfo, 28, "Int")○
+        workBottom    := NumGet(monitorInfo, 32, "Int")
+        isPrimary     := NumGet(monitorInfo, 36, "Int") & 1
+
+        SysGet, monitorCount, MonitorCount
+
+        Loop, %monitorCount% {
+            SysGet, tempMon, Monitor, %A_Index%
+
+            ; Compare location to determine the monitor index.
+            if ((monitorLeft = tempMonLeft) and (monitorTop = tempMonTop)
+                and (monitorRight = tempMonRight) and (monitorBottom = tempMonBottom)) {
+                monitorIndex := A_Index
+                break
+            }
+        }
+    }
+
+    return %monitorIndex%
+}
+
+;---------------------------------------------------------------------------
+;	Hotkeys
+;---------------------------------------------------------------------------
+
+; Directional Arrow Hotkeys
+#!Up::SnapActiveWindow("top","full","half")
+#!Down::SnapActiveWindow("bottom","full","half")
+^#!Up::SnapActiveWindow("top","full","third")
+^#!Down::SnapActiveWindow("bottom","full","third")
+
+; Numberpad Hotkeys (Landscape)
+#!Numpad7::SnapActiveWindow("top","left","half")
+#!Numpad8::SnapActiveWindow("top","full","half")
+#!Numpad9::SnapActiveWindow("top","right","half")
+#!Numpad1::SnapActiveWindow("bottom","left","half")
+#!Numpad2::SnapActiveWindow("bottom","full","half")
+#!Numpad3::SnapActiveWindow("bottom","right","half")
+
+; Numberpad Hotkeys (Portrait)
+^#!Numpad8::SnapActiveWindow("top","full","third")
+^#!Numpad5::SnapActiveWindow("middle","full","third")
+^#!Numpad2::SnapActiveWindow("bottom","full","third")
+
+;====================================================================================================
+;	END
+;====================================================================================================
+
+
+
 
 ;====================================================================================================
 ;	Archive
