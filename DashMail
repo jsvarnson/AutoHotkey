@@ -1,65 +1,83 @@
 ;====================================================================================================
-;	DashMail	v1.02
+;	DashMail	v2.03
 ;====================================================================================================
-/*☻
+/*
 -------------------------
-|	Main Directory		|
+|	Main Directory	|
 -------------------------
 1.	Settings
 2.	Universal
-3.	Main
-	i. 		Cesar's Dashboard
-	ii..	Sample 2
-	iii.	Sample 3
-	
+3.	GUI
 4.	Subroutines
-	i. 		Cesar's Dashboard
-	ii..	Sample 2
-	iii.	Sample 3
-	
 5.	Archive
 -------------------------
-|		  END			|
+|	END		|
 -------------------------
 */
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force						; Recommended for all scripts to prevent old instances
+#NoEnv								; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000					; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000					; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A						; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0						; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+
+gui_autoexecute:
+    ; Tomorrow Night Color Definitions:
+    cBackground := "c" . "1d1f21"
+    cCurrentLine := "c" . "282a2e"
+    cSelection := "c" . "373b41"
+    cForeground := "c" . "c5c8c6"
+    cComment := "c" . "969896"
+    cRed := "c" . "cc6666"
+    cOrange := "c" . "de935f"
+    cYellow := "c" . "f0c674"
+    cGreen := "c" . "b5bd68"
+    cAqua := "c" . "8abeb7"
+    cBlue := "c" . "81a2be"
+    cPurple := "c" . "b294bb"
+
+    gui_control_options := "xm w220 " . cForeground . " -E0x200"
+    ; -E0x200 removes border around Edit controls
+
+    ; Initialize variable to keep track of the state of the GUI
+    gui_state = closed
+
+    ; Initialize search_urls as a variable set to zero
+    search_urls := 0
+    return
 
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
 
-~^+Esc::
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
 
-~^!#+r::
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -71,37 +89,111 @@ SendMode Input							;Recommended to set sendinput as the default send method
 	return
 
 ;====================================================================================================
-;	Main
+;	GUI
 ;====================================================================================================
 
-;---------------------------------------------------------------------------
-;	Cesar's Dashboard
-;---------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; GUI Functions and Subroutines
+;-------------------------------------------------------------------------------
+ 
+;--------------------------------------------------
+;	GUI Escape
+;--------------------------------------------------
+
+GuiEscape:																										; Automatically triggered on Escape key:
+    gui_destroy()
+    return
 
 ;--------------------------------------------------
-;	Send @ Interval - Cesar's Dashboard
+;	GUI Destroy + Toggle
 ;--------------------------------------------------
 
-^+j::																											; launches GUI
-	GUI, Add, Text,, DashMail Summary																			; names GUI
+#WinActivateForce																								; Destroy the GUI after use.
+gui_destroy() {
+    global gui_state
+    global gui_search_title
+
+    gui_state = closed
+    ; Forget search title variable so the next search does not re-use it
+    ; in case the next search does not set its own:
+    gui_search_title =
+
+
+    ; Hide GUI
+    Gui, Destroy
+
+    ; Bring focus back to another window found on the desktop
+    WinActivate
+}
+	return
+
+;--------------------------------------------------
+;	GUI Close
+;--------------------------------------------------
+
+GUIClose:
+	Pause, on
+	Reload
+	return
+
+;--------------------------------------------------
+;	Send @ Interval 
+;--------------------------------------------------
+
+^!#+j::
+	gui_spawn:
+    if gui_state != closed
+    {
+        ; If the GUI is already open, close it.
+        gui_destroy()
+        return
+    }
+    gui_state = main
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s24 cf0c674, Segoe UI																			; choses font size and color
+	GUI, Add, Text,, DashMail																					; names GUI
 	;GUI, Add, Edit, vedit, Your Text to send should be entered here
-	GUI, Add, Text,, Enter time inverval (in minutes)															; determines the interval 	-> user input
-	GUI, Add, Edit, x+10 +number w33 vtime, 5																	; creates time variable
+	Gui, Font, s11 cf0c674, Segoe UI																			; launches GUI
+	GUI, Add, Text,, Enter time interval (min)																	; determines the interval 	-> user input
+	GUI, Add, Edit, x+45 +number w33 vtime, 5																	; creates time variable
 	GUI, Add, Checkbox, checked xm vsend, Send with OK															; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer
-	GUI, Add, Button, x+10, OK																					; Button OK control 		-> using default/hitting enter DOES NOT activate interval timer
-	GUI, Add, Button, x+40, Cancel																				; Button Cancel control
+	;Gui, Font, s10, Segoe UI																					
+	GUI, Add, Button, default gButtonOK x+10, OK																; Button OK control 		
+	GUI, Add, Button, x+20, Cancel																				; Button Cancel control
 	GUI, Show																									; displays GUI
 	return
 	
 ;--------------------------------------------------
-;	Send Once Now - Cesar's Dashboard
+;	Send Once Now
 ;--------------------------------------------------	
 	
-^+k::
+^!#+k::
+	gosub, ChooseNameFileRec																					; chooses file name, file path, and email recipients
 	gosub, Dash_mail_send																						; activates the action subroutine
 	gosub, SendMsg																								; activates the msgbox subroutine
 	return	
-	
+
+;====================================================================================================
+;	Subroutines
+;====================================================================================================
+
+;---------------------------------------------------------------------------
+;	Variables
+;---------------------------------------------------------------------------
+/*
+CSVName			- Desired name of file to be saved and used as email subject - DO NOT include date/time or .csv
+CSVNameTime		- Desired name of file to be saved + date/time stamped
+FilePath		- Source file to be converted to CSV
+FileDest		- Destination of converted CSV file
+CSVFILENAME		- FileDest & CSVNameTime - new file full path
+EmailTo			- Desired email recipients in the To line
+EmailCC			- Desired email recipients in the CC line
+TodayDateSubject	- Date formatted for subject line
+TodayDateBody		- Date formatted for email body
+TodayDateFile		- Date formatted for file saving 
+*/
 ;--------------------------------------------------
 ;	Button - OK
 ;--------------------------------------------------	
@@ -109,34 +201,21 @@ SendMode Input							;Recommended to set sendinput as the default send method
 ButtonOK:
 	GUI, Submit
 		if send
+		gosub, ChooseNameFileRec																				; chooses file name, file path, and email recipients
 		gosub, 	Dash_mail_send																					; activates the action subroutine
-	SetTimer, period, % time * 1000 * 60																		; creates an interval timer
-	return	
-
+	SetTimer, period, % time * 1000 * 60	; * 60 * 24	* 7														; creates an interval timer in minutes	; in hours	; in days	; in weeks
+	return																										; remember to update GUI label from (min) if you change periodicity
+	
 ;--------------------------------------------------
 ;	Button - Cancel
 ;--------------------------------------------------	
 
 ButtonCancel:
 	GUI, Hide
+	Pause, on
+	Reload
 	return
 	
-;====================================================================================================
-;	Subroutines
-;====================================================================================================
-
-;---------------------------------------------------------------------------
-;	Success Message Subroutine
-;---------------------------------------------------------------------------
-
-SendMsg:
-	msgbox, 0, File Sent, File has been sent successfully. , 1													; sends message upon subroutine completion
-	return
-
-;---------------------------------------------------------------------------
-;	Cesar's Dashboard Subroutines
-;---------------------------------------------------------------------------
-
 ;--------------------------------------------------
 ;	Interval Trigger
 ;--------------------------------------------------
@@ -144,47 +223,87 @@ SendMsg:
 Period:																											; create new gosubs for each different file you want to send out
 	Gosub, Dash_mail_send																						; function triggered by the interval above, triggering action subroutine
 	return
+	
+;--------------------------------------------------
+;	Sent
+;--------------------------------------------------
+
+SendMsg:
+	msgbox, 0, File Sent, File has been sent successfully. , 1													; sends message upon subroutine completion
+	return
 
 ;--------------------------------------------------
-;	Archive CSV w/ Timestamp
-;--------------------------------------------------		
-/*	
-Dash_mail_archive:
-	subroutine that does that takes the same file, converts to csv, and saves with timestamp to location
-*/
+;	Select Name, File, and Recipients
+;--------------------------------------------------
+
+ChooseNameFileRec:
+	SetTimer, ChooseFileName, 10
+	InputBox, CSVName, Save As CSV,,, 300, 100, center, center,,, 	;.csv										; Show the InputBox to choose a name for the file	- DO NOT INCLUDE a time on this name
+	FileSelectFile, FilePath																					; Select file to be saved as CSV
+	FileSelectFolder, FileDest, ;"C:\Users\FM36\Desktop\DashMail\DashMail Archive\"								; Select where output file will be saved
+	InputBox, EmailTo, Email To,,, 300, 100, center, center,,, joseph.arnson@MillerCoors.com					; Show the InputBox to choose recipients for email
+	InputBox, EmailCC, Email CC To,,, 300, 100, center, center,,, joseph.arnson@MillerCoors.com					; Show the InputBox to choose CC recipients for email
+	if 	CSVName = .csv																							; checks if any name was selected for new file
+	{
+	msgbox, No name selected
+	Pause, on
+	Reload
+	}
+	else if	CSVName = 																							; checks if any name was selected for new file
+	{
+	msgbox, No name selected
+	Pause, on
+	Reload
+	}
+	else if FilePath = 																							; checks if a file was selected to be converted
+	{
+	msgbox, No file selected
+	Pause, on
+	Reload
+	}
+	else if FileDest = 																							; checks if a destination was selected for the file
+	{
+	msgbox, No file destination selected
+	Pause, on
+	Reload	
+	}
+	return
+	
+ChooseFileName:
+	IfWinNotActive, Save As CSV
+		return
+	Send, {HOME}																								; moves cursor to beginning of InputBox window		
+	SetTimer, ChooseFileName, Off
+	return	
 
 ;--------------------------------------------------
 ;	Sends email of CSV
 ;--------------------------------------------------
 
 Dash_mail_send:
+	TodayDateSubject 	:= A_YYYY . "-" . A_MM . "-" . A_DD . " at " . A_Hour . ":" . A_Min						; stores subject line date formatting
+	TodayDateBody 		:= A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min	; stores email body date formatting
+	TodayDateFile	 	:= A_YYYY . "-" . A_MM . "-" . A_DD . "_" . A_Hour . "-" . A_Min						; stores subject line date formatting	
 	xlCSV = 6
-	CSVFILENAME := "Cesars Dashboard.csv"																		; name file to be saved
-	;FileSelectFile, FilePath
+	CSVNameTime = %CSVName%_%TodayDateFile%.csv																	; takes original name and adds a time stamp +.csv every time the subroutine runs
+	CSVFILENAME = %FileDest%\%CSVNameTime%																		; name file to be saved
 	oExcel := ComObjCreate("Excel.Application") 																; Creates excel object
-	oExcel.Workbooks.Open("C:\Users\FM36\Desktop\export.XLSX")			; sample, please change					; Opens the selected existing file
+	oExcel.Workbooks.Open(FilePath)																				; Opens the selected existing file
 	oExcel.Visible := False																						; set to false if you don't need excel to be seen
 	oExcel.DisplayAlerts := False																				; this is Set to False to suppress prompts and alert messages 
-	oExcel.ActiveWorkbook.SaveAs("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv", xlCSV)					; saves file as CSV with chosen name
-	;oExcel.ActiveWorkbook.SaveAs("C:\Users\FM36\Desktop\DashMail\DashMail Archive\Cesars Dashboard",%TodayDateFile%, xlCSV)	; saves file as CSV with chosen name with time stamp to create archive
+	oExcel.ActiveWorkbook.SaveAs(CSVFILENAME, xlCSV)															; saves file as CSV with chosen name	;don't include file type extension
 	oExcel.Quit()																								; closes the excel object
 	;exitapp	
-	
-	;FormatTime, CurrentDateTime,, MMDDYYYY h:mm 	;tt  														; format date as such 06-26-2019 9:32
 	
 	olMailItem := 0	
 	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
 	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
 	MailItem.BodyFormat := 2 																					; olFormatHTML	
-	MailItem.TO :="joseph.arnson@MillerCoors.com;"																; Add recipients 	-> use ; between email names inside the outer quotes
-	;MailItem.CC :="joseph.arnson@MillerCoors.com"																; Add recipients to the CC line
+	MailItem.TO := EmailTo																						; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := EmailCC																						; Add recipients to the CC line
 	;~ MailItem.Replyto :="joejunkemail@yahoo.com"																; create a reply email
 	
-	TodayDateSubject 	:= A_YYYY . "-" . A_MM . "-" . A_DD . " at " . A_Hour . ":" . A_Min						; stores subject line date formatting
-	TodayDateBody 		:= A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min	; stores email body date formatting
-	TodayDateFile	 	:= A_YYYY . "-" . A_MM . "-" . A_DD . "  " . A_Hour . ":" . A_Min						; stores subject line date formatting	
-
-	MailItem.Subject 	:= "Cesar's Dashboard " TodayDateSubject												; Subject line of email
+	MailItem.Subject 	:= CSVName " " TodayDateSubject															; Subject line of email
 ;																												; create body of email
 ;																												; <H2 style='BACKGROUND-COLOR: red'><br></H2>       ; Added as first line under MailItem.HTMLBody :=
 	MailItem.HTMLBody := "																							
@@ -196,25 +315,12 @@ Dash_mail_send:
 	<br>Milwaukee, WI
 	<br>414-931-2347
 	</HTML>"
-
-	MailItem.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")
-
+	MailItem.Attachments.Add(CSVFILENAME)	;should be same as name of file to be saved
 	;~ MailItem.Display 																						; Make email visible
 	;~ mailItem.Close(0) 																						; Creates draft version in default folder
 	MailItem.Send() 																							; Sends the email																							; activates the msgbox subroutine
 	Return
 
-;--------------------------------------------------
-;	GUI Controls
-;--------------------------------------------------
-
-^+m::
-	GUI, Show
-	return
-
-GUIClose:
-	Exitapp
-	
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
@@ -223,59 +329,3 @@ GUIClose:
 ;====================================================================================================
 ;	Archive
 ;====================================================================================================
-
-/*
-	;Myself = %AUMailAdress%
-	Recipient := "joseph.arnson@MillerCoors.com"
-	Subject := "Cesars Dashboard %CurrentDateTime%"
-	Body := "Please find Cesars Dashboard attached as of %CurrentDateTime%"
-	Recipient5 = "jsvarnson@gmail.com"
-
-	DocumentLocation = C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv
-
-	olMailItem := 0
-	MailItem := ComObjCreate("Outlook.Application").CreateItem(olMailItem)
-	olFormatHTML := 2
-	MailItem.BodyFormat := olFormatHTML
-	MailItem.Subject := Subject
-	MailItem.HTMLBody := Body
-	Recipient := MailItem.Recipients.Add(Recipient)
-	Recipient.Type := 1 
-	Loop, %DocumentLocation%	;\*.*
-	MailItem.Attachments.Add(A_LoopFileLongPath)
-	MailItem.cc := Recipient5
-	MailItem.Send()
-	return
-*/
-/*
-	olMailItem := ComObjCreate("Outlook.Application")
-	;olMailItem := ComObjActive("Outlook.Application")
-	;olMailItem := 0
-	olMailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)
-	olMailItem.To := "joseph.arnson@MillerCoors.com"																; choose recipients of email
-	olMailItem.Subject := "Cesars Dashboard %CurrentDateTime%"	;%CurrentDateTime%" 								; choose subject line of email
-	olMailItem.Body := "Please find Cesars Dashboard attached as of "												; choose main body of email
-	send, %CurrentDateTime%																							; Adds date time stamp to body of email
-	olMailItem.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv",1,1,"C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")	; attaches the predetermined file to the email
-	olMailItem.Display(true)																						; visually display the email
-	olMailItem.Send()																								; send the email
-	return
-*/
-
-
-	;oMailItem.BodyFormat := olFormatHTML
-	;oMailItem.HTMLBody := "<HTML><H2>The body of this message will appear in HTML.</H2><BODY> Please enter the message text here. </BODY></HTML>"
-	;oMailItem.Display
-	
-/*	
-	outlook := ComObjectactive("Outlook.Application")																; connects to outlook
-	email := Outlook.Application.CreateObject("Outlook.Application")												; creates new email
-	email.To := "joseph.arnson@MillerCoors.com"																		; choose recipients of email
-	email.Subject := "Cesars Dashboard %CurrentTime%"	;%CurrentDateTime%" 										; choose subject line of email
-	email.Body := "Please find Cesars Dashboard attached as of "													; choose main body of email
-	send, %CurrentDateTime%																							; Adds date time stamp to body of email
-	email.Attachments.Add("C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv",1,1,"C:\Users\FM36\Desktop\DashMail\Cesars Dashboard.csv")	; attaches the predetermined file to the email
-	email.Display(true)																								; visually display the email
-	email.Send()																									; send the email
-	return
-*/
