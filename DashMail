@@ -1,7 +1,12 @@
 ;====================================================================================================
-;	DashMail	v2.04
+;	DashMail	v3.01
 ;====================================================================================================
 /*☻
+	Version History
+1.01	- new file, send @ interval functionality
+2.01	- added send once, now functionality. drastically improved GUI interface and script organization
+3.01	- added	send later @ time functionality. Added second, unique, GUI. minor improvements to GUI interface
+
 -------------------------
 |	Main Directory		|
 -------------------------
@@ -92,9 +97,18 @@ gui_autoexecute:
 ;	GUI
 ;====================================================================================================
 
-;-------------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+;	Variables
+;---------------------------------------------------------------------------
+/*
+time				- interval time, in minutes
+time2				- trigger time, in military time HHMM, won't let you include a ":"
+Send				- checking OK on the interval GUI
+Send2				- checking OK on the trigger time GUI
+*/
+;---------------------------------------------------------------------------
 ; GUI Functions and Subroutines
-;-------------------------------------------------------------------------------
+;---------------------------------------------------------------------------
  
 ;--------------------------------------------------
 ;	GUI Escape
@@ -118,7 +132,6 @@ gui_destroy() {
     ; in case the next search does not set its own:
     gui_search_title =
 
-
     ; Hide GUI
     Gui, Destroy
 
@@ -135,6 +148,39 @@ GUIClose:
 	Pause, on
 	Reload
 	return
+	
+;--------------------------------------------------
+;	Button - OK
+;--------------------------------------------------	
+	
+ButtonOK:																										; send @ interval OK Button
+	GUI, Submit
+		if send
+		gosub, ChooseNameFileRec																				; chooses file name, file path, and email recipients
+		gosub, 	Dash_mail_send																					; activates the action subroutine
+	SetTimer, period, % time * 1000 * 60	; * 60 * 24	* 7														; creates an interval timer in minutes	; in hours	; in days	; in weeks
+	return																										; remember to update GUI label from (min) if you change periodicity
+	
+ButtonOK2:																										; send @ time OK Button
+	GUI, Submit
+		if send2
+		gosub, ChooseNameFileRec																				; chooses file name, file path, and email recipients
+		gosub, OuttaTime																						; calculates time until desired time, then executes subroutine
+	return																										
+	
+;--------------------------------------------------
+;	Button - Cancel
+;--------------------------------------------------	
+
+ButtonCancel:																									; pauses and reloads all existing threads for this script
+	GUI, Hide
+	Pause, on
+	Reload																										; will reset sequences for both the interval and the desired time routines
+	return
+	
+;---------------------------------------------------------------------------
+;	Activators
+;---------------------------------------------------------------------------	
 
 ;--------------------------------------------------
 ;	Send @ Interval 
@@ -152,17 +198,17 @@ GUIClose:
 	Gui, Margin, 16, 16
 	Gui, Color, 1d1f21, 282a2e
 	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
-	Gui, Font, s48 cf0c674, Rage Italic																		; choses font size and color
-	GUI, Add, Text,, DashMail																					; names GUI
-	;GUI, Add, Edit, vedit, Your Text to send should be entered here
+	Gui, Font, s48 cf0c674, Rage Italic																			; choses font size and color
+	GUI, Add, Text, x+10 y+10, DashMail																			
+	Gui, Font, s22 cf0c674, Rage Italic																			; choses font size and color
+	GUI, Add, Text, xm+14 y+1 , Send now...send later!
 	Gui, Font, s11 cf0c674, Segoe UI																			; launches GUI
-	GUI, Add, Text,, Enter time interval (min)																	; determines the interval 	-> user input
-	GUI, Add, Edit, x+45 +number w33 vtime, 15																	; creates time variable
-	GUI, Add, Checkbox, checked xm vsend, Send with OK															; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer
-	;Gui, Font, s10, Segoe UI																					
-	GUI, Add, Button, default gButtonOK x+10, OK																; Button OK control 		
-	GUI, Add, Button, x+20, Cancel																				; Button Cancel control
-	GUI, Show																									; displays GUI
+	GUI, Add, Text, xm+7, Enter time interval (min)																; determines the interval 	-> user input
+	GUI, Add, Edit, x+45 +number w60 vtime, 15																	; creates time variable
+	GUI, Add, Checkbox, checked xm+7 vsend, Send with OK														; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer																					
+	GUI, Add, Button, default gButtonOK x+10 w60, OK															; Button OK control 		
+	GUI, Add, Button, x+20 w60, Cancel																			; Button Cancel control
+	GUI, Show, w310 h250																						; displays GUI
 	return
 	
 ;--------------------------------------------------
@@ -174,7 +220,36 @@ GUIClose:
 	gosub, Dash_mail_send																						; activates the action subroutine
 	gosub, SendMsg																								; activates the msgbox subroutine
 	return	
-
+	
+;--------------------------------------------------
+;	Send Later @ time
+;--------------------------------------------------		
+	
+^!#+l::	
+	gui_spawn2:
+    if gui_state != closed
+    {
+        ; If the GUI is already open, close it.
+        gui_destroy()
+        return
+    }
+    gui_state = main
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s48 cf0c674, Rage Italic																			; choses font size and color
+	GUI, Add, Text, x+10 y+10, DashMail																			; header text
+	Gui, Font, s22 cf0c674, Rage Italic																			; choses font size and color
+	GUI, Add, Text, xm+7 y+1 , Request now...send later!														; subtitle text
+	Gui, Font, s11 cf0c674, Segoe UI																			; choses font size and color
+	GUI, Add, Text, xm, Enter desired send time (HHMM)															; determines the trigger time 	-> user input
+	GUI, Add, Edit, x+7 +number w55 vtime2, 0800																; creates time variable
+	GUI, Add, Checkbox, checked xm vsend2, Send with OK															; Adds checkbox to the GUI 																					
+	GUI, Add, Button, default gButtonOK2 x+36 w55, OK															; Button OK control 		
+	GUI, Add, Button, x+20 w55, Cancel																			; Button Cancel control
+	GUI, Show, w310 h250																						; displays GUI
+	return
+	
 ;====================================================================================================
 ;	Subroutines
 ;====================================================================================================
@@ -194,28 +269,10 @@ TodayDateSubject	- Date formatted for subject line
 TodayDateBody		- Date formatted for email body
 TodayDateFile		- Date formatted for file saving 
 */
-;--------------------------------------------------
-;	Button - OK
-;--------------------------------------------------	
-	
-ButtonOK:
-	GUI, Submit
-		if send
-		gosub, ChooseNameFileRec																				; chooses file name, file path, and email recipients
-		gosub, 	Dash_mail_send																					; activates the action subroutine
-	SetTimer, period, % time * 1000 * 60	; * 60 * 24	* 7														; creates an interval timer in minutes	; in hours	; in days	; in weeks
-	return																										; remember to update GUI label from (min) if you change periodicity
-	
-;--------------------------------------------------
-;	Button - Cancel
-;--------------------------------------------------	
+;---------------------------------------------------------------------------
+;	Main Routines
+;---------------------------------------------------------------------------
 
-ButtonCancel:
-	GUI, Hide
-	Pause, on
-	Reload
-	return
-	
 ;--------------------------------------------------
 ;	Interval Trigger
 ;--------------------------------------------------
@@ -225,12 +282,59 @@ Period:																											; create new gosubs for each different file yo
 	return
 	
 ;--------------------------------------------------
-;	Sent
+;	Sent Message
 ;--------------------------------------------------
 
 SendMsg:
 	msgbox, 0, File Sent, File has been sent successfully. , 1													; sends message upon subroutine completion
 	return
+	
+;--------------------------------------------------
+;	Check Time Trigger
+;--------------------------------------------------	
+
+OuttaTime:																										; calculates time until desired time, then executes secondary subroutine
+	;time2 := regexreplace(time2, "):", "")																		; used to replace the ":" in the time input	; removed ":" from input GUI
+	target_time = %time2%																						; 0145 ; 01:45 am	; use GUI to determine time
+	; Get target time in a format we can:
+	;  - compare (with "<"), and
+	;  - use to calculate "time delta" (with EnvSub.)
+	target = %A_YYYY%%A_MM%%A_DD%%target_time%00
+	; < comparison should be safe as long as both are in the *exact* same format.
+	if (target < A_Now)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, target, 1, d
+	}
+	; Calculate how many seconds until the target time is reached.
+	EnvSub, target, %A_Now%, Seconds
+	; Sleep until the target is reached.
+	Sleep, % target * 1000 ; (milliseconds)
+/*
+	FormatTime, now, %A_Now%
+	MsgBox, The time is now %now%	
+*/	
+	SetTimer, TargetTimeReached, % target * -1000 																; negative means run *once*
+	msgbox, Your email will be sent at %time2%																	; confirmation message with time the email will be sent
+	return
+	
+;--------------------------------------------------
+;	Time Reached Trigger
+;--------------------------------------------------	
+	
+TargetTimeReached:																								; once time is reached, main routine will execute
+	gosub, Dash_mail_send
+	return
+
+;--------------------------------------------------
+;	Moves Cursor at InputBox
+;--------------------------------------------------	
+	
+ChooseFileName:																									; moves cursor to beginning of InputBox window		
+	IfWinNotActive, Save As CSV
+		return
+	Send, {HOME}																								
+	SetTimer, ChooseFileName, Off
+	return	
 
 ;--------------------------------------------------
 ;	Select Name, File, and Recipients
@@ -269,13 +373,6 @@ ChooseNameFileRec:
 	}
 	return
 	
-ChooseFileName:
-	IfWinNotActive, Save As CSV
-		return
-	Send, {HOME}																								; moves cursor to beginning of InputBox window		
-	SetTimer, ChooseFileName, Off
-	return	
-
 ;--------------------------------------------------
 ;	Sends email of CSV
 ;--------------------------------------------------
@@ -309,7 +406,7 @@ Dash_mail_send:
 	MailItem.HTMLBody := "																							
 	<HTML>Please find your report updated as of "(TodayDateBody)" <br><br>
 	<span style='color:black'>As always, please let me know if you have any questions or concerns.
-	<br><br><a href='mailto:joseph.arnson@MillerCoors.com'>Joseph Arnson</a> 
+	<br><br>Cheers,<br><br><a href='mailto:joseph.arnson@MillerCoors.com'>Joseph Arnson</a> 
 	<br>Import Supply Chain Analyst
 	<br>MillerCoors
 	<br>Milwaukee, WI
@@ -318,7 +415,7 @@ Dash_mail_send:
 	MailItem.Attachments.Add(CSVFILENAME)	;should be same as name of file to be saved
 	;~ MailItem.Display 																						; Make email visible
 	;~ mailItem.Close(0) 																						; Creates draft version in default folder
-	MailItem.Send() 																							; Sends the email																							; activates the msgbox subroutine
+	MailItem.Send() 																							; Sends the email
 	Return
 
 ;====================================================================================================
