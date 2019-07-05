@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Stay Active	v1.04
+;	Stay Active	v1.05
 ;====================================================================================================
 /*
 
@@ -17,47 +17,48 @@ Currently set to two seconds mouse move
 2.	Return Sequence
 3.	MouseMove Subroutine
 -------------------------
-|	END		|
+|		  END			|
 -------------------------
 */
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
 
 ;====================================================================================================
-;	Universal
+;	Universal	
 ;====================================================================================================
 
-~^+Esc::
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
 
-~^!#+r::
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
-	return
-
-~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -75,15 +76,28 @@ SendMode Input							;Recommended to set sendinput as the default send method
 #IfWinActive, ahk_exe notepad.exe
 
 ;---------------------------------------------------------------------------
+;	Activators
+;---------------------------------------------------------------------------
+
+:*:stay_active::
+F2::	
+	gosub, stayactive
+	return
+	
+:*:im_back::
+F3::
+	gosub, imback
+	return	
+
+;---------------------------------------------------------------------------
 ;	Activate Sequence
 ;---------------------------------------------------------------------------
 
 toggle := 0
 
-:*:stay_active::
-	send, See ya later{!}
+stayactive:
+	msgbox,, Stay Active, See ya later!, 1
 	sleep, 1000
-	send, {backspace 13}
 		mousegetpos, mouseX, mouseY
 	if toggle := !toggle
 		gosub, MoveTheMouse
@@ -95,10 +109,9 @@ toggle := 0
 ;	Return Sequence
 ;---------------------------------------------------------------------------
 	
-:*:im_back::
-	send, Hey you're back{!}
+imback:
+	msgbox,, Stay Active, Hey you're back!, 1
 	sleep, 1000
-	send, {backspace 16}
 	reload, %A_ScriptFullPath%
 	return
 	
@@ -108,13 +121,14 @@ toggle := 0
 
 MoveTheMouse:
 	Mousemove, 200, 200
-	SetTimer, MoveTheMouse, -2000 ;every 2 seconds
+	SetTimer, MoveTheMouse, -3000 ;every 3 seconds
 	MouseMove, %MouseX%, %MouseY%
 	return
 
 ;====================================================================================================
 ;	END
 ;====================================================================================================
+
 
 
 
