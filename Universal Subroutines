@@ -2,8 +2,6 @@
 ;	Universal Subroutines v1.01
 ;====================================================================================================
 /*
-
-
 -------------------------
 |	Main Directory		|
 -------------------------
@@ -97,7 +95,7 @@ gui_autoexecute:
 
 ^!#+u::
 	if WinExist("Universal") 
-	{																		; check if the GUI is already open, then coses it
+	{																											; check if the GUI is already open, then coses it
 		Gui, Destroy
 	}	
 	else 
@@ -106,24 +104,42 @@ gui_autoexecute:
 		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
 		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
 		Gui, Font, s38 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10 y+10, Universal Subroutines														; sets the title of the GUI
+		GUI, Add, Text, x+15 y+10, Universal																	; sets the title of the GUI
 		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 gSub1, Sub1
-		GUI, Add, Button, w75 x+10 gSub2, Sub2
-		GUI, Add, Button, w75 x+10 gSub3, Sub3
-		GUI, Add, Button, w75 x+10 gSub4, Sub4
-		GUI, Add, Button, w75 x+10 gSub5, Sub5
+		GUI, Add, Button, w75 xs y+10 gSub1, Dates
+		GUI, Add, Button, w75 x+10 gSub2, WinS
+		GUI, Add, Button, w75 x+10 gSub3, Dash
+		GUI, Add, Button, w75 x+10 gSub4, BP Claim
+		GUI, Add, Button, w75 x+10 gSub5, Orders
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Emails
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
 		GUI, Add, Button, w75 xs y+10 gSub6, Sub6
 		GUI, Add, Button, w75 x+10 gSub7, Sub7
 		GUI, Add, Button, w75 x+10 gSub8, Sub8
 		GUI, Add, Button, w75 x+10 gSub9, Sub9
 		GUI, Add, Button, w75 x+10 gSub10, Sub10
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Files
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
 		GUI, Add, Button, w75 xs y+10 gSub11, Sub11
 		GUI, Add, Button, w75 x+10 gSub12, Sub12
 		GUI, Add, Button, w75 x+10 gSub13, Sub13
 		GUI, Add, Button, w75 x+10 gSub14, Sub14
 		GUI, Add, Button, w75 x+10 gSub15, Sub15
-		GUI, Show, x0 y0 w470 h275, Universal																	; displays GUI
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Reports
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub16, Sub16
+		GUI, Add, Button, w75 x+10 gSub17, Sub17
+		GUI, Add, Button, w75 x+10 gSub18, Sub18
+		GUI, Add, Button, w75 x+10 gSub19, Stay
+		GUI, Add, Button, w75 x+10 gSub20, Back
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, System
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, default w100 xs+315 y+15 gClose, Close
+		GUI, Show, x0 y0 w550 h320, Universal																	; displays and names GUI
 		}
 	return
 	
@@ -131,19 +147,23 @@ gui_autoexecute:
 ;	Subroutines
 ;====================================================================================================
 
+;---------------------------------------------------------------------------
+;	Email Buttons
+;---------------------------------------------------------------------------
+
 Sub1:
 	Gui, Destroy
-	msgbox, Subroutine here
+	msgbox, Date update email
 	return
 	
 Sub2:
 	Gui, Destroy
-	msgbox, Subroutine here
+	msgbox, Winshuttle update email
 	return
 	
 Sub3:
 	Gui, Destroy
-	msgbox, Subroutine here	
+	msgbox, DashMail trigger
 	return
 	
 Sub4:
@@ -155,6 +175,10 @@ Sub5:
 	Gui, Destroy
 	msgbox, Subroutine here
 	return
+	
+;---------------------------------------------------------------------------
+;	File Buttons
+;---------------------------------------------------------------------------	
 	
 Sub6:
 	Gui, Destroy
@@ -181,6 +205,10 @@ Sub10:
 	msgbox, Subroutine here
 	return	
 
+;---------------------------------------------------------------------------
+;	System Buttons
+;---------------------------------------------------------------------------
+
 Sub11:
 	Gui, Destroy
 	msgbox, Subroutine here
@@ -205,4 +233,45 @@ Sub15:
 	Gui, Destroy
 	msgbox, Subroutine here
 	return	
+	
+;---------------------------------------------------------------------------
+;	
+;---------------------------------------------------------------------------	
+
+Sub16:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub17:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub18:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub19:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub20:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return		
+	
+;---------------------------------------------------------------------------
+;	GUI Controls
+;---------------------------------------------------------------------------	
+	
+Close:
+	GUI, destroy
+	return	
+	
+;====================================================================================================
+;	END
+;====================================================================================================	
 	
