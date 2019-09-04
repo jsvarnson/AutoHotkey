@@ -1,0 +1,208 @@
+;====================================================================================================
+;	Universal Subroutines v1.01
+;====================================================================================================
+/*
+
+
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+4.	
+5.	
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+
+gui_autoexecute:
+    ; Tomorrow Night Color Definitions:
+    cBackground := "c" . "1d1f21"
+    cCurrentLine := "c" . "282a2e"
+    cSelection := "c" . "373b41"
+    cForeground := "c" . "c5c8c6"
+    cComment := "c" . "969896"
+    cRed := "c" . "cc6666"
+    cOrange := "c" . "de935f"
+    cYellow := "c" . "f0c674"
+    cGreen := "c" . "b5bd68"
+    cAqua := "c" . "8abeb7"
+    cBlue := "c" . "81a2be"
+    cPurple := "c" . "b294bb"
+
+    gui_control_options := "xm w220 " . cForeground . " -E0x200"
+    ; -E0x200 removes border around Edit controls
+
+    ; Initialize variable to keep track of the state of the GUI
+    gui_state = closed
+
+    ; Initialize search_urls as a variable set to zero
+    search_urls := 0
+    return
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+
+~^+Esc::								; Exits all active scripts
+	Exitapp
+	return
+
+~^Esc::									; Pauses all active scripts
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+r::								; Unpauses and reloads all active scripts
+	Suspend, off
+	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+	
+	
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+^!#+u::
+	if WinExist("Universal") 
+	{																		; check if the GUI is already open, then coses it
+		Gui, Destroy
+	}	
+	else 
+		{																										; check if the GUI isn't open, then opens it
+		Gui, Margin, 16, 16
+		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
+		Gui, Font, s38 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10 y+10, Universal Subroutines														; sets the title of the GUI
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 gSub1, Sub1
+		GUI, Add, Button, w75 x+10 gSub2, Sub2
+		GUI, Add, Button, w75 x+10 gSub3, Sub3
+		GUI, Add, Button, w75 x+10 gSub4, Sub4
+		GUI, Add, Button, w75 x+10 gSub5, Sub5
+		GUI, Add, Button, w75 xs y+10 gSub6, Sub6
+		GUI, Add, Button, w75 x+10 gSub7, Sub7
+		GUI, Add, Button, w75 x+10 gSub8, Sub8
+		GUI, Add, Button, w75 x+10 gSub9, Sub9
+		GUI, Add, Button, w75 x+10 gSub10, Sub10
+		GUI, Add, Button, w75 xs y+10 gSub11, Sub11
+		GUI, Add, Button, w75 x+10 gSub12, Sub12
+		GUI, Add, Button, w75 x+10 gSub13, Sub13
+		GUI, Add, Button, w75 x+10 gSub14, Sub14
+		GUI, Add, Button, w75 x+10 gSub15, Sub15
+		GUI, Show, x0 y0 w470 h275, Universal																	; displays GUI
+		}
+	return
+	
+;====================================================================================================
+;	Subroutines
+;====================================================================================================
+
+Sub1:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub2:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub3:
+	Gui, Destroy
+	msgbox, Subroutine here	
+	return
+	
+Sub4:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub5:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub6:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub7:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub8:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub9:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub10:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return	
+
+Sub11:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub12:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub13:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub14:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return
+	
+Sub15:
+	Gui, Destroy
+	msgbox, Subroutine here
+	return	
+	
