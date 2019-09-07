@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v1.03
+;	Universal Subroutines v1.06
 ;====================================================================================================
 /*
 -------------------------
@@ -33,31 +33,6 @@ SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
 
-gui_autoexecute:
-    ; Tomorrow Night Color Definitions:
-    cBackground := "c" . "1d1f21"
-    cCurrentLine := "c" . "282a2e"
-    cSelection := "c" . "373b41"
-    cForeground := "c" . "c5c8c6"
-    cComment := "c" . "969896"
-    cRed := "c" . "cc6666"
-    cOrange := "c" . "de935f"
-    cYellow := "c" . "f0c674"
-    cGreen := "c" . "b5bd68"
-    cAqua := "c" . "8abeb7"
-    cBlue := "c" . "81a2be"
-    cPurple := "c" . "b294bb"
-
-    gui_control_options := "xm w220 " . cForeground . " -E0x200"
-    ; -E0x200 removes border around Edit controls
-
-    ; Initialize variable to keep track of the state of the GUI
-    gui_state = closed
-
-    ; Initialize search_urls as a variable set to zero
-    search_urls := 0
-    return
-
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
@@ -87,11 +62,14 @@ gui_autoexecute:
 			Reload
 		}
 	return
-	
-	
+
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
+
+~Esc::
+	Gui, Destroy
+	return	
 
 ^!#+u::
 	if WinExist("Universal") 
@@ -109,7 +87,7 @@ gui_autoexecute:
 		GUI, Add, Button, w75 xs y+10 gSub1, Dates
 		GUI, Add, Button, w75 x+10 gSub2, WinS
 		GUI, Add, Button, w75 x+10 gSub3, Dash
-		GUI, Add, Button, w75 x+10 gSub4, BP Claim
+		GUI, Add, Button, w75 x+10 gSub4, Directs
 		GUI, Add, Button, w75 x+10 gSub5, Orders
 		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
 		GUI, Add, Text, x+10, Emails
@@ -122,13 +100,13 @@ gui_autoexecute:
 		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
 		GUI, Add, Text, x+10, Files
 		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub11, Sub11
-		GUI, Add, Button, w75 x+10 gSub12, Sub12
-		GUI, Add, Button, w75 x+10 gSub13, Sub13
-		GUI, Add, Button, w75 x+10 gSub14, Sub14
+		GUI, Add, Button, w75 xs y+10 gSub11, Dists
+		GUI, Add, Button, w75 x+10 gSub12, Plants
+		GUI, Add, Button, w75 x+10 gSub13, SKUs
+		GUI, Add, Button, w75 x+10 gSub14, Lanes
 		GUI, Add, Button, w75 x+10 gSub15, Sub15
 		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Reports
+		GUI, Add, Text, x+10, Tables
 		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
 		GUI, Add, Button, w75 xs y+10 gSub16, Sub16
 		GUI, Add, Button, w75 x+10 gSub17, Sub17
@@ -138,7 +116,7 @@ gui_autoexecute:
 		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
 		GUI, Add, Text, x+10, System
 		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, default w100 xs+315 y+15 gClose, Close
+		;GUI, Add, Button, default w100 xs+315 y+15 gClose, Close
 		GUI, Show, x0 y0 w550 h320, Universal																	; displays and names GUI
 		}
 	return
@@ -148,12 +126,51 @@ gui_autoexecute:
 ;====================================================================================================
 
 ;---------------------------------------------------------------------------
+;	Subroutine Code
+;---------------------------------------------------------------------------
+
+; Include Stay Active
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Search Genie\GUI\Stay Active.ahk		; change filepath if file is moved back to single modules
+
+; Include DashMail
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
+
+; Include Excel Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Excel Automation.ahk
+
+; Include Global
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Global.ahk
+
+; Include Notepad++
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
+
+; Include Outlook Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Outlook Automation.ahk
+
+; Include Reference Tables
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Reference Tables.ahk
+
+;---------------------------------------------------------------------------
 ;	Email Buttons
 ;---------------------------------------------------------------------------
 
 Sub1:
 	Gui, Destroy
-	msgbox, Date update email
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, date_change_email1
+		gosub, date_change_email2
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000
+		gosub, date_change_email1
+		gosub, date_change_email2
+		gosub, email_signature
+		}
 	return
 	
 Sub2:
@@ -163,12 +180,68 @@ Sub2:
 	
 Sub3:
 	Gui, Destroy
-	msgbox, DashMail trigger
+	gosub, dashmail_activator
 	return
 	
 Sub4:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, orders_timeline
+		gosub, mbd_directs_email
+		gosub, mbd_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, goldcoast_directs_email
+		gosub, goldcoast_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, bonanza_directs_email
+		gosub, bonanza_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, vsuarez_directs_email
+		gosub, vsuarez_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, carisam_directs_email
+		gosub, carisam_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, sto_orders_email
+		gosub, sto_orders_email2
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000	
+		gosub, orders_timeline
+		gosub, mbd_directs_email
+		gosub, mbd_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, goldcoast_directs_email
+		gosub, goldcoast_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, bonanza_directs_email
+		gosub, bonanza_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, vsuarez_directs_email
+		gosub, vsuarez_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, carisam_directs_email
+		gosub, carisam_directs_email2
+		gosub, email_signature
+		sleep, 1000
+		gosub, sto_orders_email
+		gosub, sto_orders_email2
+		gosub, email_signature
+		}
 	return
 	
 Sub5:
@@ -206,27 +279,27 @@ Sub10:
 	return	
 
 ;---------------------------------------------------------------------------
-;	System Buttons
+;	Reports Buttons
 ;---------------------------------------------------------------------------
 
 Sub11:
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, ref_table_distributors
 	return
 	
 Sub12:
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, ref_table_plants
 	return
 	
 Sub13:
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, ref_table_SKUs
 	return
 	
 Sub14:
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, ref_table_lanes
 	return
 	
 Sub15:
@@ -235,7 +308,7 @@ Sub15:
 	return	
 	
 ;---------------------------------------------------------------------------
-;	
+;	System Buttons
 ;---------------------------------------------------------------------------	
 
 Sub16:
@@ -270,64 +343,58 @@ Sub20:
 Close:
 	GUI, destroy
 	return	
-	
-	
-	
+
 ;====================================================================================================
 ;	Subroutines
 ;====================================================================================================	
-	
-;---------------------------------------------------------------------------
-;	Stay Active
-;---------------------------------------------------------------------------
 
-;--------------------------------------------------
-;	Activate Sequence
-;--------------------------------------------------
 
-toggle := 0
-
-stayactive:
-	msgbox,, Stay Active, See ya later!, 1
-	sleep, 1000
-		mousegetpos, mouseX, mouseY
-	if toggle := !toggle
-		gosub, MoveTheMouse
-	else
-		setTimer, MoveTheMouse, off
-	return
-	
-;--------------------------------------------------
-;	Return Sequence
-;--------------------------------------------------
-
-imback:
-	msgbox,, Stay Active, Hey you're back!, 1
-	sleep, 1000
-	setTimer,MoveTheMouse,Off	
-	return
-	
-;--------------------------------------------------
-;	MouseMove Subroutine
-;--------------------------------------------------
-
-MoveTheMouse:
-	Mousemove, 200, 200
-	SetTimer, MoveTheMouse, -5000 ;every 5 seconds
-	MouseMove, %MouseX%, %MouseY%
-	return
-	
-;---------------------------------------------------------------------------
-;	
-;---------------------------------------------------------------------------	
-	
-;--------------------------------------------------
-;	
-;--------------------------------------------------	
-	
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
