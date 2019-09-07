@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Outlook Automation	v1.04
+;	Outlook Automation	v3.01
 ;====================================================================================================
 /*
 -------------------------
@@ -15,40 +15,41 @@
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
 
 ;====================================================================================================
-;	Universal
+;	Universal	
 ;====================================================================================================
-
-~^+Esc::
+/*
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
 
-~^!#+r::
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
-	return
-
-~^s::	
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -58,7 +59,7 @@ SendMode Input							;Recommended to set sendinput as the default send method
 			Reload
 		}
 	return
-
+*/
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
@@ -116,17 +117,44 @@ F5::
 F6::
 	send, ^{enter}
 	return
-	
-;---------------------------------------------------------------------------
-;	Key Remapping
-;---------------------------------------------------------------------------	
-	
-	
+
+;====================================================================================================
+;	Template Emails
+;====================================================================================================
+
 ;--------------------------------------------------
-;	Date Change Email
+;	Signature Subroutine
 ;--------------------------------------------------	
 	
+email_signature:
+	send, {alt down}
+	send, {h}
+	sleep, 3
+	send, {a}
+	sleep, 3
+	send, {s}
+	send, {alt up}
+	send, {enter}	
+	return
+
+;--------------------------------------------------
+;	Bold and Highlight Subroutine
+;--------------------------------------------------
+
+email_bold_highlight:																							; cursor start anywhere - highlights complete line
+	send, {end}																									; move cursor to end
+	send, {shift down}{home}{shift up}																			; highlight whole line
+	send, {ctrl down}{b}{ctrl up}																				; bold
+	send, {alt down}{h}{i}{alt up}																						; outlook shortcut to highlight
+	send, {enter}																								; select yellow highlighting		
+	return
+
+;---------------------------------------------------------------------------
+;	Date Change email - old
+;---------------------------------------------------------------------------
+
 :*:datechange::
+date_change:
 	send,
 	(	
 Hello everyone,
@@ -135,7 +163,7 @@ I have processed the below date changes for all inbound import shipments.
 
 
 
-Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
+Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, expected arrival dates, actual arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
 
 Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
 
@@ -147,19 +175,376 @@ send, {down 4}
 sleep, 3
 send, ^v
 return
+
+;---------------------------------------------------------------------------
+;	Date Change Email - ComObj
+;---------------------------------------------------------------------------
+	
+;--------------------------------------------------
+;	Create email
+;--------------------------------------------------
+
+date_change_email1:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := "Amanda.Champion@millercoors.com`;"															; Add recipients to the CC line
+	;~ MailItem.Replyto :="joejunkemail@yahoo.com"																; create a reply email
+	
+	;~ MailItem.Subject := DateChangeSubject																	; Subject line of email
+;																												; create body of email
+;																												; <H2 style='BACKGROUND-COLOR: red'><br></H2>       ; Added as first line under MailItem.HTMLBody :=
+	MailItem.HTMLBody := "																					
+		<HTML>Hello everyone,
+		<br><br><span style='color:black'>I have processed the below date changes for all inbound import shipments.
+		<br><br><br><br>Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, expected arrival dates, actual arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
+		<br><br>Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+		<br><br>Cheers,
+		</HTML>"		
+		;~ <a href='mailto:joseph.arnson@MillerCoors.com'>Joseph Arnson</a> 									; html signature
+		;~ <br>Import Supply Chain Analyst																		; html signature	
+		;~ <br>MillerCoors																						; html signature
+		;~ <br>Milwaukee, WI																					; html signature
+		;~ <br>414-931-2347																						; html signature		
+		;~ </HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		;~ mailItem.Close(0) 																					; Creates draft version in default folder
+		;~ MailItem.Send() 																						; Sends the email
+		sleep, 3
+	return
+	
+;--------------------------------------------------
+;	Add Subject
+;--------------------------------------------------	
+	
+date_change_email2:
+	DateChangeDate := A_MM . "-" . A_DD . "-" . A_YYYY 	 														; stores subject line date formatting	
+	DateChangeSubject := "Import Date Change " DateChangeDate													; stores the subject
+	send %DateChangeSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, ^v																									; paste in picture of date change summary - must be most recent clip
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
 	
 ;---------------------------------------------------------------------------
-;	ComObj
+;	Direct Dist Order Request Emails - ComObj
+;---------------------------------------------------------------------------	
+/*
+write the same email to all direct Peroni distributors
+
+1) determine the order due date with an InputBox prompt
+2) determine the email subject with an InputBox prompt
+3) create subroutines for each of the Peroni direct distributors
+
+	1. Manhattan beer
+		- antonio, dennis heron, Nikki letser, cristina monreal, april
+	2. Gold Coast
+		- duy phan, betty ruiz, April
+	3. Bonanza beverage
+		- francine cromer, april
+	4. V. Suarez
+		- josely alayon, jose cabanillos, April
+	5. Carisam
+		- javier jimenez, Jiri rais, claire land, April
+		
+4) make sure to end each subroutine with the a pt.2 subroutine that Adds recipients and then gosub, email_signature
+
+	; example of how to send escaped semi-colons for email rec lines
+		
+	send, joseph.arnson@MillerCoors.com`; April.amend@MillerCoors.com`; John.putnam2@MillerCoors.com`;
+*/
+;---------------------------------------------------------------------------
+;	Direct Order Emails timeline variables
+;---------------------------------------------------------------------------
+
+orders_timeline:
+	InputBox, OrderDueDate, Due Date `- Day`, Month Date,,, 300, 100, center, center,,, 						; Show the InputBox to choose order due by date
+	InputBox, ArrivalMonth, Order Arrival Month,,, 300, 100, center, center,,, 									; Show the InputBox to choose arrival month for requested orders
+	InputBox, OrderPlaceDate, Order Date `- Day`, the Date,,, 300, 100, center, center,,, 						; Show the InputBox to choose day orders will be placed
+	DirectOrdersSubject := "Birra Peroni Direct Orders due by " OrderDueDate " COB"								; stores the subject
+	DirectOrdersTimeline := "---Peroni direct are orders due by " OrderDueDate " COB for " ArrivalMonth " arrival---"	; stores the timeline
+	StoOrdersSubject := "Import orders due by " OrderDueDate " COB"
+	StoOrdersTimeline := "---Import orders are due by " OrderDueDate " COB to be processed on " OrderPlaceDate "---"	; stores the timeline
+	return
+
+;---------------------------------------------------------------------------
+;	Manhattan Beer Direct Orders Email
+;---------------------------------------------------------------------------
+
+mbd_directs_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "adalessandro@ManhattanBeer.net`; HDENNI01@MILLERBPN.COM`;"									; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := "Nicole.Letser@millercoors.com`; April.Amend`2@millercoors.com`; Cristina.Monreal@millercoors.com`;"				; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Antonio,
+		<br><br><span style='color:black'>I will be placing orders to Birra Peroni with the following timeline.
+		<br><br><br><br>Please let me know what you would like me to order for you and if you have any questions or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+mbd_directs_email2:
+	send %DirectOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %DirectOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
+	
+;---------------------------------------------------------------------------
+;	Gold Coast Direct Orders Email
+;---------------------------------------------------------------------------
+
+goldcoast_directs_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "DPhan@reyesholdings.com`; bruiz@reyesholdings.com`;"										; Add recipients 	-> use `; between email names
+	MailItem.CC := "April.Amend`2@millercoors.com`;"															; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Duy and Betty,
+		<br><br><span style='color:black'>I will be placing orders to Birra Peroni with the following timeline.
+		<br><br><br><br>Please let me know what you would like me to order for you and if you have any questions or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+goldcoast_directs_email2:
+	send %DirectOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %DirectOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
+	
+;---------------------------------------------------------------------------
+;	Bonanza Beverage Direct Orders Email
+;---------------------------------------------------------------------------
+
+bonanza_directs_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "fcromer@bonanzabev.com`;"																	; Add recipients 	-> use `; between email names
+	MailItem.CC := "April.Amend`2@millercoors.com`;"															; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Francine,
+		<br><br><span style='color:black'>I will be placing orders to Birra Peroni with the following timeline.
+		<br><br><br><br>Please let me know what you would like me to order for you and if you have any questions or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+bonanza_directs_email2:
+	send %DirectOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %DirectOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
+	
+;---------------------------------------------------------------------------
+;	V. Suarez Direct Orders Email
 ;---------------------------------------------------------------------------
 	
+vsuarez_directs_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "josely.alayon@molsoncoors.com`;"															; Add recipients 	-> use `; between email names
+	MailItem.CC := "Jiri.Bota@millercoors.com`; April.Amend`2@millercoors.com`;"								; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Josely,
+		<br><br><span style='color:black'>I will be placing orders to Birra Peroni with the following timeline. 
+		<br><br><br><br>I have attached your requested orders for this month. Please let me know if that all looks correct or if you have any changes, questions, or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
 
+vsuarez_directs_email2:
+	send %DirectOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %DirectOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
+	
+;---------------------------------------------------------------------------
+;	Carisam Direct Orders Email
+;---------------------------------------------------------------------------
+	
+carisam_directs_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "J.Jimenez@carisamco.com`;"																	; Add recipients 	-> use `; between email names
+	MailItem.CC := "Jiri.Rais@millercoors.com`; Jiri.Bota@millercoors.com`; April.Amend`2@millercoors.com`;"	; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Javier,
+		<br><br><span style='color:black'>I will be placing orders to Birra Peroni with the following timeline.
+		<br><br><br><br>Please let me know what you would like me to order for you and if you have any questions or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
 
+carisam_directs_email2:
+	send %DirectOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %DirectOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
 	
+;---------------------------------------------------------------------------
+;	Import Team STO Orders Email
+;---------------------------------------------------------------------------	
 	
-	
+sto_orders_email:
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := "Amanda.Champion@millercoors.com`;"															; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello team,
+		<br><br><span style='color:black'>As a reminder, I will be placing all import orders with the following timeline.
+		<br><br><br><br>Please respond to this email with your order files and corresponding NEDC volume notes and let me know if you have any questions or concerns.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+sto_orders_email2:
+	send %StoOrdersSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	sleep, 3
+	send, %StoOrdersTimeline%																				; inputs the order timeline
+	gosub, email_bold_highlight
+	send, {down 20}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return	
 	
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
