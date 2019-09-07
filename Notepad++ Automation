@@ -1,5 +1,5 @@
 ;----------------------------------------------------------------------------------------------------
-;	Notepad++ Automation	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Notepad++ Automation	v1.07	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 /*
 -------------------------
@@ -15,44 +15,45 @@
 |		  END			|
 -------------------------
 */
-;----------------------------------------------------------------------------------------------------
-;	Settings	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-;----------------------------------------------------------------------------------------------------
-
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
-
 ;====================================================================================================
-;	Universal	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Settings
 ;====================================================================================================
 
-~^+Esc::
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+/*
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
-	
-~^!#+r::
+
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -62,29 +63,28 @@ SendMode Input							;Recommended to set sendinput as the default send method
 			Reload
 		}
 	return
-
+*/
 ;====================================================================================================
-;	Main	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Main	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;====================================================================================================
 
 #IfWinActive, ahk_class Notepad++
 
 ;----------------------------------------------------------------------------------------------------
-;	AutoExecute	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	New Script	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
-/*		;sendraw works but puts a bunch of unwanted indenting in the Universal section
+/*
+	;send raw works but puts a bunch of unwanted indenting in the Universal section
 :*:===::
-;ClipSaved := ClipboardAll        ; save clipboard
-;clipboard := ""                  ; empty clipboard
-;clipboard =                      ; send this text to the clipboard:
-send, {raw}
-(
+ClipSaved := ClipboardAll        ; save clipboard
+clipboard := ""                  ; empty clipboard
+New_script := (
 ;====================================================================================================
 ;
 ;====================================================================================================
 /*
 -------------------------
-|	Main Directory	|
+|	Main Directory		|
 -------------------------		
 1.	
 2.	
@@ -92,47 +92,48 @@ send, {raw}
 4.
 5.
 -------------------------
-|	END		|
+|		  END			|
 -------------------------
 */
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
 /*
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
 
 ;====================================================================================================
-;	Universal
+;	Universal	
 ;====================================================================================================
 
-~^+Esc::
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
-	
-~^!#+R::
+
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -149,13 +150,14 @@ SendMode Input							;Recommended to set sendinput as the default send method
 
 
 )
-;ClipWait, 1                    ; wait for the clipboard to contain data
-;Send, ^v                       ; paste the clipboard content
-;clipboard := ClipSaved         ; restore original clipboard
+clipboard =	New_script            	    ; send this text to the clipboard:
+ClipWait, 1         	  			    ; wait for the clipboard to contain data
+Send, ^v                	       		; paste the clipboard content
+clipboard := ClipSaved      	   		; restore original clipboard
 return
 */
 ;----------------------------------------------------------------------------------------------------
-;	Bracketing - Large	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Bracketing - Large	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 
 :*:0-::
@@ -170,7 +172,7 @@ return
 	return
 
 ;----------------------------------------------------------------------------------------------------
-;	Bracketing - Medium		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Bracketing - Medium		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 
 :*:-0::
@@ -185,7 +187,7 @@ send, {tab}
 return
 
 ;----------------------------------------------------------------------------------------------------
-;	Bracketing - Small	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Bracketing - Small	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 
 :*:=-::
@@ -200,7 +202,7 @@ return
 	return
 
 ;----------------------------------------------------------------------------------------------------
-;	Run Notepad++	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Run Notepad++	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 
 ^!n::  ; Ctrl+Alt+N
@@ -213,7 +215,7 @@ else
 return
 
 ;----------------------------------------------------------------------------------------------------
-;	Quality of Life	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	Quality of Life	\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 
 :*:(::
@@ -261,6 +263,53 @@ return
 
 	
 ;----------------------------------------------------------------------------------------------------
-;	END		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+;	END		\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 ;----------------------------------------------------------------------------------------------------
 /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
