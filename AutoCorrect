@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	AutoCorrect
+;	AutoCorrect	v1.05
 ;====================================================================================================
 /*
 
@@ -8,40 +8,41 @@
 ;	Settings
 ;====================================================================================================
 
-#Singleinstance, Force					;Recommended for all scripts to prevent old instances
-#NoEnv									;Recommended for all scripts to disable environment variables
-#MaxHotkeysPerInterval 99000000			;Recommended for all scripts to prevent error messages
-#HotkeyInterval 99000000				;Recommended for all scripts to prevent error messages
-#KeyHistory 0							;Only useful for debugging purposes
-ListLines Off							;Only useful for debugging purposes
-Process, Priority, , A					;Recommended to set a higher priority to improve speed
-SetBatchLines, -1						;Recommended to remove the default 10 ms sleep between lines
-SetKeyDelay, -1, -1						;Recommended to remove the default 10 ms sleep between lines
-SetMouseDelay, -1						;Recommended to remove the default delayed mouse move
-SetDefaultMouseSpeed, 0					;Recommended to remove the default delayed mouse move
-SetWinDelay, -1							;Recommended to set sendinput as the default send method
-SetControlDelay, -1						;Recommended to set sendinput as the default send method
-SendMode Input							;Recommended to set sendinput as the default send method
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
 
 ;====================================================================================================
-;	Universal
+;	Universal	
 ;====================================================================================================
 
-~^+Esc::
+~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
 
-~^Esc::
+~^Esc::									; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
-	
-~^!#+r::
+
+~^!#+r::								; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::	
+~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -380,7 +381,6 @@ Legacy ID	SAP ID	Location Name
 :*:bp::Birra Peroni
 :*:peroni::Peroni
 :*:perni::Peroni
-:*:permi::Peroni
 :*:peromi::Peroni
 ::peron::Peroni
 :*:perono::Peroni
@@ -431,12 +431,12 @@ Legacy ID	SAP ID	Location Name
 :*:??::As always, please let me know if you have any other questions so we may discuss them further.
 :*:?/::Please see the Ws Import Shared folder for full details.
 :*:\\::Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
-:*:/?::Please let me know if you have any further questions or concerns so we may discuss them further.
+:*:/?::Please let me know if you have any other questions or concerns so we may discuss them further.
 :*:pfa::Please find that file attached.
 :*:plmk::please let me know
 :*:plmka::Please let me know at your earliest convenience.
 :*:plmkw::Please let me know when you can.
-:*:pluk::Please let us know
+::pluk::Please let us know
 :*:plukw::Please let us know when you can.
 :*:paw::Please advise when you can.
 
@@ -5689,3 +5689,17 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :*:gui::GUI
 :*:inputbox::InputBox
 :*:unforunately::unfortunately
+:*:stw::STW
+:*:delivieres::deliveries
+:*:whitney::Whitney
+:*:sepetember::September
+:*:asap::ASAP
+:*:lukw::Let us know when you can.
+:*:one on one::one-on-one
+:*:Wednessday::Wednesday
+:*:fyi::FYI
+:*:Aguust::August
+::upd::UPD
+::wednseday::wednesday
+:*:proibably::probably
+::eth::the
