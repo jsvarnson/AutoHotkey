@@ -1,0 +1,392 @@
+;====================================================================================================
+;	Reference Tables	v1.02
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+4.	
+5.	
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+
+gui_autoexecute_ref_tables:
+    ; Tomorrow Night Color Definitions:
+    cBackground := "c" . "1d1f21"
+    cCurrentLine := "c" . "282a2e"
+    cSelection := "c" . "373b41"
+    cForeground := "c" . "c5c8c6"
+    cComment := "c" . "969896"
+    cRed := "c" . "cc6666"
+    cOrange := "c" . "de935f"
+    cYellow := "c" . "f0c674"
+    cGreen := "c" . "b5bd68"
+    cAqua := "c" . "8abeb7"
+    cBlue := "c" . "81a2be"
+    cPurple := "c" . "b294bb"
+
+    gui_control_options := "xm w220 " . cForeground . " -E0x200"
+    ; -E0x200 removes border around Edit controls
+
+    ; Initialize variable to keep track of the state of the GUI
+    gui_state = closed
+
+    ; Initialize search_urls as a variable set to zero
+    search_urls := 0
+	return
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+/* turned off by default
+~^+Esc::								; Exits all active scripts
+	Exitapp
+	return
+
+~^Esc::									; Pauses all active scripts
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+r::								; Unpauses and reloads all active scripts
+	Suspend, off
+	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+*/
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+;---------------------------------------------------------------------------
+;	Active Orders
+;---------------------------------------------------------------------------
+
+ref_table_actives:
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s10, Segoe UI
+	Gui, add, listview, w1000 h200 vActives, PO|STO/SO|Delivery|Shipment|Booking|Dest|MSKU|QTY|Batch|Ship End
+		; Loop, "C:\Users\FM36\Desktop\Sample Report.xlsx"
+		;	LV_Add("", A_LoopFileName, A_LoopFileSizeKB)
+		; LV_ModifyCol(autohdr) 																	; Auto-size each column to fit its contents and header
+		; LV_ModifyCol(1, "Integer Center NoSort", PO)  						
+		; LV_ModifyCol(2, "Integer Center NoSort", STO/SO)
+		; LV_ModifyCol(3, "Integer Center NoSort", Delivery)
+		; LV_ModifyCol(4, "Integer Center NoSort", Shipment)
+		; LV_ModifyCol(5, "Integer Center NoSort", Booking)
+		; LV_ModifyCol(6, "Integer Center NoSort", Dest)
+		; LV_ModifyCol(7, "Integer Center NoSort", MSKU)
+		; LV_ModifyCol(8, "Integer Center NoSort", QTY)
+		; LV_ModifyCol(9, "Text Center NoSort", Batch)
+		; LV_ModifyCol(10, "MM/DD/YYYY Center NoSort", Ship End)
+	Gui, Show, Autosize, ActiveOrdersGUI
+	return
+
+;---------------------------------------------------------------------------
+;	Distributors
+;---------------------------------------------------------------------------
+
+ref_table_distributors:
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s10 cf0c674, Segoe UI
+	Gui, add, listview, w950 h770 vDistributors, Ship-to|Name|Address|District|Postal|City|Region
+	LV_ModifyCol(auto)  		; autohdr - autosize to headers					; Auto-size each column to fit its contents and header
+	LV_ModifyCol(1, "Integer Left 55", "Ship-to")  						
+	LV_ModifyCol(2, "String Left 254", "Name")
+	LV_ModifyCol(3, "String Left 177", "Address")
+	LV_ModifyCol(4, "String Left 158", "District") 
+	LV_ModifyCol(5, "String Left 83", "Postal") 
+	LV_ModifyCol(6, "String Left 158", "City") 
+	LV_ModifyCol(7, "String Left 53", "Region") 
+	LV_Add(,601979,"ALLIED BEVERAGES","13235 GOLDEN STATE RD","SYLMAR","91342","SYLMAR","CA")
+	LV_Add(,54360,"BAY AREA BEVERAGE COMPANY","700 National Ct","RICHMOND","94804","RICHMOND","CA")
+	LV_Add(,57000,"BEAUCHAMP DISTRIBUTING CO INC","1911 S Santa Fe Ave","COMPTON","90221","COMPTON","CA")
+	LV_Add(,290100,"BONANZA BEVERAGE COMPANY INC","6333 Ensworth St","LAS VEGAS","89119","LAS VEGAS","NV")
+	LV_Add(,224000,"BURKE DISTRIBUTING CO LLC","89 TEED DR","RANDOLPH","2368","RANDOLPH","MA")
+	LV_Add(,601565,"CARISAM-SAMUEL MEISEL INC","10900 NW 27TH ST","DORAL","33172","DORAL","FL")
+	LV_Add(,149800,"CHICAGO BEVERAGE SYSTEMS LLC","441 N Kilbourn Ave","CHICAGO","60624","CHICAGO","IL")
+	LV_Add(,51700,"CLASSIC DISTG & BEV GROUP INC","120 PUENTE AVE","CITY OF INDUSTRY","91746","CITY OF INDUSTRY","CA")
+	LV_Add(,484005,"COHO DISTRIBUTING LLC","20301 59th Pl S","KENT","98032","KENT","WA")
+	LV_Add(,381000,"COHO DISTRIBUTING LLC","6840 N Cutter Cir","PORTLAND","97217","PORTLAND","OR")
+	LV_Add(,62250,"COORS DISTRIBUTING COMPANY","5400 PECOS ST","DENVER","80221","DENVER","CO")
+	LV_Add(,36200,"CRESCENT CROWN DISTRIBUTING LLC","1640 W Broadway Rd","MESA","85202","MESA","AZ  ")
+	LV_Add(,55300,"CREST BEVERAGE LLC","8870 Liquid Ct","SAN DIEGO","92121","SAN DIEGO","CA")
+	LV_Add(,900244,"CRISPIN CIDER","986 S CANYON WAY","COLFAX","95713","COLFAX","CA")
+	LV_Add(,36200,"CRISPIN CIDER","986 S CANYON WAY","COLFAX","95713","COLFAX","CA")
+	LV_Add(,55000,"DBI BEVERAGE SAN FRANCISCO","245 S SPRUCE AVE STE 900","SOUTH SAN FRANCISCO","94080","SOUTH SAN FRANCISCO","CA  ")
+	LV_Add(,50145,"GATE CITY BEVERAGE DISTRIBUTORS","2505 Steele Rd","SAN BERNARDINO","92408","SAN BERNARDINO","CA")
+	LV_Add(,602038,"GOLD COAST BEVERAGE LLC","1751 NW 12TH AVE","POMPANO BEACH","33069","POMPANO BEACH","FL")
+	LV_Add(,602036,"GOLD COAST BEVERAGE LLC","10055 NW 12TH ST","DORAL","33172","DORAL","FL")
+	LV_Add(,50144,"HARBOR DISTRIBUTING LLC","16407 S Main St","GARDENA","90248","GARDENA","CA")
+	LV_Add(,50140,"HARBOR DISTRIBUTING LLC","5901 Bolsa Ave","HUNTINGTON BEACH","92647","HUNTINGTON BEACH","CA")
+	LV_Add(,101980,"J J TAYLOR DISTRIBUTING FLORIDA INC","2040 Park 82 Dr","FORT MYERS","33905","FORT MYERS","FL")
+	LV_Add(,600167,"J J TAYLOR DISTRIBUTING MINNESOTA I","701 Industrial Blvd Ne","MINNEAPOLIS","55413","MINNEAPOLIS","MN  ")
+	LV_Add(,140140,"JOSEPH MULLARKEY DISTRIBUTORS INC","2200 Ridge Dr","GLENVIEW","60025","GLENVIEW","IL")
+	LV_Add(,339000,"MANHATTAN BEER DISTRIBUTORS LLC","955 E 149th St","BRONX","10455","BRONX","NY  ")
+	LV_Add(,339008,"MANHATTAN BEER DISTRIBUTORS LLC","4747 Metropolitan Ave","RIDGEWOOD","11385","RIDGEWOOD","NY  ")
+	LV_Add(,602045,"MANHATTAN BEER DISTRIBUTORS LLC","2 ATLANTIC AVE PIER 7","BROOKLYN","11201","BROOKLYN","NY  ")
+	LV_Add(,602351,"MARINE WHOLESALE & WHSE CO","727 W CAPITOL DR","SAN PEDRO","90731","SAN PEDRO","FL")
+	LV_Add(,149700,"TOWN & COUNTRY DISTRIBUTORS INC","1050 Ardmore Ave","ITASCA","60143","ITASCA","IL  ")
+	LV_Add(,112490,"UNITED DISTRIBUTORS INC","5500 United Dr SE","SMYRNA","30082","SMYRNA","GA")
+	LV_Add(,602212,"V SUAREZ & COMPANY INC","INDUSTRIAL LUCHETTI #300","BAYAMON","00961","BAYAMON","PR")
+	LV_Add(,2030,"ELIZABETH DC","1140 POLARIS ST","UNION","07201-0000","ELIZABETH","NJ")
+	LV_Add(,1030,"FORT WORTH BREWERY","7001 SOUTH FWY","TARRANT","76134-4001","FORT WORTH","TX")
+	LV_Add(,2070,"FORT WORTH DC","6657 OAK GROVE RD","TARRANT","76134","FORT WORTH","TX")
+	LV_Add(,1070,"IRWINDALE BREWERY","15801 E FIRST ST","LOS ANGELES","91706-6202","IRWINDALE","CA")
+	Gui, Show, w982 h800, DistGUI
+	return
+
+;---------------------------------------------------------------------------
+;	Plants
+;---------------------------------------------------------------------------
+
+ref_table_plants:
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s10 cf0c674, Segoe UI
+	Gui, add, listview, w450 h305 vPlants, Plant|Name|Address|Region
+	LV_ModifyCol(auto)  													; Auto-size each column to fit its contents and header
+	LV_ModifyCol(1, "Integer Left 50", "Plant")  						
+	LV_ModifyCol(2, "String Left 170", "Name")
+	LV_ModifyCol(3, "String Left 150", "Address")
+	LV_ModifyCol(4, "String Left 60", "District") 
+	LV_Add(,1000,"GOLDEN BREWERY","GOLDEN","CO")
+	LV_Add(,1010,"MILWAUKEE BREWERY","MILWAUKEE","WI")
+	LV_Add(,1020,"TRENTON BREWERY","TRENTON","OH")
+	LV_Add(,1030,"FORT WORTH BREWERY","FORT WORTH","TX")
+	LV_Add(,1040,"SHENANDOAH BREWERY","ELKTON","VA")
+	LV_Add(,1060,"ALBANY BREWERY","ALBANY","GA")
+	LV_Add(,1070,"IRWINDALE BREWERY","IRWINDALE","CA")
+	LV_Add(,2000,"GOLDEN DC","GOLDEN","CO")
+	LV_Add(,2020,"PORTLAND DC","PORTLAND","OR")
+	LV_Add(,2030,"ELIZABETH DC","ELIZABETH","NJ")
+	LV_Add(,2060,"ALBANY DC","ALBANY","GA")
+	LV_Add(,2070,"FORT WORTH DC","FORT WORTH","TX")
+	LV_Add(,2080,"MILWAUKEE DC","MENOMONEE FALLS","WI")
+	Gui, Show, w482 h337, PlantsGUI
+	return
+
+;---------------------------------------------------------------------------
+;	SKUs
+;---------------------------------------------------------------------------
+
+ref_table_SKUs:
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s10 cf0c674, Segoe UI
+	Gui, add, listview, w610 h330 vSKUs, Peroni|OSKU|MSKU|BPA|BPACLL|Description
+	LV_ModifyCol(auto)  													; Auto-size each column to fit its contents and header
+	LV_ModifyCol(1, "Integer Left 80", "Birra Peroni")  						
+	LV_ModifyCol(2, "Integer Left 68", "OSKU")
+	LV_ModifyCol(3, "Integer Left 68", "MSKU")
+	LV_ModifyCol(4, "Integer Left 68", "BPA") 
+	LV_ModifyCol(5, "String Left 90", "BPA CLL") 
+	LV_ModifyCol(6, "String Left 215", "Description")
+	LV_Add(,896,701190,34361,"PN1525","PN1525","1/2BBL STD KEG")
+	LV_Add(,184,701728,36446,"PN1555","PN1555","1/4BBL SLM KEG")s
+	LV_Add(,1436,701728,36446,"PN1555","PN1555","1/4BBL SLM KEG")
+	LV_Add(,1393,702240,43834,"PN21E5","PN21E5R54","4/6 330ML GBT LSTDGR BSK CTN")
+	LV_Add(,1394,702241,43827,"PN22E5","PN22E5R54","2/12 330ML GBT LSTDGR CAR TRY")
+	LV_Add(,1471,703250,43829,"PN33P5","PN33P5E54","24 4/6 330ML AL CAN SL CAR TRY")
+	LV_Add(,1403,703250,43829,"PN33P5","PN33P5E54","24 4/6 330ML AL CAN SL CAR TRY")
+	LV_Add(,1437,703702,43865,"PN37G5","PN37G5E54","24 LS 500ML AL CAN IS TRS")
+	LV_Add(,,702330,43832,"PN23E5","PN23E5R54","24LS 330ML GBT LSTDGR HGC")
+	LV_Add(,,702370,43647,"PN23G5","PN23G5R54","2/10 330ML GBT LSTDGR CAR TRY")
+	LV_Add(,,702832,43830,"PN3855","PN3855E54","24 LS 330ML AL CAN SL TRS")
+	LV_Add(,1393,702240,43835,"PN21E5","PN21E5R54","4/6 330ML GBT LSTDGR BSK CTN")
+	LV_Add(,1394,702241,43828,"PN22E5","PN22E5R54","2/12 330ML GBT LSTDGR CAR TRY")
+	LV_Add(,,703841,44021,"PN2AG5","PN2AG5R54P","24 4/6 8.5OZ GBT LSTDGR BSK CT")
+	Gui, Show, w642 h362, SKUGUI
+	return
+
+;---------------------------------------------------------------------------
+;	Lanes
+;---------------------------------------------------------------------------
+
+; not done - still need to input and format all the lane information
+
+ref_table_lanes:
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
+	Gui, Font, s10 cf0c674, Segoe UI
+	Gui, add, listview, w700 h600 vLanes, Source Name|Dest Name|Origin|Dest|Duration
+	LV_ModifyCol(autohdr)  													; Auto-size each column to fit its contents and header
+	LV_ModifyCol(1, "String Left 200", "Source Name")
+	LV_ModifyCol(2, "String Left 250", "Dest Name")
+	LV_ModifyCol(3, "Integer Left 75", "Origin")
+	LV_ModifyCol(4, "Integer Left 75", "Dest")
+	LV_ModifyCol(5, "Integer Left 75", "Duration") 
+	LV_Add(,"PILSNER URQUELL","-",6880,22000,61)
+	LV_Add(,"PILSNER URQUELL","-",6880,22003,61)
+	LV_Add(,"PILSNER URQUELL","-",6880,36205,50)
+	LV_Add(,"PILSNER URQUELL","HARBOR DISTRIBUTING LLC",6880,50140,50)
+	LV_Add(,"PILSNER URQUELL","-",6880,52000,50)
+	LV_Add(,"PILSNER URQUELL","-",6880,57400,55)
+	LV_Add(,"PILSNER URQUELL","-",6880,66000,37)
+	LV_Add(,"PILSNER URQUELL","-",6880,71700,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,72400,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,89000,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,92000,35)
+	LV_Add(,"BIRRA PERONI","FORT WORTH BREWERY",6870,4,53)
+	LV_Add(,"BIRRA PERONI","FORT WORTH BREWERY",6870,4,53)
+	LV_Add(,"GROLSCH","FORT WORTH BREWERY",6860,4,38)
+	LV_Add(,"GROLSCH","FORT WORTH BREWERY",6860,4,38)
+	LV_Add(,"GROLSCH","IRWINDALE BREWERY",6860,6,56)
+	LV_Add(,"BIRRA PERONI","IRWINDALE BREWERY",6870,6,52)
+	LV_Add(,"BIRRA PERONI","IRWINDALE BREWERY",6870,6,52)
+	LV_Add(,"GROLSCH","IRWINDALE BREWERY",6860,6,56)
+	LV_Add(,"GROLSCH","IRWINDALE BREWERY",6860,6,56)
+	LV_Add(,"BIRRA PERONI","IRWINDALE BREWERY",6870,6,52)
+	LV_Add(,"PILSNER URQUELL","IRWINDALE BREWERY",6880,6,50)
+	LV_Add(,"PILSNER URQUELL","IRWINDALE BREWERY",6880,6,50)
+	LV_Add(,"BAVARIA","IRWINDALE BREWERY",6850,6,38)
+	LV_Add(,"PILSNER URQUELL","-",6880,140100,36)
+	LV_Add(,"PILSNER URQUELL","JOSEPH MULLARKEY DISTRIBUTORS INC",6880,140140,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,140160,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,140170,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,140180,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,148400,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,149900,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,152000,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,156000,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,156005,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,174000,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,195807,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,210100,38)
+	LV_Add(,"PILSNER URQUELL","-",6880,230100,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,232000,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,263000,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,311000,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,313000,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,319000,35)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,339000,41)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,339000,41)
+	LV_Add(,"PILSNER URQUELL","-",6880,339005,35)
+	LV_Add(,"TYSKIE","MANHATTAN BEER DISTRIBUTORS LLC",6810,339008,33)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,339008,41)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,339008,41)
+	LV_Add(,"PILSNER URQUELL","MANHATTAN BEER DISTRIBUTORS LLC",6880,339008,35)
+	LV_Add(,"TYSKIE","MANHATTAN BEER DISTRIBUTORS LLC",6810,339008,33)
+	LV_Add(,"PILSNER URQUELL","COHO DISTRIBUTING LLC",6880,381000,59)
+	LV_Add(,"PILSNER URQUELL","-",6880,435000,38)
+	LV_Add(,"PILSNER URQUELL","-",6880,445600,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,472010,35)
+	LV_Add(,"PILSNER URQUELL","COHO DISTRIBUTING LLC",6880,484005,59)
+	LV_Add(,"PILSNER URQUELL","-",6880,600133,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,600155,36)
+	LV_Add(,"PILSNER URQUELL","-",6880,600219,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,600248,37)
+	LV_Add(,"PILSNER URQUELL","-",6880,600298,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,600304,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,600793,37)
+	LV_Add(,"PILSNER URQUELL","-",6880,601507,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,601564,38)
+	LV_Add(,"PILSNER URQUELL","CARISAM-SAMUEL MEISEL INC",6880,601565,38)
+	LV_Add(,"GROLSCH","CARISAM-SAMUEL MEISEL INC",6860,601565,44)
+	LV_Add(,"PILSNER URQUELL","CARISAM-SAMUEL MEISEL INC",6880,601565,38)
+	LV_Add(,"PILSNER URQUELL","CARISAM-SAMUEL MEISEL INC",6880,601565,38)
+	LV_Add(,"PILSNER URQUELL","-",6880,601899,36)
+	LV_Add(,"BIRRA PERONI","ALLIED BEVERAGES",6870,601979,52)
+	LV_Add(,"BIRRA PERONI","ALLIED BEVERAGES",6870,601979,52)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,602045,40)
+	LV_Add(,"BIRRA PERONI","MANHATTAN BEER DISTRIBUTORS LLC",6870,602045,40)
+	LV_Add(,"PILSNER URQUELL","MANHATTAN BEER DISTRIBUTORS LLC",6880,602045,34)
+	LV_Add(,"PILSNER URQUELL","-",6880,602096,38)
+	LV_Add(,"PILSNER URQUELL","-",6880,602134,37)
+	LV_Add(,"PILSNER URQUELL","-",6880,602202,35)
+	LV_Add(,"PILSNER URQUELL","-",6880,602251,35)
+	LV_Add(,"BIRRA PERONI","ELIZABETH DC",6870,72,41)
+	LV_Add(,"-","ELIZABETH DC",6830,72,27)
+	LV_Add(,"BAVARIA","ELIZABETH DC",6850,72,30)
+	LV_Add(,"BACKUS","ELIZABETH DC",6800,72,33)
+	LV_Add(,"GROLSCH","ELIZABETH DC",6860,72,36)
+	LV_Add(,"PILSNER URQUELL","ELIZABETH DC",6880,72,35)
+	LV_Add(,"TYSKIE","ELIZABETH DC",6810,72,33)
+	LV_Add(,"PILSNER URQUELL","FORT WORTH DC",6880,6,43)
+	LV_Add(,"BIRRA PERONI","BONANZA BEVERAGE COMPANY INC",6870,0,49)
+	LV_Add(,"BIRRA PERONI","GOLD COAST BEVERAGE LLC",6870,0,40)
+	LV_Add(,"BIRRA PERONI","V SUAREZ & COMPANY INC",6870,0,35)
+	Gui, Show, w732 h632, LanesGUI
+	return
+
+;====================================================================================================
+;	END
+;====================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
