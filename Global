@@ -1,15 +1,18 @@
 ;====================================================================================================
-;	Global	v1.04
+;	Global	v1.06
 ;====================================================================================================
 /*
 -------------------------
 |	Main Directory		|
 -------------------------		
-1.	Systems
-2.	Key Mapping
-3.	File Explorer	
-4.	Adv Win Snap
-5.
+1.	Settings
+2.	Universal
+3.	AutoCapitlize
+4.	Systems
+5.	Key Mapping
+6.	File Explorer	
+7.	Adv Win Snap
+8.	
 -------------------------
 |		  END			|
 -------------------------
@@ -36,7 +39,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-
+/*
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -62,13 +65,67 @@ SendMode Input							; Recommended to set sendinput as the default send method
 			Reload
 		}
 	return
-	
+*/
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
 /*
 
 */
+;---------------------------------------------------------------------------
+;	AutoCapitalize
+;---------------------------------------------------------------------------
+/*
+#SingleInstance force
+#NoEnv
+Process Priority,,High
+SetBatchLines -1
+*/
+
+Loop {
+   Input key, I L1 V,
+(  Join
+{ScrollLock}{CapsLock}{NumLock}{Esc}{BS}{PrintScreen}{Pause}{LControl}{RControl}
+{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}
+{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}
+)
+   If StrLen(ErrorLevel) > 3  ; NewInput, EndKey
+      state =
+   Else If InStr(".!?",key)   ; Sentence end
+      state = 1
+   Else If InStr("`t `n",key) ; White space
+      state += (state = 1)    ; state1 -> state2
+   Else {
+      StringUpper key, key
+      If state = 2            ; End-Space*-Letter
+         Send {BS}{%key%}     ; Letter -> Upper case
+      state =
+   }
+}
+
+~LButton::
+~RButton::
+~MButton::
+~WheelDown::
+~WheelUp::
+~XButton1::
+~XButton2::State =
+
+;---------------------------------------------------------------------------
+;	Expo
+;---------------------------------------------------------------------------
+
+^+z::			;Ctrl+Shift+Z
+	oldclipboard:= clipboard
+	clipboard:=""
+	send, ^c ; copies selected text
+	clipwait
+	run, https://expo.expeditors.com/expotr/expotr?action=com.expd.webapp.tracking.action.searches.SearchWebAction&SearchType=advancedshipment.BaseAdvancedShipmentSearch&reference=%Clipboard%
+	winactivate
+	clipboard:= oldclipboard
+Return
+
+
 ;---------------------------------------------------------------------------
 ;	Systems
 ;---------------------------------------------------------------------------
@@ -424,5 +481,44 @@ RControl::		;Right control x2
 ;--------------------------------------------------
 ;	
 ;--------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
