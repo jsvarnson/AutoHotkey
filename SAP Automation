@@ -1,0 +1,255 @@
+;====================================================================================================
+;	SAP		v1.01
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+	i.		Search ME23N - Ctrl+Alt+Win+Shift+ i
+	ii.		Search VL03N - Ctrl+Alt+Win+Shift+ t
+	iii.	Search VT03N - Ctrl+Alt+Win+Shift+ y	
+4. 
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+
+~^+Esc::								; Exits all active scripts
+	Exitapp
+	return
+
+~^Esc::									; Pauses all active scripts
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+r::								; Unpauses and reloads all active scripts
+	Suspend, off
+	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+
+;---------------------------------------------------------------------------
+;	ME23N - Search PO/STO
+;---------------------------------------------------------------------------
+
+!^#+i::
+	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+	if WinExist("ahk_class SAP_FRONTEND_SESSION")
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinActivate, ahk_class SAP_FRONTEND_SESSION						; activate SAP window
+		sleep, 10
+		send, {ctrl down}{n}{ctrl up}									; create new SAP window
+		sleep, 10		
+		WinWaitActive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, ME23N {enter}												; enter transaction name
+		winwaitactive, Import PO - APO, , 3								; wait until active
+		sleep, 10
+		send, {shift down}{F5}{shift up}								; search document hotkey in SAP
+		winwaitactive, Select Document, , 3								; wait until active
+		sleep, 100
+		send, {shift down}{end}{shift up}{delete}						; clear search box
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, ME23N {enter}												; enter transaction name
+		winwaitactive, Import PO - APO, , 3								; wait until active
+		sleep, 10
+		send, {shift down}{F5}{shift up}								; search document hotkey in SAP
+		winwaitactive, Select Document, , 3								; wait until active
+		sleep, 100
+		send, {shift down}{end}{shift up}{delete}						; clear search box
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	SetTitleMatchMode, 3												; MatchMode 3: A window's title must exactly match WinTitle to be a match.
+	return
+	
+;---------------------------------------------------------------------------
+;	VL03N - Search Delivery
+;---------------------------------------------------------------------------
+
+!^#+t::
+	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+	if WinExist("ahk_class SAP_FRONTEND_SESSION")
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinActivate, ahk_class SAP_FRONTEND_SESSION						; activate SAP window
+		sleep, 10
+		send, {ctrl down}{n}{ctrl up}									; create new SAP window
+		sleep, 10		
+		WinWaitActive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VL03N {enter}												; enter transaction name
+		winwaitactive, Display Outbound Delivery, , 3					; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VL03N {enter}												; enter transaction name
+		winwaitactive, Display Outbound Delivery, , 3					; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	SetTitleMatchMode, 3												; MatchMode 3: A window's title must exactly match WinTitle to be a match.
+	return
+
+;---------------------------------------------------------------------------
+;	VT03N - Search Shipment
+;---------------------------------------------------------------------------
+
+!^#+y::
+	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+	if WinExist("ahk_class SAP_FRONTEND_SESSION")
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinActivate, ahk_class SAP_FRONTEND_SESSION						; activate SAP window
+		sleep, 10
+		send, {ctrl down}{n}{ctrl up}									; create new SAP window
+		sleep, 10		
+		WinWaitActive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VT03N {enter}												; enter transaction name
+		winwaitactive, Display Shipment, , 3							; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VT03N {enter}												; enter transaction name
+		winwaitactive, Display Shipment, , 3							; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	SetTitleMatchMode, 3												; MatchMode 3: A window's title must exactly match WinTitle to be a match.
+	return
+
+;---------------------------------------------------------------------------
+;	
+;---------------------------------------------------------------------------
+	
+	
+	
+;====================================================================================================
+;	END
+;====================================================================================================
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
