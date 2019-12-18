@@ -1,8 +1,16 @@
 ;====================================================================================================
-;	AutoCorrect	v1.05
+;	AutoCorrect	v1.06
 ;====================================================================================================
 /*
-
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+-------------------------
+|		  END			|
+-------------------------
 */
 ;====================================================================================================
 ;	Settings
@@ -247,17 +255,18 @@ return
 :*:6p::Peroni 6-pack bottles
 :*:12p::Peroni 12-pack bottles
 :*:pcan::Peroni 6-pack cans
-:*:p5::Peroni 500ml loose cans
+:*:p5::Peroni 500ml cans
 :*:picc::Peroni 8.5oz Piccola bottles
 :*:pcel::Peroni Celebration pack
 :*:24p::Peroni 24-pack loose bottles
 
-:*:mp12::34361
+::mp12::34361
 :*:mp14::36446
 :*:m6p::43834
 :*:m12p::43827
 :*:mpcan::43829
-:*:mp5::43865
+;~ :*:mp5::43865
+:*:mp5::44502
 :*:mpicc::44021
 :*:mpcel::43647
 :*:m24p::43832
@@ -276,7 +285,8 @@ return
 :*:em6p::43834 (Peroni 6-pack bottles)
 :*:em12p::43827 (Peroni 12-pack bottles)
 :*:empcan::43829 (Peroni 6-pack cans)
-:*:emp5::43865 (Peroni 500ml loose cans)
+;~ :*:emp5::43865 (Peroni 500ml loose cans)				; old MSKU -> switched to 44502
+:*:emp5::44502 (Peroni 500ml loose cans)
 :*:empcel::43647 (Peroni Celebration pack)
 :*:em24p::43832 (Peroni 24-pack loose bottles)
 
@@ -285,7 +295,7 @@ return
 :*:eo6p::702240 (Peroni 6-pack bottles)
 :*:eo12p::702241 (Peroni 12-pack bottles)
 :*:eopcan::703250 (Peroni 6-pack cans)
-:*:eop5::703702 (Peroni 500ml loose cans)
+:*:eop5::703702 (Peroni 500ml cans)
 :*:eopcel::702370 (Peroni Celebration pack)
 :*:eo24p::702330 (Peroni 24-pack loose bottles)
 
@@ -388,19 +398,6 @@ Legacy ID	SAP ID	Location Name
 :*:preoni:Peroni
 :*:proni::Peroni
 
-#IfWinActive, ahk_exe outlook.exe
-::ty::thank you
-::t,::thanks,
-::ht,::Hello team,
-::c::cheers
-::g::grazie
-::gm::grazie mille
-::ct::ciao tutti
-:*:tyvm::thank you very much
-;::am::AM						;commented out because it's a word too
-::pm::PM
-#IfWinActive
-
 :*:npp::Notepad++
 :*:run log::RUN LOG
 :*:validate log::VALIDATE LOG
@@ -424,21 +421,39 @@ Legacy ID	SAP ID	Location Name
 :*:youre::you're
 
 ;--------------------------------------------------
-;	Prewritten
+;	Outlook
 ;--------------------------------------------------
 
+#IfWinActive, ahk_exe OUTLOOK.EXE
 :*://::Please let me know if you have any questions or concerns.
 :*:??::As always, please let me know if you have any other questions so we may discuss them further.
 :*:?/::Please see the Ws Import Shared folder for full details.
 :*:\\::Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
 :*:/?::Please let me know if you have any other questions or concerns so we may discuss them further.
+:*:,,,::In the meantime, please let me know if you have any questions or concerns so we may discuss them further.
 :*:pfa::Please find that file attached.
-:*:plmk::please let me know
+::plmk::please let me know										; too simple. commented out to allow for further evolutions
 :*:plmka::Please let me know at your earliest convenience.
 :*:plmkw::Please let me know when you can.
+::plmkyt::Please let me know your thoughts
+:*:plmkytw::Please let me know your thoughts when you can.
+::lmkyt::Let me know your thoughts
+:*:lmkytw::Let me know your thoughts when you can.
 ::pluk::Please let us know
 :*:plukw::Please let us know when you can.
 :*:paw::Please advise when you can.
+
+::ty::thank you
+::t,::thanks,
+::ht,::Hello team,
+::c::cheers
+::g::grazie
+::gm::grazie mille
+::ct::ciao tutti
+:*:tyvm::thank you very much
+; ::am::AM						; commented out because it's a word too
+::pm::PM
+#IfWinActive
 
 ;--------------------------------------------------
 ;	Names
@@ -481,12 +496,9 @@ Legacy ID	SAP ID	Location Name
 :*:qy82::QY82
 :*:kh56::KH56
 
-
-
 ;-------------------------------------------------------------------------------------
 ;	Main
 ;-------------------------------------------------------------------------------------
-
 
 ;------------------------------------------------------------------------------
 ; Fix for -ign instead of -ing.
@@ -5654,9 +5666,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :*:hwehre::where
 :*:whree::where
 :*:wehre::where
-
-
-
 :*:attachement::attachment
 :*:bop::BOP
 :*:activies::activities
@@ -5686,7 +5695,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :*:valentina::Valentina
 :*:protetc::protect
 :*:url::URL
-:*:gui::GUI
+; :*:gui::GUI
 :*:inputbox::InputBox
 :*:unforunately::unfortunately
 :*:stw::STW
@@ -5703,3 +5712,15 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::wednseday::wednesday
 :*:proibably::probably
 ::eth::the
+:*:fgl::FGL
+:*:horus::hours
+:*:mb51::MB51
+:*:se16::SE16
+:*:cmir::CMIR
+::ron::Ron
+::ella::Ella
+::scetion::section
+:*:nick::Nick
+
+
+:*:tuesdasy::Tuesday
