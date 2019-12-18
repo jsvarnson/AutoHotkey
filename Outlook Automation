@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Outlook Automation	v3.01
+;	Outlook Automation	v4.04
 ;====================================================================================================
 /*
 -------------------------
@@ -7,6 +7,9 @@
 -------------------------
 1.	Key Remapping
 2.	ComObj
+3.	Date Change Email
+4.	Direct Order Emails
+5.  Ws Update Email
 -------------------------
 |		  END			|
 -------------------------
@@ -33,7 +36,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-/*
+/* turned off by default
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -117,10 +120,159 @@ F5::
 F6::
 	send, ^{enter}
 	return
+	
+;---------------------------------------------------------------------------
+;	Email Flag Reminders
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Email Flag Subroutines
+;--------------------------------------------------
+
+GuiEsc:	
+	Gui, destroy
+	return
+
+Activate_Reminder_Date1:
+	Gui, Destroy
+	winactivate, ahk_class rctrl_renwnd32
+	send, {alt}{h}{u}{c}
+	send, {tab 3}
+	send, %EmailReminderDay%
+	send, {tab 2}{space}{tab 3}
+	send, 7AM
+	send, {tab 3}{enter}
+return
+
+Activate_Reminder_Date2:
+	Gui, Destroy
+	winactivate, ahk_class rctrl_renwnd32
+	send, {alt}{h}{w}{r}
+	send, {tab 4}
+	send, %EmailReminderDay%
+	send, {tab 5}
+	send, 7AM
+	send, {tab}{enter}
+return
+
+
+;--------------------------------------------------
+;	Email within Outlook Window
+;--------------------------------------------------	
+	
+F7::
+	gosub, inner_email_reminder_flags
+	return
+
+inner_email_reminder_flags:
+		;Gui, -ToolWindow -Caption
+		gui, Add, radio, vReminderDate group checked, Monday
+		gui, Add, radio, , Tuesday
+		gui, Add, radio, , Wednesday
+		gui, Add, radio, , Thursday
+		gui, Add, radio, , Friday
+		gui, Add, Button, gButtonOKFlag1 default, Ok
+		Gui, Show,, Reminders																	; titles the GUI and chooses the size
+	return	
+	
+ButtonOKFlag1:
+	Gui, Submit
+	if ReminderDate = 1
+	{
+		EmailReminderDay = Monday
+		;msgbox, monday
+	}
+	else if ReminderDate = 2
+	{
+		EmailReminderDay = Tuesday
+		;msgbox, tuesday
+	}
+	else if ReminderDate = 3
+	{
+		EmailReminderDay = Wednesday
+		;msgbox, Wednesday
+	}
+	else if ReminderDate = 4
+	{
+		EmailReminderDay = Thursday
+		;msgbox, Thursday
+	}
+	else if ReminderDate = 5
+	{
+		EmailReminderDay = Friday
+		;msgbox, Friday
+	}
+	else
+	{
+		msgbox, No selection
+	}
+	gosub, Activate_Reminder_Date1
+	return
+
+;--------------------------------------------------
+;	Pop Out Email Window
+;--------------------------------------------------	
+	
+F8::
+	gosub, outer_email_reminder_flags
+	return
+
+outer_email_reminder_flags:
+		;Gui, -ToolWindow -Caption
+		gui, Add, radio, vReminderDate group checked, Monday
+		gui, Add, radio, , Tuesday
+		gui, Add, radio, , Wednesday
+		gui, Add, radio, , Thursday
+		gui, Add, radio, , Friday
+		gui, Add, Button, gButtonOKFlag2 default, Ok
+		Gui, Show,, Reminders																	; titles the GUI and chooses the size
+	return	
+	
+ButtonOKFlag2:
+	Gui, Submit
+	if ReminderDate = 1
+	{
+		EmailReminderDay = Monday
+		;msgbox, monday
+	}
+	else if ReminderDate = 2
+	{
+		EmailReminderDay = Tuesday
+		;msgbox, tuesday
+	}
+	else if ReminderDate = 3
+	{
+		EmailReminderDay = Wednesday
+		;msgbox, Wednesday
+	}
+	else if ReminderDate = 4
+	{
+		EmailReminderDay = Thursday
+		;msgbox, Thursday
+	}
+	else if ReminderDate = 5
+	{
+		EmailReminderDay = Friday
+		;msgbox, Friday
+	}
+	else
+	{
+		msgbox, No selection
+	}
+	gosub, Activate_Reminder_Date2
+	return
 
 ;====================================================================================================
 ;	Template Emails
 ;====================================================================================================
+
+;--------------------------------------------------
+;	Ws Time Variables
+;--------------------------------------------------
+
+AvgTimeSaved := 75
+PrepTimeSaved := 12
+TimeSaverVar := AvgTimeSaved + PrepTimeSaved
 
 ;--------------------------------------------------
 ;	Signature Subroutine
@@ -145,8 +297,20 @@ email_bold_highlight:																							; cursor start anywhere - highlights
 	send, {end}																									; move cursor to end
 	send, {shift down}{home}{shift up}																			; highlight whole line
 	send, {ctrl down}{b}{ctrl up}																				; bold
-	send, {alt down}{h}{i}{alt up}																						; outlook shortcut to highlight
+	sleep, 40
+	sleep, 100
+	send, {alt down}{h}{i}{alt up}																				; outlook shortcut to highlight
 	send, {enter}																								; select yellow highlighting		
+	return
+	
+;--------------------------------------------------
+;	Manual Indent Subroutine
+;--------------------------------------------------	
+
+manual_indent:
+	send, {space 4}
+	send, {-}
+	send, {space 2}
 	return
 
 ;---------------------------------------------------------------------------
@@ -185,12 +349,23 @@ return
 ;--------------------------------------------------
 
 date_change_email1:
+	InputBox, StoDates, STO Records Processed,,, 300, 100, center, center,,, 									; Show the InputBox to choose order due by date
+	InputBox, DelDates, Delivery Records Processed,,, 300, 100, center, center,,, 								; Show the InputBox to choose order due by date
+	InputBox, ShipDates, Shipment Records Processed,,, 300, 100, center, center,,, 								; Show the InputBox to choose order due by date
+	InputBox, TMDates, TM Records Processed,,, 300, 100, center, center,,, 										; Show the InputBox to choose order due by date
+	DatesTransSaved := StoDates + DelDates + ShipDates
+	DatesTimeSaved2 := (DatesTransSaved * 97)
+	DatesTimeSaved3 := (TMDates * 30)
+	DatesTimeSaved4 := (DatesTimeSaved2 + DatesTimeSaved3) / 3600
+	TotalDateTimeSaved := round(DatesTimeSaved4,2)
+	TotalDateTimeSavedUpdate := "Total time saved: " TotalDateTimeSaved " hours"
+	
 	olMailItem := 0	
 	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
 	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
 	MailItem.BodyFormat := 2 																					; olFormatHTML	
 	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
-	MailItem.CC := "Amanda.Champion@millercoors.com`;"															; Add recipients to the CC line
+	MailItem.CC := "Ronald.Bialosky@millercoors.com`; Amanda.Champion@millercoors.com`;"															; Add recipients to the CC line
 	;~ MailItem.Replyto :="joejunkemail@yahoo.com"																; create a reply email
 	
 	;~ MailItem.Subject := DateChangeSubject																	; Subject line of email
@@ -199,7 +374,7 @@ date_change_email1:
 	MailItem.HTMLBody := "																					
 		<HTML>Hello everyone,
 		<br><br><span style='color:black'>I have processed the below date changes for all inbound import shipments.
-		<br><br><br><br>Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, expected arrival dates, actual arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
+		<br><br><br><br><br><br>Brian/Andrew -- Please see the TM Updates tab for all required updates including direct sales orders, containers, sail dates, expected arrival dates, actual arrival dates, and port departure dates. Please respond to the team to let us know when those activities have been completed.
 		<br><br>Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
 		<br><br>Cheers,
 		</HTML>"		
@@ -214,11 +389,7 @@ date_change_email1:
 		;~ MailItem.Send() 																						; Sends the email
 		sleep, 3
 	return
-	
-;--------------------------------------------------
-;	Add Subject
-;--------------------------------------------------	
-	
+
 date_change_email2:
 	DateChangeDate := A_MM . "-" . A_DD . "-" . A_YYYY 	 														; stores subject line date formatting	
 	DateChangeSubject := "Import Date Change " DateChangeDate													; stores the subject
@@ -229,6 +400,9 @@ date_change_email2:
 	send, {down 4}																								; move cursor to correct position
 	sleep, 3
 	send, ^v																									; paste in picture of date change summary - must be most recent clip
+	send, {down 2}
+	send, %TotalDateTimeSavedUpdate%
+	gosub, email_bold_highlight
 	send, {down 20}																								; moves cursor in place for signature subroutine	
 	send, {end}
 	send, {enter}
@@ -472,25 +646,308 @@ sto_orders_email:
 	return
 
 sto_orders_email2:
-	send %StoOrdersSubject%																					; inputs the subject for the email
+	send %StoOrdersSubject%																						; inputs the subject for the email
 	sleep, 3
 	send, {tab}																									; move cursor to bottom of email
 	sleep, 3
 	send, {down 4}																								; move cursor to correct position
 	sleep, 3
-	send, %StoOrdersTimeline%																				; inputs the order timeline
+	send, %StoOrdersTimeline%																					; inputs the order timeline
 	gosub, email_bold_highlight
 	send, {down 20}																								; moves cursor in place for signature subroutine	
 	send, {end}
 	send, {enter}
 	Return	
 	
+;---------------------------------------------------------------------------
+;	Winshuttle Update Email
+;---------------------------------------------------------------------------
+	
+ws_update_email:
+	InputBox, BatchesUpdate1, Batch Transactions,,, 300, 100, center, center,,, 								; Show the InputBox
+	InputBox, BatchesUpdate3, Batches for how many orders,,, 300, 100, center, center,,, 						; Show the InputBox
+	InputBox, IBDsUpdate1, IBD Transactions,,, 300, 100, center, center,,, 										; Show the InputBox
+	InputBox, OBDsUpdate1, OBD Transactions,,, 300, 100, center, center,,, 										; Show the InputBox
+	InputBox, SpecReqUpdate1, Special Request Transactions,,, 300, 100, center, center,,, 						; Show the InputBox
+	InputBox, SpecReqUpdate2, Special Request Records,,, 300, 100, center, center,,, 							; Show the InputBox
+	BatchesUpdate2 := BatchesUpdate1 * 5
+	IBDsUpdate2 := IBDsUpdate1 * 2
+	OBDsUpdate2 := OBDsUpdate1 * 7
+	TotalRecords := BatchesUpdate2 + IBDsUpdate2 + OBDsUpdate2 + SpecReqUpdate2
+	TotalTrans := BatchesUpdate1 + IBDsUpdate1 + OBDsUpdate1 + SpecReqUpdate1
+	TotalTimeSaved1 := (TotalTrans * 100) / 3600
+	TotalTimeSaved2 := round(TotalTimeSaved1,2)
+	
+	BatchesUpdate :=  BatchesUpdate1 " batches for " BatchesUpdate2 " total records, covering " BatchesUpdate3 " total orders"
+	IBDsUpdate := IBDsUpdate1 " IBDs for " IBDsUpdate2 " total records"
+	OBDsUpdate := OBDsUpdate1 " OBDs for " OBDsUpdate2 " total records"
+	SpecReqUpdate := SpecReqUpdate1 " transactions for " SpecReqUpdate2 " total records"
+	TotalRecordsUpdate := "Total records processed: " TotalRecords
+	TotalTimeSavedUpdate := "Total time saved: " TotalTimeSaved2 " hours"
+	
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := ""																							; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+	<HTML>Hello everyone,
+	<br><br><span style='color:black'>I have processed the following SAP transactions for inbound import orders. 
+	<br><br><br><br><br><br><br><br>Additionally, I have also processed the following SAP transactions per special request.
+	<br><br><br><br><br><br><br><br>Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+	<br><br>Cheers,
+	</HTML>"
+	MailItem.Display 																							; Make email visible
+	sleep, 3
+	return
+	
+ws_update_email2:
+	WsUpdateDate := A_MM . "-" . A_DD . "-" . A_YYYY 	 														; stores subject line date formatting	
+	WsUpdateSubject := "SAP Processing " WsUpdateDate " - " TotalRecords " records updated" 					; stores the subject
+	send %WsUpdateSubject%																						; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to body of email
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	gosub, manual_indent																						; create manual bullet point with a dash
+	send, %BatchesUpdate%
+	sleep, 3
+	send, {down 2}																								; move cursor to correct position
+	gosub, manual_indent																						; create manual bullet point with a dash
+	send, %IBDsUpdate%
+	sleep, 3
+	send, {down 2}																								; move cursor to correct position
+	gosub, manual_indent																						; create manual bullet point with a dash
+	send, %OBDsUpdate%
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	gosub, manual_indent																						; create manual bullet point with a dash
+	send, %SpecReqUpdate%
+	sleep, 3
+	send, {down 3}																								; move cursor to correct position
+	send, %TotalRecordsUpdate%
+	gosub, email_bold_highlight
+	sleep, 5
+	send, {down}																								; move cursor to correct position
+	send, %TotalTimeSavedUpdate%
+	gosub, email_bold_highlight
+	sleep, 5
+	send, {down 4}																								; moves cursor in place for signature subroutine	
+	send, {end}
+	send, {enter}
+	Return
+	
+;---------------------------------------------------------------------------
+;	Peroni Loading Claim Email
+;---------------------------------------------------------------------------
+
+peroni_claim_email:
+	InputBox, ClaimStart, Loading Start Date `(MM/DD`),,, 300, 100, center, center,,, 								; Show the InputBox
+	InputBox, ClaimEnd, Loading End Date `(MM/DD`),,, 300, 100, center, center,,, 									; Show the InputBox
+	ClaimEmailBody := "Please find below the list of POs that did not meet the 21 day shipping standard from Birra Peroni for orders shipping between " ClaimStart " and " ClaimEnd ". Please let me know if you have any questions or concerns."
+	ClaimEmailSubject := "Peroni Claimable POs - " ClaimStart " to " ClaimEnd
+
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "Ronald.Bialosky@millercoors.com`; Amanda.Champion@millercoors.com`;"						; Add recipients 	-> use ; between email names inside the outer quotes
+	MailItem.CC := "importmgmt@millercoors.com`;"																; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello Amanda,
+		<br><br><br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+peroni_claim_email2:
+	send %ClaimEmailSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, {down 2}																								; move cursor to correct position
+	sleep, 3
+	send, %ClaimEmailBody%																						; inputs the order timeline
+	send, {down 1}																								; moves cursor in place for signature subroutine	
+	sleep, 3
+	send, ^v																									; paste in picture of claimable POs - must be most recent clip
+	send, {end}
+	send, {down 4}																								; move cursor to correct position
+	send, {end}
+	send, {enter}
+	Return	
+	
+;---------------------------------------------------------------------------
+;	Import Orders Email
+;---------------------------------------------------------------------------
+
+import_orders_email:
+	InputBox, StoLines, STO Total Lines ,,, 300, 100, center, center,,, 										; Show the InputBox
+	InputBox, PoLines, PO Total Lines,,, 300, 100, center, center,,, 											; Show the InputBox
+	InputBox, StoCrossRefLines, STO Cross Reference Total Lines ,,, 300, 100, center, center,,, 				; Show the InputBox
+	InputBox, SoCrossRefLines, Sales Order Cross Reference Total Lines ,,, 300, 100, center, center,,, 			; Show the InputBox
+	InputBox, AckLines, Acknowledgement Total Lines,,, 300, 100, center, center,,, 								; Show the InputBox
+	StoRecords := "STO Records:" 
+	PoRecords := "PO Records:" 
+	StoCrossRefRecords := "STO Cross Ref Records:" 
+	SoCrossRefRecords := "SO Cross Ref Records:" 
+	AckRecords := "Acknowledgement Records:" 
+	ImportOrdersTotal := "Total Records Processed:" 
+	StoRecords2 := StoLines * 11
+	PoRecords2 := PoLines * 22
+	StoCrossRefRecords2 := StoCrossRefLines * 2
+	SoCrossRefRecords2 := SoCrossRefLines * 3
+	AckRecords2 := AckLines * 5
+	ImportOrdersTotal2 := StoRecords2 + PoRecords2 + StoCrossRefRecords2 + SoCrossRefRecords2 + AckRecords2
+	ImportOrdersTotal3 := StoLines + PoLines + StoCrossRefLines + SoCrossRefLines + AckLines
+	OrdersTimeSaved := (ImportOrdersTotal3 * 100) / 3600
+	OrdersTimeSaved2 := round(OrdersTimeSaved,2)
+	OrdersTimeSavedUpdate := "Total time saved:" 
+	OrdersTimeSavedUpdate2 := OrdersTimeSaved2 " hours"
+	OrdersEmailDate := A_MM . "-" . A_DD . "-" . A_YYYY 	 													; stores subject line date formatting	
+	;~ OrdersEmailBody := "I have completed the 
+	OrdersEmailSubject := "Import Orders - " OrdersEmailDate
+	
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+	;~ MailItem.CC := "Amanda.Champion@millercoors.com`;"														; Add recipients to the CC line
+	MailItem.HTMLBody := "																					
+		<HTML>Hello team,
+		<br><br>All import STOs and POs have been created successfully.
+		<br><br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br><br><br>
+		<br><br>Please see the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+		<br><br>Cheers,
+		</HTML>"																								; end html section
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+import_orders_email2:
+	send %OrdersEmailSubject%																					; inputs the subject for the email
+	send, {tab}																									; move cursor to email body
+	send, {down 4}																								; move cursor to correct position
+	send, %StoRecords%																							; inputs the variable
+	send, {tab 3}
+	send, %StoRecords2%																							; inputs the variable
+	send, {down 1}																								; moves cursor in place
+	send, %PoRecords%																							; inputs the variable
+	send, {tab 3}
+	send, %PoRecords2%																							; inputs the variable	
+	send, {down 1}																								; moves cursor in place
+	send, %StoCrossRefRecords%																					; inputs the variable
+	send, {tab 2}
+	send, %StoCrossRefRecords2%																					; inputs the variable	
+	send, {down 1}																								; moves cursor in place
+	send, %SoCrossRefRecords%																					; inputs the variable
+	send, {tab 2}
+	send, %SoCrossRefRecords2%																					; inputs the variable	
+	send, {down 1}																								; moves cursor in place
+	send, %AckRecords%																							; inputs the variable
+	send, {tab 1}
+	send, %AckRecords2%																							; inputs the variable	
+	send, {down 2}																								; moves cursor in place
+	send, %ImportOrdersTotal%																					; inputs the variable
+	send, {tab 1}
+	send, %ImportOrdersTotal2%																					; inputs the variable
+	gosub, email_bold_highlight																					; highlights and bolds current line
+	sleep, 5
+	send, {down 1}																								; moves cursor in place
+	send, %OrdersTimeSavedUpdate%																				; inputs the variable
+	send, {tab 2}
+	send, %OrdersTimeSavedUpdate2%																				; inputs the variable
+	gosub, email_bold_highlight																					; highlights and bolds current line
+	sleep, 5
+	sleep, 3
+	send, {down 4}																								; move cursor to correct position
+	send, {end}
+	send, {enter}
+	Return	
+
+;---------------------------------------------------------------------------
+;	Ws Processing Schedule
+;---------------------------------------------------------------------------
+
+Ws_Processing_email1:
+	WsProcessingEmailWeek1 := A_YWeek																			; gets current year weeknum	;yyyyww format
+	StringRight, WsProcessingEmailWeek2, WsProcessingEmailWeek1, 2 												; returns only right 2 chars	; gets only weeknum
+	;~ InputBox, ClaimStart, Loading Start Date `(MM/DD`),,, 300, 100, center, center,,, 						; Show the InputBox
+	;~ InputBox, ClaimEnd, Loading End Date `(MM/DD`),,, 300, 100, center, center,,, 							; Show the InputBox
+	WsProcessingEmailSubject := "Ws Processing Schedule - Week " WsProcessingEmailWeek2							; creates the subject line	; Adds autocalculated weeknum 
+	;WsProcessingEmailBody := "Please find below my Winshuttle processing schedule for week " WsProcessingEmailWeek2 ". ."
+
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	MailItem.TO := "importmgmt@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+	;~ MailItem.CC := "importmgmt@millercoors.com`;"															; Add recipients to the CC line
+		MailItem.Display 																						; Make email visible
+		sleep, 3
+	return
+
+Ws_Processing_email2:
+	send %WsProcessingEmailSubject%																					; inputs the subject for the email
+	sleep, 3
+	send, {tab}																									; move cursor to bottom of email
+	sleep, 3
+	send, 
+	(
+Hello team,
+
+Please find below my Winshuttle processing schedule for week %WsProcessingEmailWeek2%. Make sure to send all requests via email so none are missed, include the team, and save your file in the designated folder in the current week. Files will be processed in the week they were submitted and returned either completed or with any necessary follow ups for the brand owner.
+)
+	send, {enter 2}
+	send, {alt}
+	sleep, 100
+	send, {n}
+	sleep, 100
+	send, {t}
+	sleep, 100
+	send, {t}
+	sleep, 100
+	send, {enter}
+	sleep, 10
+	send, {down 4}
+send, 
+(
+X = Processing Window
+
+All files should be saved with your four digits using the following naming conventions:
+
+Batches - FM36 - MMDDYYYY
+IBDs - FM36 - MMDDYYYY
+OBDs - FM36 - MMDDYYYY
+
+Please allow a half day lead time when submitting files for regular processing. If timing is a concern, or you have a special request, please coordinate with me directly so we may complete all activities as planned. See the Ws Import Shared folder for full details and, as always, please let me know if you have any other questions so we may discuss them further.
+
+Cheers,
+
+)
+return
+
+Ws_Processing_email3:
+	send, {up 16}
+	sleep, 10
+	send, {tab}
+	return
+
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
+/*
+
 	
-	
-	
+
 	
 	
 	
