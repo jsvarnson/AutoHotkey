@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Excel	v1.06
+;	Excel	v1.09
 ;====================================================================================================
 /*
 -------------------------
@@ -36,7 +36,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-/*
+
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -62,7 +62,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 			Reload
 		}
 	return
-*/
+
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
@@ -184,6 +184,19 @@ F1::
 	send, {enter}
 	return
 
+;--------------------------------------------------
+;	Table Creation
+;--------------------------------------------------
+
+~^t::
+	send, {tab}{enter}						; use if window defaults to "My table has headers" box checked
+	; send, {tab}{space}{enter}				; necessary to check the "My table has headers" box
+	sleep, 50
+	send, {down}
+	sleep,500
+	send, {alt}{j}{t}{a}
+	return
+
 ;---------------------------------------------------------------------------
 ;	Comobjects
 ;---------------------------------------------------------------------------
@@ -237,19 +250,19 @@ F8::
 	XL_Format_Wrap(XL,RG:= active_tbl_rg ,Wrap:=0)																; Unwraps all cells in active table range
 	
 	
-	;XL_Col_To_Char(2)																	; Sets columns string
-	;XL_String_To_Number("ab")															; Sets columns numeric
-	;Xl.Range("J:J").NumberFormat := "#########"										; change the column format to 9 digits
+	;XL_Col_To_Char(2)																							; Sets columns string
+	;XL_String_To_Number("ab")																					; Sets columns numeric
+	;Xl.Range("J:J").NumberFormat := "#########"																; change the column format to 9 digits
 	
 	;XL_Format_Number(XL,RG:="B:B",Format:="#########")
 	
 	
 	XL_Format_Font(XL,RG:="A1:BM4000",Font:="Roboto Mono",Size:=10)												; Sets whole sheet font and size	;Inconsolata
 	XL_Border(XL,RG:=  active_header_rg ,Weight:=2,Line:=1)														; Outlines the header
-	XL_Format_Cell_Shading(XL,RG:="A1:BM4000",Color:=48)														; shades whole sheet very dark gray
-	XL_Format_Cell_Shading(XL,RG:= active_header_rg ,Color:=16)													; shades active header range medium gray
+	XL_Format_Cell_Shading(XL,RG:="A1:BM4000",Color:=48)														; shades whole sheet 			; medium gray = 48
+	XL_Format_Cell_Shading(XL,RG:= active_header_rg ,Color:= 37)												; shades active header range 	; light blue = 41	; medium blue = 23	; blue gray = 37
 	XL_Format_Format(XL,RG:= active_header_rg ,Bold:=1,Italic:=0,Underline:=0) 									; sets active header range bold, italic, or underline	;1 = on
-	XL_Format_Cell_Shading(XL,RG:= active_tbl_rg ,Color:=15)													; shades active table range light gray
+	XL_Format_Cell_Shading(XL,RG:= active_tbl_rg ,Color:= 2) 													; shades active table range		; light gray = 15	; white = 2
 	XL_Col_Width_Set(XL,RG:="A:BM=-1")																			; autofits active column range
 	XL_Row_Height(XL,RG:="1:4000=-1")																			; autofits active row range
 	return
