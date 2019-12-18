@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Reference Tables	v1.02
+;	Reference Tables	v1.03
 ;====================================================================================================
 /*
 -------------------------
@@ -95,7 +95,7 @@ gui_autoexecute_ref_tables:
 ;---------------------------------------------------------------------------
 ;	Active Orders
 ;---------------------------------------------------------------------------
-
+/*
 ref_table_actives:
 	;gui_destroy()
 	Gui, Margin, 16, 16
@@ -118,7 +118,7 @@ ref_table_actives:
 		; LV_ModifyCol(10, "MM/DD/YYYY Center NoSort", Ship End)
 	Gui, Show, Autosize, ActiveOrdersGUI
 	return
-
+*/
 ;---------------------------------------------------------------------------
 ;	Distributors
 ;---------------------------------------------------------------------------
@@ -218,7 +218,7 @@ ref_table_SKUs:
 	Gui, Color, 1d1f21, 282a2e
 	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border
 	Gui, Font, s10 cf0c674, Segoe UI
-	Gui, add, listview, w610 h330 vSKUs, Peroni|OSKU|MSKU|BPA|BPACLL|Description
+	Gui, add, listview, w610 h372 vSKUs, Peroni|OSKU|MSKU|BPA|BPACLL|Description
 	LV_ModifyCol(auto)  													; Auto-size each column to fit its contents and header
 	LV_ModifyCol(1, "Integer Left 80", "Birra Peroni")  						
 	LV_ModifyCol(2, "Integer Left 68", "OSKU")
@@ -233,14 +233,16 @@ ref_table_SKUs:
 	LV_Add(,1394,702241,43827,"PN22E5","PN22E5R54","2/12 330ML GBT LSTDGR CAR TRY")
 	LV_Add(,1471,703250,43829,"PN33P5","PN33P5E54","24 4/6 330ML AL CAN SL CAR TRY")
 	LV_Add(,1403,703250,43829,"PN33P5","PN33P5E54","24 4/6 330ML AL CAN SL CAR TRY")
-	LV_Add(,1437,703702,43865,"PN37G5","PN37G5E54","24 LS 500ML AL CAN IS TRS")
+	LV_Add(,1437,703702,44502,"PN37G5","PN37G5E54","24 LS 500ML AL CAN IS TRS")
+	LV_Add(,1437,703702,43865,"PN37G5","PN37G5E54","OLD 24 LS 500ML AL CAN IS TRS")
 	LV_Add(,,702330,43832,"PN23E5","PN23E5R54","24LS 330ML GBT LSTDGR HGC")
 	LV_Add(,,702370,43647,"PN23G5","PN23G5R54","2/10 330ML GBT LSTDGR CAR TRY")
 	LV_Add(,,702832,43830,"PN3855","PN3855E54","24 LS 330ML AL CAN SL TRS")
-	LV_Add(,1393,702240,43835,"PN21E5","PN21E5R54","4/6 330ML GBT LSTDGR BSK CTN")
+	LV_Add(,1393,702240,44433,"PN21E5","PN21E5R54","4/6 330ML GBT LSTDGR BSK CTN")
+	LV_Add(,1393,702240,43835,"PN21E5","PN21E5R54","OLD 4/6 330ML GBT LSTDGR BSK CTN")
 	LV_Add(,1394,702241,43828,"PN22E5","PN22E5R54","2/12 330ML GBT LSTDGR CAR TRY")
 	LV_Add(,,703841,44021,"PN2AG5","PN2AG5R54P","24 4/6 8.5OZ GBT LSTDGR BSK CT")
-	Gui, Show, w642 h362, SKUGUI
+	Gui, Show, w642 h404, SKUGUI
 	return
 
 ;---------------------------------------------------------------------------
