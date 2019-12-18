@@ -1,7 +1,7 @@
 ;====================================================================================================
-;	SAP		v1.01
+;	SAP		v1.04
 ;====================================================================================================
-/* 
+/*
 -------------------------
 |	Main Directory		|
 -------------------------
@@ -38,7 +38,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-
+/* turned off by default
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -64,19 +64,18 @@ SendMode Input							; Recommended to set sendinput as the default send method
 			Reload
 		}
 	return
-
+*/
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
-
 
 ;---------------------------------------------------------------------------
 ;	ME23N - Search PO/STO
 ;---------------------------------------------------------------------------
 
-!^#+i::
+!^#+o::
 	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
-	if WinExist("ahk_class SAP_FRONTEND_SESSION")
+	if WinExist("ahk_class SAP_FRONTEND_SESSION")						; detects if program is open
 	{
 		oldclipboard := clipboard										; stores old clipboard
 		clipboard :=""													; empties current clipboard
@@ -100,7 +99,32 @@ SendMode Input							; Recommended to set sendinput as the default send method
 		send, {enter}
 		clipboard:= oldclipboard										; reset clipboard to original
 	}
-	else
+	else if WinExist("SAP Logon")										; detects if logon window is open
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinClose, SAP Logon												; closes the detected window
+		WinWaitClose, SAP Logon, 3										; wait until closed
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, ME23N {enter}												; enter transaction name
+		winwaitactive, Import PO - APO, , 3								; wait until active
+		sleep, 10
+		send, {shift down}{F5}{shift up}								; search document hotkey in SAP
+		winwaitactive, Select Document, , 3								; wait until active
+		sleep, 100
+		send, {shift down}{end}{shift up}{delete}						; clear search box
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else																; result if program is not open
 	{
 		oldclipboard := clipboard										; stores old clipboard
 		clipboard :=""													; empties current clipboard
@@ -130,7 +154,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;	VL03N - Search Delivery
 ;---------------------------------------------------------------------------
 
-!^#+t::
+!^#+y::
 	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
 	if WinExist("ahk_class SAP_FRONTEND_SESSION")
 	{
@@ -143,6 +167,27 @@ SendMode Input							; Recommended to set sendinput as the default send method
 		send, {ctrl down}{n}{ctrl up}									; create new SAP window
 		sleep, 10		
 		WinWaitActive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VL03N {enter}												; enter transaction name
+		winwaitactive, Display Outbound Delivery, , 3					; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else if WinExist("SAP Logon")
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinClose, SAP Logon												; closes the detected window
+		WinWaitClose, SAP Logon, 3										; wait until closed
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
 		sleep, 1000
 		send, VL03N {enter}												; enter transaction name
 		winwaitactive, Display Outbound Delivery, , 3					; wait until active
@@ -178,7 +223,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;	VT03N - Search Shipment
 ;---------------------------------------------------------------------------
 
-!^#+y::
+!^#+t::
 	SetTitleMatchMode, 2												; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
 	if WinExist("ahk_class SAP_FRONTEND_SESSION")
 	{
@@ -191,6 +236,27 @@ SendMode Input							; Recommended to set sendinput as the default send method
 		send, {ctrl down}{n}{ctrl up}									; create new SAP window
 		sleep, 10		
 		WinWaitActive, SAP Easy Access, , 5								; wait until active
+		sleep, 1000
+		send, VT03N {enter}												; enter transaction name
+		winwaitactive, Display Shipment, , 3							; wait until active
+		sleep, 10
+		send, {ctrl down}{v}{ctrl up}									; paste copied Text
+		sleep, 250
+		send, {enter}
+		clipboard:= oldclipboard										; reset clipboard to original
+	}
+	else if WinExist("SAP Logon")
+	{
+		oldclipboard := clipboard										; stores old clipboard
+		clipboard :=""													; empties current clipboard
+		send, {ctrl down}{c}{ctrl up}									; copies selected text
+		clipwait														; Adds copied Text to clipboard
+		WinClose, SAP Logon												; closes the detected window
+		WinWaitClose, SAP Logon, 3										; wait until closed
+		run, saplogon.exe												; run program
+		winwaitactive, SAP Logon, , 3									; wait until active
+		send, {enter}
+		winwaitactive, SAP Easy Access, , 5								; wait until active
 		sleep, 1000
 		send, VT03N {enter}												; enter transaction name
 		winwaitactive, Display Shipment, , 3							; wait until active
@@ -223,10 +289,44 @@ SendMode Input							; Recommended to set sendinput as the default send method
 	return
 
 ;---------------------------------------------------------------------------
-;	
+;	Picking
 ;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+; 900085 picking
+;--------------------------------------------------
+/*
+^!#+q::
+	send, 900085
+	send, {tab}
+	send, 6870
+	send, {tab}
+	send, DC01
+	send, {tab}
+	send, 72
+	send, {tab}
+	send, {tab}
+	send, 72
+	send, {tab}
+	send, {enter}
+	return	
 	
-	
+^!#+w::
+	send, 900011
+	send, {tab}
+	send, 6870
+	send, {tab}
+	send, DC01
+	send, {tab}
+	send, 21
+	send, {tab}
+	send, {tab}
+	send, 21
+	send, {tab}
+	send, {enter}
+	return		
+*/
+
 	
 ;====================================================================================================
 ;	END
