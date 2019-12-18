@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	DashMail	v4.03
+;	DashMail	v4.04
 ;====================================================================================================
 /*
 	Version History
@@ -125,7 +125,7 @@ gui_autoexecute:
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-/*
+/* turned off by default
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -188,7 +188,12 @@ Doc_OnClick(doc) {											; defines actions for gui events ie. clicking butto
 		;msgbox, Send @ target!
 		}
 	else if (id="Active") 
-		msgbox, List of active Sequences 'n%Sequence% is active! 
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, Active_OnClick
+		; msgbox, List of active Sequences 'n%Sequence% is active! 
+		}
 	else if (id = "About")
 		msgbox, Put a readme with instructions and creation information here.	
 	else if (id="Cancel") 
@@ -313,11 +318,13 @@ Interval_OnClick:
 	GUI, Add, Text, xm+14 y+1 , Send now...send later!															; Adds a subtitle bar and positions it
 	Gui, Font, s11 cf0c674, Segoe UI																			; sets font for the bottom half of the GUI
 	GUI, Add, Text, xm+7, Enter time interval (min)																; determines the interval 	-> user input
-	GUI, Add, Edit, x+45 +number w60 vtime, 15																	; creates time variable -> user input
+	GUI, Add, Edit, x+45 +number w60 vtime, 15																	; creates time variable 	-> user input
+	GUI, Add, Text, xm+7, Name the sequence																		; names the sequence timer 	-> user input
+	GUI, Add, Edit, x+75 w60 vSeqName, 																			; names the timer 			-> user input
 	GUI, Add, Checkbox, checked xm+7 vSendInterval, Send with OK												; Adds checkbox to the GUI 	-> must CLICK OK Button to activate interval timer																					
 	GUI, Add, Button, default gIntervalButtonOK x+10 w60, OK													; Button OK control 		
 	GUI, Add, Button, x+20 w60 gGUIClose, Cancel																; Button Cancel control
-	GUI, Show, w310 h250																						; displays GUI
+	GUI, Show, w310 h275																						; displays GUI
 	return
 
 ;--------------------------------------------------
@@ -346,11 +353,36 @@ Target_OnClick:																									; last test was 3 minutes late
 	GUI, Add, Text, xm+7 y+1 , Request now...send later!														; Adds a subtitle bar and positions it; subtitle text
 	Gui, Font, s11 cf0c674, Segoe UI																			; sets font for the bottom half of the GUI
 	GUI, Add, Text, xm, Enter desired send time (HHMM)															; determines the trigger time 	-> user input
-	GUI, Add, Edit, x+7 +number w55 vtimeTarget, 0800																	; creates time variable
+	GUI, Add, Edit, x+7 +number w55 vtimeTarget, 0800															; creates time variable
 	GUI, Add, Checkbox, checked xm vSendTarget, Send with OK													; Adds checkbox to the GUI 																					
 	GUI, Add, Button, default gTargetButtonOK x+36 w55, OK														; Button OK control 		
 	GUI, Add, Button, x+20 w55 gGUIClose, Cancel																; Button Cancel control
 	GUI, Show, w310 h250																						; displays GUI
+	return
+
+;--------------------------------------------------
+;	Active Sequences
+;--------------------------------------------------	
+
+Active_OnClick:
+	msgbox, active sequences
+/*
+	;gui_destroy()
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e																					; colors the background dark gray
+	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border														; removes the toolbar
+	Gui, Font, s48 cf0c674, Rage Italic																			; choses font size and color
+	GUI, Add, Text, x+40 y+10, Active Sequences																	; sets the title of the GUI
+	Gui, Font, s11 cf0c674, Segoe UI																			; sets font for the bottom half of the GUI
+	
+	GUI, Text, 
+	
+	
+	GUI, Add, Button, xm+10 y+10 w55 gGUIClose, Cancel															; Button Cancel control
+	GUI, Show, w500 h750																						; displays GUI
+
+
+*/
 	return
 
 ;---------------------------------------------------------------------------
@@ -367,8 +399,9 @@ IntervalButtonOK:																								; send @ interval OK Button
 		gosub, ChooseNameFileRec																				; chooses file name, file path, and email recipients
 		gosub, 	Dash_mail_send																					; activates the action subroutine
 	SetTimer, Period, % time * 1000 * 60	; * 60 * 24	* 7														; creates an interval timer in minutes	; in hours	; in days	; in weeks
+	;~ SetTimer, %SeqName%, % time * 1000 * 60	; * 60 * 24	* 7														; creates an interval timer in minutes	; in hours	; in days	; in weeks
 	return																										; remember to update GUI label from (min) if you change periodicity
-	
+		
 TargetButtonOK:																									; send @ time OK Button
 	GUI, Submit
 		if SendTarget	
@@ -734,8 +767,8 @@ SendMsg:
 
 OuttaTime:																										; calculates time until desired time, then executes secondary subroutine
 	;time2 := regexreplace(time2, "):", "")																		; used to replace the ":" in the time input	; removed ":" from input GUI
-	target_time = %timeTarget%																						; 0145 ; 01:45 am	; use GUI to determine time
-	msgbox, Your email will be sent at %timeTarget%																	; confirmation message with time the email will be sent
+	target_time = %timeTarget%																					; 0145 ; 01:45 am	; use GUI to determine time
+	msgbox, Your email will be sent at %timeTarget%																; confirmation message with time the email will be sent
 	; Get target time in a format we can:
 	;  - compare (with "<"), and
 	;  - use to calculate "time delta" (with EnvSub.)
@@ -896,16 +929,16 @@ Dash_mail_send:
 ;	GUI, Add, Text, x+30 y+10, DashMail																			; header text
 ;	Gui, Font, s22 cf0c674, Rage Italic																			; choses font size and color
 ;	GUI, Add, Text, xm+7 y+1 , Email and Report scheduler														; subtitle text
-		;Gui, Font, s11 cf0c674, Segoe UI																			; choses font size and color
-		;GUI, Add, Text, xm, Enter desired send time (HHMM)															; determines the trigger time 	-> user input
-		;GUI, Add, Edit, x+7 +number w55 vtime, 0800																	; creates time variable
-		;GUI, Add, Checkbox, checked xm vsend, Send with OK															; Adds checkbox to the GUI 																					
-		;GUI, Add, Button, default gIntervalButtonOK xm+16 w70 h40, Interval												; goes to Interval subroutine
-		;GUI, Add, Button, gOnceNowGUI x+16 w70 h40, Now															; goes to OnceNow subroutine
+		;Gui, Font, s11 cf0c674, Segoe UI																		; choses font size and color
+		;GUI, Add, Text, xm, Enter desired send time (HHMM)														; determines the trigger time 	-> user input
+		;GUI, Add, Edit, x+7 +number w55 vtime, 0800															; creates time variable
+		;GUI, Add, Checkbox, checked xm vsend, Send with OK														; Adds checkbox to the GUI 																					
+		;GUI, Add, Button, default gIntervalButtonOK xm+16 w70 h40, Interval									; goes to Interval subroutine
+		;GUI, Add, Button, gOnceNowGUI x+16 w70 h40, Now														; goes to OnceNow subroutine
 		;GUI, Add, Button, gTargetButtonOK x+16 w70 h40, Target													; goes to TargetTime subroutine
 	Gui, Add, ActiveX, w450 h350 x0 y0 vdoc, HTMLFile						; W300 H80 x25 y130
 	doc.write(html)
-	;GUI, Add, Button, xm+20 w60, Active																			; Button Cancel control
+	;GUI, Add, Button, xm+20 w60, Active																		; Button Cancel control
 	GUI, Add, Button, xm+20 w60, Cancel																			; Button Cancel control
 	;GUI, Show, ;w350 h250																						; displays GUI
 	Gui, Show, Center, DashMail
