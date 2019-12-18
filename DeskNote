@@ -1,0 +1,154 @@
+;====================================================================================================
+;	Desktop Editable Zone
+;====================================================================================================
+/*
+-------------------------
+|	Main Directory		|
+-------------------------
+1.	Settings
+2.	Universal
+3.	Main
+4. 
+-------------------------
+|		  END			|
+-------------------------
+*/
+;====================================================================================================
+;	Settings
+;====================================================================================================
+
+#Singleinstance, Force					; Recommended for all scripts to prevent old instances
+#NoEnv									; Recommended for all scripts to disable environment variables
+#MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
+#HotkeyInterval 99000000				; Recommended for all scripts to prevent error messages
+#KeyHistory 0							; Only useful for debugging purposes
+ListLines Off							; Only useful for debugging purposes
+Process, Priority, , A					; Recommended to set a higher priority to improve speed
+SetBatchLines, -1						; Recommended to remove the default 10 ms sleep between lines
+SetKeyDelay, -1, -1						; Recommended to remove the default 10 ms sleep between lines
+SetMouseDelay, -1						; Recommended to remove the default delayed mouse move
+SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse move
+SetWinDelay, -1							; Recommended to set sendinput as the default send method
+SetControlDelay, -1						; Recommended to set sendinput as the default send method
+SendMode Input							; Recommended to set sendinput as the default send method
+SetTitleMatchMode 2                     ; Compares window title names
+#Persistent                             ; Will stay running until terminated manually or by EarlyTerm1                                     
+
+;====================================================================================================
+;	Universal	
+;====================================================================================================
+
+~^+Esc::								; Exits all active scripts
+	Exitapp
+	return
+
+~^Esc::									; Pauses all active scripts
+	Suspend, on
+	Pause, on
+	return
+
+~^!#+r::								; Unpauses and reloads all active scripts
+	Suspend, off
+	Pause, off
+	SetTimer,UPDATEDSCRIPT,1000
+	return	
+	
+~^s::									; Reloads scipt upon save
+	SetTimer,UPDATEDSCRIPT,1000
+	UPDATEDSCRIPT:
+		FileGetAttrib,attribs,%A_ScriptFullPath1%
+		IfInString,attribs,A
+		{
+			FileSetAttrib,-A,%A_ScriptFullPath1%
+			Reload
+		}
+	return
+
+;====================================================================================================
+;	Main
+;====================================================================================================
+
+^!#+q::
+	if WinExist("DesktopNote") 
+	{																											; check if the GUI is already open, then coses it
+		Gui, Destroy
+	}	
+	else 
+	{	
+	gosub, createDesktopNote
+	}
+	return
+
+createDesktopNote: ;
+		Gui 3: +LastFound +toolwindow -0xC00000 ;+0x200000
+		desktopNoteId:= WinExist()
+		winset,Bottom,,ahk_id %desktopNoteId%
+		gui 3: margin,0,0
+		Gui 3: Color,black,black
+		winset,transcolor,black
+		desktopNoteX:=0
+		desktopNoteY:=321
+		desktopNoteW:=983
+		desktopNoteH:=320
+		;~ desktopNoteX:=200
+		;~ desktopNoteY:=0
+		;~ desktopNoteW:=(A_screenWidth-desktopNoteX)
+		;~ desktopNoteH:=(A_screenHeight-desktopNoteY-taskbarH)
+		Gui 3: Add, Edit,W%desktopNoteW% H%desktopNoteH%  cYELLOW +wantTab vscroll -hScroll -Wrap t16 t96 t112 T164 T196 T336 WantCtrlA -0x4000 +0x200000 -E0x200,%desktopNote%
+		Gui 3: Show,  x%desktopNoteX% y%desktopNoteY% W%desktopNoteW% H%desktopNoteH% NoActivate,DesktopNote
+		winset,Bottom,,ahk_id %desktopNoteId%
+		OnMessage(0x200, "OnMouseMove")
+		OnMessage(0x06, "OnActivate")
+	return
+	onMouseMove:
+		winset,Bottom
+	return
+	onActivate:
+		winset,Bottom
+	return
+	mouseLeaveTimer: ;
+		GetKeyState,btnMState,mButton,P
+		GetKeyState,btnRState,rButton,P
+		ifEqual,btnMState,D,return
+		ifEqual,btnRState,D,return
+			
+		mouseGetPos,MouseX,MouseY,winID
+		WinGetPos, DNX2, DNY2,dnw2,dnh2,ahk_id %desktopNoteId%
+		if (dnx<>dnx2 and dnx2<>"" or dny<>dny2 and dny2<>""){
+			dnx:=dnx2
+			dny:=dny2
+		}else if(dnw2<>dnw and dnw2<>"" or dnh2<>dnh and dnh2<>""){
+			dnw:=dnw2
+			dnh:=dnh2
+			gui,destroy
+			gosub createDesktopNote
+		}else if(mousex<dnx or mousex>(dnx+dnw) or mouseY<dny or mousey>(dny+dnh) or winId<>desktopNoteId ){
+			ControlGetText, desktopNoteNew, Edit1,ahk_id %desktopNoteId%
+			if(desktopNoteNew<>desktopNote){
+				StringLen, desktopNoteLen, desktopNote
+				StringLen, desktopNoteNewLen, desktopNoteNew
+				diff:=(desktopNoteNewLen-desktopNoteLen)
+				if(diff<-600){
+					gosub UPDATEDSCRIPT
+				}
+				desktopNote:=desktopNoteNew
+				FileDelete, desktopNote.txt
+				FileAppend, %desktopNote%, desktopNote.txt
+			}
+			winset,transcolor,Black,ahk_id %desktopNoteId%
+			SetTimer mouseLeaveTimer, off
+			click
+		}
+		winset,Bottom,,ahk_id %desktopNoteId%
+		
+	return ;; ;;
+	
+	;====================================================================================================
+	;	End
+	;====================================================================================================
+	
+	;====================================================================================================
+	;	Archive
+	;====================================================================================================
+	
+	
