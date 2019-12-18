@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Desktop Editable Zone v1.01
+;	Script Controls	v1.01
 ;====================================================================================================
 /*
 -------------------------
@@ -8,7 +8,8 @@
 1.	Settings
 2.	Universal
 3.	Main
-4. 
+4.	
+5.	
 -------------------------
 |		  END			|
 -------------------------
@@ -31,13 +32,11 @@ SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse mo
 SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
-SetTitleMatchMode 2                     ; Compares window title names
-#Persistent                             ; Will stay running until terminated manually or by EarlyTerm1                                     
 
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-
+/* turned off by default
 ~^+Esc::								; Exits all active scripts
 	Exitapp
 	return
@@ -56,99 +55,41 @@ SetTitleMatchMode 2                     ; Compares window title names
 ~^s::									; Reloads scipt upon save
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
-		FileGetAttrib,attribs,%A_ScriptFullPath1%
+		FileGetAttrib,attribs,%A_ScriptFullPath%
 		IfInString,attribs,A
 		{
-			FileSetAttrib,-A,%A_ScriptFullPath1%
+			FileSetAttrib,-A,%A_ScriptFullPath%
 			Reload
 		}
 	return
-
+*/
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
 
-^!#+q::
-	if WinExist("DesktopNote") 
-	{																											; check if the GUI is already open, then coses it
-		Gui, Destroy
-	}	
-	else 
-	{	
-	gosub, createDesktopNote
+~^+Esc::
+	SetTitleMatchMode, 2
+	DetectHiddenWindows, On 																		; allows the script to identify hidden windows
+	WinGet, ahkList, list, - AutoHotkey 															; get all AHK windows
+	Loop % ahkList ; loop through these windows
+	{
+	WinGetTitle, this_title, % "ahk_id " ahkList%A_Index% 											; get the title of the window for the next line
+	IfInString, this_title, %A_ScriptName% 															; we don't want to close the script that is executing this hotkey, or else it may leave some other AHKs behind
+	   Continue 																					; so just go onto the next identified window if the above line is True
+	PostMessage, 0x111, 65307,,, % this_title 														; 65307 is ExitApp. 65303 is Reload. 65304 is Edit. 65305 is Suspend. 65306 is Pause. 
 	}
-	return
+	return 																							; make this ExitApp to close this script as well
 
-createDesktopNote: ;
-		Gui 3: +LastFound +toolwindow -0xC00000 ;+0x200000
-		desktopNoteId:= WinExist()
-		winset,Bottom,,ahk_id %desktopNoteId%
-		gui 3: margin,0,0
-		Gui 3: Color,black,black
-		winset,transcolor,black
-		desktopNoteX:=0
-		desktopNoteY:=321
-		desktopNoteW:=983
-		desktopNoteH:=320
-		;~ desktopNoteX:=200
-		;~ desktopNoteY:=0
-		;~ desktopNoteW:=(A_screenWidth-desktopNoteX)
-		;~ desktopNoteH:=(A_screenHeight-desktopNoteY-taskbarH)
-		Gui 3: Add, Edit,W%desktopNoteW% H%desktopNoteH%  cYELLOW +wantTab vscroll -hScroll -Wrap t16 t96 t112 T164 T196 T336 WantCtrlA -0x4000 +0x200000 -E0x200,%desktopNote%
-		Gui 3: Show,  x%desktopNoteX% y%desktopNoteY% W%desktopNoteW% H%desktopNoteH% NoActivate,DesktopNote
-		winset,Bottom,,ahk_id %desktopNoteId%
-		OnMessage(0x200, "OnMouseMove")
-		OnMessage(0x06, "OnActivate")
-	return
-	onMouseMove:
-		winset,Bottom
-	return
-	onActivate:
-		winset,Bottom
-	return
-	mouseLeaveTimer: ;
-		GetKeyState,btnMState,mButton,P
-		GetKeyState,btnRState,rButton,P
-		ifEqual,btnMState,D,return
-		ifEqual,btnRState,D,return
-			
-		mouseGetPos,MouseX,MouseY,winID
-		WinGetPos, DNX2, DNY2,dnw2,dnh2,ahk_id %desktopNoteId%
-		if (dnx<>dnx2 and dnx2<>"" or dny<>dny2 and dny2<>""){
-			dnx:=dnx2
-			dny:=dny2
-		}else if(dnw2<>dnw and dnw2<>"" or dnh2<>dnh and dnh2<>""){
-			dnw:=dnw2
-			dnh:=dnh2
-			gui,destroy
-			gosub createDesktopNote
-		}else if(mousex<dnx or mousex>(dnx+dnw) or mouseY<dny or mousey>(dny+dnh) or winId<>desktopNoteId ){
-			ControlGetText, desktopNoteNew, Edit1,ahk_id %desktopNoteId%
-			if(desktopNoteNew<>desktopNote){
-				StringLen, desktopNoteLen, desktopNote
-				StringLen, desktopNoteNewLen, desktopNoteNew
-				diff:=(desktopNoteNewLen-desktopNoteLen)
-				if(diff<-600){
-					gosub UPDATEDSCRIPT
-				}
-				desktopNote:=desktopNoteNew
-				FileDelete, desktopNote.txt
-				FileAppend, %desktopNote%, desktopNote.txt
-			}
-			winset,transcolor,Black,ahk_id %desktopNoteId%
-			SetTimer mouseLeaveTimer, off
-			click
-		}
-		winset,Bottom,,ahk_id %desktopNoteId%
-		
-	return ;; ;;
-	
-	;====================================================================================================
-	;	End
-	;====================================================================================================
-	
-	;====================================================================================================
-	;	Archive
-	;====================================================================================================
-	
-	
+;====================================================================================================
+;	END
+;====================================================================================================
+
+
+
+
+
+
+
+
+
+
