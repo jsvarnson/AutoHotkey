@@ -1,15 +1,20 @@
 ;====================================================================================================
-;	Universal Subroutines v1.06
+;	Universal Subroutines v3.03
 ;====================================================================================================
 /*
 -------------------------
 |	Main Directory		|
 -------------------------
 1.	Settings
-2.	Universal
-3.	Main
-4.	
-5.	
+2.	AutoExecute
+3.	Universal
+4.	Main
+5.	Email Buttons
+6.	File Buttons
+7.  Ref Table Buttons
+8.  System Buttons
+9.	
+10.	
 -------------------------
 |		  END			|
 -------------------------
@@ -32,12 +37,60 @@ SetDefaultMouseSpeed, 0					; Recommended to remove the default delayed mouse mo
 SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
+#Persistent								; Script will stay running after the auto-execute section
+
+;====================================================================================================
+;	AutoExecute
+;====================================================================================================
+
+;--------------------------------------------------
+;	Activate Universal GUI on MouseOver		
+;--------------------------------------------------
+
+/*
+;#Persistent
+;SetTimer, ActivateUGUI, 100
+SetTimer, WatchCursor, 100
+return
+
+
+#If MouseIsOver("ahk_class AutoHotkeyGUI")
+	WinActivate, Universal
+	;~ RButton::msgbox UGUI Activated
+#If   ; finish definition of context-sensitive hotkeys
+
+MouseIsOver(Universal) {
+    MouseGetPos,,, Win
+    return WinExist(Universal . " ahk_id " . Win)
+}
+*/
+
+;--------------------------------------------------
+;	Watch Cursor
+;--------------------------------------------------
+
+/*
+; Display window information under mouse
+
+; #Persistent
+; SetTimer, WatchCursor, 100
+; return
+
+WatchCursor:
+MouseGetPos, , , id, control
+WinGetTitle, title, ahk_id %id%
+WinGetClass, class, ahk_id %id%
+ToolTip, ahk_id %id%`nahk_class %class%`n%title%`nControl: %control%
+return
+*/
 
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
 
+
 ~^+Esc::								; Exits all active scripts
+	Gui, Destroy
 	Exitapp
 	return
 
@@ -63,13 +116,11 @@ SendMode Input							; Recommended to set sendinput as the default send method
 		}
 	return
 
+
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
 
-~Esc::
-	Gui, Destroy
-	return	
 
 ^!#+u::
 	if WinExist("Universal") 
@@ -77,78 +128,559 @@ SendMode Input							; Recommended to set sendinput as the default send method
 		Gui, Destroy
 	}	
 	else 
-		{																										; check if the GUI isn't open, then opens it
+	{																											; check if the GUI isn't open, then opens it
+		SetTimer, UpdateClock, 1000
+
+;--------------------------------------------------
+;	SF Alien Encounters Style GUI
+;--------------------------------------------------	
+	
+; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/	
+; VCR OSD Mono download https://www.hipsthetic.com/vcr-osd-mono-free-pixel-font/
+; Lazer84 download https://www.dafont.com/lazer84.font
+; Indelible download https://indieground.net/product/indelible-font/
+; Px437 VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
+; PxPlus VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
+	
 		Gui, Margin, 16, 16
 		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
-		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
-		Gui, Font, s38 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+15 y+10, Universal																	; sets the title of the GUI
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub1, Dates
-		GUI, Add, Button, w75 x+10 gSub2, WinS
-		GUI, Add, Button, w75 x+10 gSub3, Dash
-		GUI, Add, Button, w75 x+10 gSub4, Directs
-		GUI, Add, Button, w75 x+10 gSub5, Orders
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Emails
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub6, Sub6
-		GUI, Add, Button, w75 x+10 gSub7, Sub7
-		GUI, Add, Button, w75 x+10 gSub8, Sub8
-		GUI, Add, Button, w75 x+10 gSub9, Sub9
-		GUI, Add, Button, w75 x+10 gSub10, Sub10
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Files
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub11, Dists
-		GUI, Add, Button, w75 x+10 gSub12, Plants
-		GUI, Add, Button, w75 x+10 gSub13, SKUs
-		GUI, Add, Button, w75 x+10 gSub14, Lanes
-		GUI, Add, Button, w75 x+10 gSub15, Sub15
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Tables
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub16, Sub16
-		GUI, Add, Button, w75 x+10 gSub17, Sub17
-		GUI, Add, Button, w75 x+10 gSub18, Sub18
-		GUI, Add, Button, w75 x+10 gSub19, Stay
-		GUI, Add, Button, w75 x+10 gSub20, Back
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, System
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		;GUI, Add, Button, default w100 xs+315 y+15 gClose, Close
-		GUI, Show, x0 y0 w550 h320, Universal																	; displays and names GUI
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border	+HwndUGUI										; removes the toolbar
+		Gui, Font, s38 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
+		Gui, Font, s12 w400 cf0c674, SF Alien Encounters														; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+16 gSub1, Dates
+		GUI, Add, Button, w80 h35 x+7 gSub2, WinS
+		GUI, Add, Button, w80 h35 x+7 gSub3, &Orders
+		GUI, Add, Button, w80 h35 x+7 gSub4, &Directs
+		GUI, Add, Button, w80 h35 x+7 gSub5, &Claims
+		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+6 , Emails
+		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub6, &ECC
+		GUI, Add, Button, w80 h35 x+7 gSub7, Batch
+		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
+		GUI, Add, Button, w80 h35 x+7 gSub9, OBDs
+		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
+		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+6, Files
+		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub11, Dists
+		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
+		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
+		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
+		GUI, Add, Button, w80 h35 x+7 gSub15, Sub15
+		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+6, Tables
+		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub21, Ship
+		GUI, Add, Button, w80 h35 x+7 gSub22, Sail
+		GUI, Add, Button, w80 h35 x+7 gSub23, ETA
+		GUI, Add, Button, w80 h35 x+7 gSub24, ATA
+		GUI, Add, Button, w80 h35 x+7 gSub25, Unexp
+		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+6, TM
+		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub16, Dash
+		GUI, Add, Button, w80 h35 x+7 gSub17, Sub17
+		GUI, Add, Button, w80 h35 x+7 gSub18, Sub18
+		GUI, Add, Button, w80 h35 x+7 gSub19, &Stay
+		GUI, Add, Button, w80 h35 x+7 gSub20, &Back
+		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		GUI, Add, Text, x+6, System
+		Gui, Font, S42, SF Alien Encounters																		; select font and size	; Rage Italic		
+		Gui, Add, Text, x+72 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
+		Gui, Font, S4, SF Alien Encounters																		; select font and size	; Rage Italic		
+		Gui, Add, MonthCal, y+16 0x4 0x8 0x16 Background1d1f21 													; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		GuiControl, Show, MonthCal, 
+		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
+
+;--------------------------------------------------
+;	GUI End
+;--------------------------------------------------
+	
+	}
+	return
+	
+UpdateClock:
+	GuiControl,, ClockTime1, % A_Hour ":" A_Min ":" A_Sec
+	return		
+
+
+;====================================================================================================
+;	Global
+;====================================================================================================	
+
+;-------------------------------------------------------------------------------------
+;	Key Mapping
+;-------------------------------------------------------------------------------------
+
+/*
+Capslock							->  Enter
+ctrl + Capslock						->  Toggle Capslock
+`									->  Backwards Tab
+Numlock Always On
+*/
+
+;--------------------------------------------------
+;	Capslock as Enter
+;--------------------------------------------------
+
+Capslock::
+	send, {enter}
+	return
+
+;--------------------------------------------------
+;	Set Capslock
+;--------------------------------------------------	
+	
+^CapsLock::
+    GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
+    if capsstate = U
+        SetCapsLockState, AlwaysOn
+    else
+        SetCapsLockState, AlwaysOff
+    return
+	
+;--------------------------------------------------
+;	Tilde as Backwards Tab
+;--------------------------------------------------
+
+`::
+	send, {shift down}
+	send, {tab}
+	send, {shift up}
+	return
+
+;--------------------------------------------------
+;	Numlock Always On
+;--------------------------------------------------
+
+SetNumLockState , on
+return
+
+
+;---------------------------------------------------------------------------
+;	Activate Window Under Mouse
+;---------------------------------------------------------------------------
+/*
+#Persistent
+SetTimer, ActivateUGUI, 100
+return
+
+ahk_pid 14768	; universal gui pid
+ahk_id 0x2a0638	; universal gui id
+
+ActivateUGUI:
+MouseGetPos,,, UGUIUMID
+if UGUIUMID = 0x2a0638 {
+	WinActivate, ahk_id %WinUMID%
+}
+return
+*/
+
+;---------------------------------------------------------------------------
+;	Activate Window Under Mouse
+;---------------------------------------------------------------------------
+/*						; interrupts Ditto window
+#Persistent
+SetTimer, ActivateWinUM, 100
+return
+
+ActivateWinUM:
+MouseGetPos,,, WinUMID
+WinActivate, ahk_id %WinUMID%
+return
+*/
+;---------------------------------------------------------------------------
+;	AutoCapitalize
+;---------------------------------------------------------------------------
+/*
+#SingleInstance force
+#NoEnv
+Process Priority,,High
+SetBatchLines -1
+*/
+
+Loop {
+   Input key, I L1 V,
+(  Join
+{ScrollLock}{CapsLock}{NumLock}{Esc}{BS}{PrintScreen}{Pause}{LControl}{RControl}
+{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}
+{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}
+)
+   If StrLen(ErrorLevel) > 3  ; NewInput, EndKey
+      state =
+   Else If InStr(".!?",key)   ; Sentence end
+      state = 1
+   Else If InStr("`t `n",key) ; White space
+      state += (state = 1)    ; state1 -> state2
+   Else {
+      StringUpper key, key
+      If state = 2            ; End-Space*-Letter
+         Send {BS}{%key%}     ; Letter -> Upper case
+      state =
+   }
+}
+
+~LButton::
+~RButton::
+~MButton::
+~WheelDown::
+~WheelUp::
+~XButton1::
+~XButton2::State =
+
+;---------------------------------------------------------------------------
+;	Expo
+;---------------------------------------------------------------------------
+
+^!#+z::			
+	oldclipboard:= clipboard
+	clipboard:=""
+	send, ^c ; copies selected text
+	clipwait
+	run, https://expo.expeditors.com/expotr/expotr?action=com.expd.webapp.tracking.action.searches.SearchWebAction&SearchType=advancedshipment.BaseAdvancedShipmentSearch&reference=%Clipboard%
+	winactivate
+	clipboard:= oldclipboard
+Return
+
+;---------------------------------------------------------------------------
+;	Systems
+;---------------------------------------------------------------------------
+/*
+ctrl + alt + win + shift + b		->	Run File Explorer
+ctrl + alt + win + shift + i		->	Run/Cycle Excel
+ctrl + alt + win + shift + /		->  Run Calculator
+ctrl + alt + win + shift + n		->  Run Notepad++
+ctrl + alt + win + shift + d		->  Run Notepad
+ctrl + alt + win + shift + Space	->  Always On Top
+ctrl + alt + win + shift + F1		->  Protect
+ctrl + alt + win + shift + q		->  picking - temp
+*/
+;--------------------------------------------------
+;	Run Explorer
+;--------------------------------------------------
+
+^!#+b::
+	if WinExist("File Explorer") {
+		WinClose
+		}
+	else
+		{
+		Run Explorer.exe
+		WinActivate
 		}
 	return
 	
+;--------------------------------------------------
+;	Excel Cycler
+;--------------------------------------------------
+
+^!#+i::
+	if winexist("ahk_class XLMAIN") {
+		winactivate
+		send, ^+{tab}
+		}
+	else
+		{
+		run excel.exe
+		winactivate
+		}
+	return	
+
+;--------------------------------------------------
+;	Run Calculator
+;--------------------------------------------------
+
+^!#+/::
+	if WinExist("ahk_exe ApplicationFrameHost.exe") {
+		WinClose
+		}
+	else
+		{
+		Run calc.exe
+		WinActivate
+		}
+	return
+	
+;--------------------------------------------------
+;	Run Notepad++
+;--------------------------------------------------	
+	
+^!#+n::
+	if WinExist("ahk_class Notepad++") {
+		WinClose
+		}
+	else
+		{
+		Run notepad++.exe
+		WinActivate
+		}
+	return
+
+;--------------------------------------------------
+;	Run Notepad
+;--------------------------------------------------
+
+^!#+d::
+	if WinExist("ahk_class Notepad") {
+		WinClose
+		}
+	else
+		{
+		Run Notepad.exe
+		WinActivate
+		}
+	return
+	
+;--------------------------------------------------
+;	Always On Top
+;--------------------------------------------------
+
+^!#+Space::  Winset, Alwaysontop, , A
+	return
+	
+;--------------------------------------------------
+;	Protect
+;--------------------------------------------------
+
+^!#+F1::
+	send, Josecian13
+	return	
+
+;-------------------------------------------------------------------------------------
+;	File Explorer
+;-------------------------------------------------------------------------------------
+
+#IfWinActive, ahk_exe Explorer.exe
+
+;--------------------------------------------------
+;	Get File Path
+;--------------------------------------------------
+
+F1::
+	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
+	Clipboard := FullPath
+	return
+
+Explorer_GetSelection(hwnd="") {
+	hwnd := hwnd ? hwnd : WinExist("A")
+	WinGetClass class, ahk_id %hwnd%
+	if (class="CabinetWClass" or class="ExploreWClass" or class="Progman")
+		for window in ComObjCreate("Shell.Application").Windows
+			if (window.hwnd==hwnd)
+    sel := window.Document.SelectedItems
+	for item in sel
+	ToReturn .= item.path "`n"
+	return Trim(ToReturn,"`n")
+}
+#IfWinActive
+
 ;====================================================================================================
-;	Subroutines
+;	Advanced Window Snap
+;====================================================================================================
+/**
+ * Advanced Window Snap
+ * Snaps the Active Window to one of nine different window positions.
+ *
+ * @author Andrew Moore <andrew+github@awmoore.com>
+ * @version 1.0
+ */
+
+/**
+ * SnapActiveWindow resizes and moves (snaps) the active window to a given position.
+ * @param {string} winPlaceVertical   The vertical placement of the active window.
+ *                                    Expecting "bottom" or "middle", otherwise assumes
+ *                                    "top" placement.
+ * @param {string} winPlaceHorizontal The horizontal placement of the active window.
+ *                                    Expecting "left" or "right", otherwise assumes
+ *                                    window should span the "full" width of the monitor.
+ * @param {string} winSizeHeight      The height of the active window in relation to
+ *                                    the active monitor's height. Expecting "half" size,
+ *                                    otherwise will resize window to a "third".
+ */
+;---------------------------------------------------------------------------
+;	Sizing
+;---------------------------------------------------------------------------
+
+SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
+    WinGet activeWin, ID, A
+    activeMon := GetMonitorIndexFromWindow(activeWin)
+
+    SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
+
+    if (winSizeHeight == "half") {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
+    } else {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
+    }
+
+    if (winPlaceHorizontal == "left") {
+        posX  := MonitorWorkAreaLeft
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else if (winPlaceHorizontal == "right") {
+        posX  := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else {
+        posX  := MonitorWorkAreaLeft
+        width := MonitorWorkAreaRight - MonitorWorkAreaLeft
+    }
+
+    if (winPlaceVertical == "bottom") {
+        posY := MonitorWorkAreaBottom - height
+    } else if (winPlaceVertical == "middle") {
+        posY := MonitorWorkAreaTop + height
+    } else {
+        posY := MonitorWorkAreaTop
+    }
+
+    WinMove,A,,%posX%,%posY%,%width%,%height%
+}
+
+;---------------------------------------------------------------------------
+;	Positioning
+;---------------------------------------------------------------------------
+
+/**
+ * GetMonitorIndexFromWindow retrieves the HWND (unique ID) of a given window.
+ * @param {Uint} windowHandle
+ * @author shinywong
+ * @link http://www.autohotkey.com/board/topic/69464-how-to-determine-a-window-is-in-which-monitor/?p=440355
+ */
+GetMonitorIndexFromWindow(windowHandle) {
+    ; Starts with 1.
+    monitorIndex := 1
+
+    VarSetCapacity(monitorInfo, 40)
+    NumPut(40, monitorInfo)
+
+    if (monitorHandle := DllCall("MonitorFromWindow", "uint", windowHandle, "uint", 0x2))
+        && DllCall("GetMonitorInfo", "uint", monitorHandle, "uint", &monitorInfo) {
+        monitorLeft   := NumGet(monitorInfo,  4, "Int")
+        monitorTop    := NumGet(monitorInfo,  8, "Int")
+        monitorRight  := NumGet(monitorInfo, 12, "Int")
+        monitorBottom := NumGet(monitorInfo, 16, "Int")
+        workLeft      := NumGet(monitorInfo, 20, "Int")
+        workTop       := NumGet(monitorInfo, 24, "Int")
+        workRight     := NumGet(monitorInfo, 28, "Int")○
+        workBottom    := NumGet(monitorInfo, 32, "Int")
+        isPrimary     := NumGet(monitorInfo, 36, "Int") & 1
+
+        SysGet, monitorCount, MonitorCount
+
+        Loop, %monitorCount% {
+            SysGet, tempMon, Monitor, %A_Index%
+
+            ; Compare location to determine the monitor index.
+            if ((monitorLeft = tempMonLeft) and (monitorTop = tempMonTop)
+                and (monitorRight = tempMonRight) and (monitorBottom = tempMonBottom)) {
+                monitorIndex := A_Index
+                break
+            }
+        }
+    }
+
+    return %monitorIndex%
+}
+
+;---------------------------------------------------------------------------
+;	Hotkeys
+;---------------------------------------------------------------------------
+
+; Directional Arrow Hotkeys
+#!Up::SnapActiveWindow("top","full","half")
+#!Down::SnapActiveWindow("bottom","full","half")
+^#!Up::SnapActiveWindow("top","full","third")
+^#!Down::SnapActiveWindow("bottom","full","third")
+
+; Numberpad Hotkeys (Landscape)
+#!Numpad7::SnapActiveWindow("top","left","half")
+#!Numpad8::SnapActiveWindow("top","full","half")
+#!Numpad9::SnapActiveWindow("top","right","half")
+#!Numpad1::SnapActiveWindow("bottom","left","half")
+#!Numpad2::SnapActiveWindow("bottom","full","half")
+#!Numpad3::SnapActiveWindow("bottom","right","half")
+
+; Numberpad Hotkeys (Portrait)
+^#!Numpad8::SnapActiveWindow("top","full","third")
+^#!Numpad5::SnapActiveWindow("middle","full","third")
+^#!Numpad2::SnapActiveWindow("bottom","full","third")
+
+;====================================================================================================
+;	Folder Loops
 ;====================================================================================================
 
 ;---------------------------------------------------------------------------
-;	Subroutine Code
+;	Ws - Completed -> Email
 ;---------------------------------------------------------------------------
+/*
+loop, \\mbsus238\trfshare\FM36\Ws - Completed\
+{
+    if (A_LoopFileName != "")
+        {
+            WsDoneFile := A_LoopFileName
+			StringRight, WsDoneName1, WsDoneFile, 15
+			StringLeft, WsDoneName2, WsDoneName1, 4
+			MailItemWsDone.TO := WsDoneName2 "@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
+            olMailItem := 0
+            o:= ComObjActive("Outlook.Application").Session()
+            MailItemWsDone := ComObjActive("Outlook.Application").CreateItem(olMailItem)
+            MailItemWsDone.BodyFormat := 2 
+            MailItemWsDone.Attachments.Add("\\mbsus238\trfshare\FM36\Ws - Completed\" . WsDoneFile)
+            TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
+            MailItemWsDone.Subject := "Ws Processing Completed for " " on " TodayDateWsDone 
+            MailItemWsDone.Display 
+			;~ MailItemWsDone.Send
+        }
+}
+*/
 
-; Include Stay Active
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Search Genie\GUI\Stay Active.ahk		; change filepath if file is moved back to single modules
+/*
+right 15
+left 4
+
+StringRight, WsDone1, WsDone1, 15
+StringLeft, WsDone2, WsDone1, 4
+
+Batches - FM36 - MMDDYYYY
+IBDs - FM36 - MMDDYYYY
+OBDs - FM36 - MMDDYYYY
+*/
+
+
+;====================================================================================================
+;	Universal GUI Subroutines
+;====================================================================================================
 
 ; Include DashMail
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
 
-; Include Excel Automation
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Excel Automation.ahk
-
 ; Include Global
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Global.ahk
+;~ #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Global.ahk
 
 ; Include Notepad++
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
+;Notepad++Setup:
+; #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
+;Run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
+;return
 
 ; Include Outlook Automation
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Outlook Automation.ahk
 
 ; Include Reference Tables
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Reference Tables.ahk
+
+; Include SAP Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\SAP Automation.ahk
+
+; Include Script Controls
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Script Controls.ahk
+
+; Include Stay Active
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Stay Active.ahk
+
+; Include TM Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\TM Automation.ahk
 
 ;---------------------------------------------------------------------------
 ;	Email Buttons
@@ -172,15 +704,66 @@ Sub1:
 		gosub, email_signature
 		}
 	return
-	
+
 Sub2:
 	Gui, Destroy
-	msgbox, Winshuttle update email
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, Ws_Processing_email1
+		gosub, Ws_Processing_email2
+		sleep, 500
+		gosub, Ws_Processing_email3
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000
+		gosub, Ws_Processing_email1
+		gosub, Ws_Processing_email2
+		sleep, 500
+		gosub, Ws_Processing_email3
+		}
 	return
-	
+
+/*	
+Sub2:
+	Gui, Destroy
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, ws_update_email
+		gosub, ws_update_email2
+		gosub, email_signature
+		;gosub, email_bold_highlight_ws_update
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000
+		gosub, ws_update_email
+		gosub, ws_update_email2
+		gosub, email_signature
+		}
+	return
+*/	
 Sub3:
 	Gui, Destroy
-	gosub, dashmail_activator
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, import_orders_email
+		gosub, import_orders_email2
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000
+		gosub, import_orders_email
+		gosub, import_orders_email2
+		gosub, email_signature
+		}
 	return
 	
 Sub4:
@@ -246,7 +829,21 @@ Sub4:
 	
 Sub5:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		gosub, peroni_claim_email
+		gosub, peroni_claim_email2
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		sleep, 3000
+		gosub, peroni_claim_email
+		gosub, peroni_claim_email2
+		gosub, email_signature
+		}
 	return
 	
 ;---------------------------------------------------------------------------
@@ -255,27 +852,64 @@ Sub5:
 	
 Sub6:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("ECC-TM Import Shipment Report") {
+		winactivate, ECC-TM Import Shipment Report
+		winwaitactive, ECC-TM Import Shipment Report
+		}
+	Else {
+		run, \\mbsus238\trfshare\FM36\Reports\ECC Report\ECC-TM Import Shipment Report.xlsx
+		winwaitactive, ECC-TM Import Shipment Report
+		send, {ctrl down}{home}{ctrl up}
+		send, {ctrl down}{shift down}{l}{shift up}{ctrl up}
+		}
 	return
 	
 Sub7:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Ws Batch Creation - FM36 - Template_New") {
+		winactivate, Ws Batch Creation - FM36 - Template_New
+		winwaitactive, Ws Batch Creation - FM36 - Template_New
+		}
+	Else {
+		run, \\mbsus238\trfshare\FM36\Templates\Ws Batch Creation - FM36 - Template_New.xlsx
+		winwaitactive, Ws Batch Creation - FM36 - Template_New
+		}
 	return
 	
 Sub8:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Ws IBD Creation - FM36 - Template") {
+		winactivate, Ws IBD Creation - FM36 - Template
+		winwaitactive, Ws IBD Creation - FM36 - Template
+		}
+	Else {
+		run, \\mbsus238\trfshare\FM36\Templates\Ws IBD Creation - FM36 - Template.xlsx
+		winwaitactive, Ws IBD Creation - FM36 - Template
+		}
 	return
 	
 Sub9:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Ws OBD Creation - FM36 - template_new") {
+		winactivate, Ws OBD Creation - FM36 - template_new
+		winwaitactive, Ws Batch Creation - FM36 - Template_New
+		}
+	Else {
+		run, \\mbsus238\trfshare\FM36\Templates\Ws OBD Creation - FM36 - template_new.xlsx
+		winwaitactive, Ws Batch Creation - FM36 - Template_New
+		}
 	return
 	
 Sub10:
 	Gui, Destroy
-	msgbox, Subroutine here
+	if WinExist("Winshuttle Import Playbook") {
+		winactivate, Winshuttle Import Playbook
+		winwaitactive, Winshuttle Import Playbook
+		}
+	Else {
+		run, \\mbsus238\trfshare\FM36\Ws Import Playbook\Winshuttle Import Playbook.docx
+		winwaitactive, Winshuttle Import Playbook
+		}
 	return	
 
 ;---------------------------------------------------------------------------
@@ -313,9 +947,9 @@ Sub15:
 
 Sub16:
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, dashmail_activator
 	return
-	
+
 Sub17:
 	Gui, Destroy
 	msgbox, Subroutine here
@@ -335,66 +969,172 @@ Sub20:
 	Gui, Destroy
 	Gosub, imback
 	return		
+
+;---------------------------------------------------------------------------
+;	TM Scripts
+;---------------------------------------------------------------------------	
+
+Sub21:
+	Gui, Destroy
+	gosub, TM_Containers
+	return
+
+Sub22:
+	Gui, Destroy
+	gosub, TM_Sail
+	return
+	
+Sub23:
+	Gui, Destroy
+	gosub, TM_ETA
+	return
+	
+Sub24:
+	Gui, Destroy
+	gosub, TM_ATA
+	return
+	
+Sub25:
+	Gui, Destroy
+	gosub, TM_Unexp
+	return		
 	
 ;---------------------------------------------------------------------------
 ;	GUI Controls
 ;---------------------------------------------------------------------------	
 	
 Close:
-	GUI, destroy
+	GUI, Destroy
 	return	
-
-;====================================================================================================
-;	Subroutines
-;====================================================================================================	
-
 
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
+
+/*
+;--------------------------------------------------
+;	Rage Italic Style GUI
+;--------------------------------------------------	
 	
+		Gui, Margin, 16, 16
+		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
+		Gui, Font, s38 cf0c674, Rage Italic																		; choses font size and color for title bar	; Rage Italic Style
+		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub1, Dates
+		GUI, Add, Button, w75 x+10 gSub2, WinS
+		GUI, Add, Button, w75 x+10 gSub3, Orders
+		GUI, Add, Button, w75 x+10 gSub4, Directs
+		GUI, Add, Button, w75 x+10 gSub5, Claims
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Emails
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub6, ECC
+		GUI, Add, Button, w75 x+10 gSub7, Batch
+		GUI, Add, Button, w75 x+10 gSub8, IBDs
+		GUI, Add, Button, w75 x+10 gSub9, OBDs
+		GUI, Add, Button, w75 x+10 gSub10, Ws Book
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Files
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub11, Dists
+		GUI, Add, Button, w75 x+10 gSub12, Plants
+		GUI, Add, Button, w75 x+10 gSub13, SKUs
+		GUI, Add, Button, w75 x+10 gSub14, Lanes
+		GUI, Add, Button, w75 x+10 gSub15, Sub15
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Tables
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub21, Ship
+		GUI, Add, Button, w75 x+10 gSub22, Sail
+		GUI, Add, Button, w75 x+10 gSub23, ETA
+		GUI, Add, Button, w75 x+10 gSub24, ATA
+		GUI, Add, Button, w75 x+10 gSub25, Unexp
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, TM
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub16, Dash
+		GUI, Add, Button, w75 x+10 gSub17, Sub17
+		GUI, Add, Button, w75 x+10 gSub18, Sub18
+		GUI, Add, Button, w75 x+10 gSub19, Stay
+		GUI, Add, Button, w75 x+10 gSub20, Back
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, System
+		Gui, Font, S80, Rage Italic																				; select font and size	; Rage Italic		
+		Gui, Add, Text, x+36 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
+		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old settings
+
+
+;--------------------------------------------------
+;	??? Style GUI
+;--------------------------------------------------	
+
+; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		Gui, Margin, 16, 16
+		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
+		Gui, Font, s38 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		; Gui, Font, s38 cf0c674, Rage Italic																	; choses font size and color for title bar	; Rage Italic Style
+		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub1, Dates
+		GUI, Add, Button, w75 x+10 gSub2, WinS
+		GUI, Add, Button, w75 x+10 gSub3, Orders
+		GUI, Add, Button, w75 x+10 gSub4, Directs
+		GUI, Add, Button, w75 x+10 gSub5, Claims
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Emails
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub6, ECC
+		GUI, Add, Button, w75 x+10 gSub7, Batch
+		GUI, Add, Button, w75 x+10 gSub8, IBDs
+		GUI, Add, Button, w75 x+10 gSub9, OBDs
+		GUI, Add, Button, w75 x+10 gSub10, Ws Book
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Files
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub11, Dists
+		GUI, Add, Button, w75 x+10 gSub12, Plants
+		GUI, Add, Button, w75 x+10 gSub13, SKUs
+		GUI, Add, Button, w75 x+10 gSub14, Lanes
+		GUI, Add, Button, w75 x+10 gSub15, Sub15
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, Tables
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub21, Ship
+		GUI, Add, Button, w75 x+10 gSub22, Sail
+		GUI, Add, Button, w75 x+10 gSub23, ETA
+		GUI, Add, Button, w75 x+10 gSub24, ATA
+		GUI, Add, Button, w75 x+10 gSub25, Unexp
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, TM
+		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
+		GUI, Add, Button, w75 xs y+10 gSub16, Dash
+		GUI, Add, Button, w75 x+10 gSub17, Sub17
+		GUI, Add, Button, w75 x+10 gSub18, Sub18
+		GUI, Add, Button, w75 x+10 gSub19, Stay
+		GUI, Add, Button, w75 x+10 gSub20, Back
+		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
+		GUI, Add, Text, x+10, System
+		Gui, Font, S42, SF Alien Encounters																		; select font and size	; Rage Italic		; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/
+		Gui, Add, Text, x+36 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
+		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old settings
+
+;--------------------------------------------------
+;	GUI End
+;--------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
