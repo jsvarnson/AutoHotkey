@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v3.03
+;	Universal Subroutines v3.04
 ;====================================================================================================
 /*
 -------------------------
@@ -157,7 +157,7 @@ return
 		GUI, Add, Text, x+6 , Emails
 		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
 		GUI, Add, Button, w80 h35 xs y+18 gSub6, &ECC
-		GUI, Add, Button, w80 h35 x+7 gSub7, Batch
+		GUI, Add, Button, w80 h35 x+7 gSub7, WsDE
 		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
 		GUI, Add, Button, w80 h35 x+7 gSub9, OBDs
 		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
@@ -455,13 +455,8 @@ ctrl + alt + win + shift + q		->  picking - temp
 #IfWinActive, ahk_exe Explorer.exe
 
 ;--------------------------------------------------
-;	Get File Path
+;	Explorer Get Selection Handler
 ;--------------------------------------------------
-
-F1::
-	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
-	Clipboard := FullPath
-	return
 
 Explorer_GetSelection(hwnd="") {
 	hwnd := hwnd ? hwnd : WinExist("A")
@@ -474,7 +469,60 @@ Explorer_GetSelection(hwnd="") {
 	ToReturn .= item.path "`n"
 	return Trim(ToReturn,"`n")
 }
+
+;--------------------------------------------------
+;	Get File Path
+;--------------------------------------------------
+
+F1::
+	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
+	Clipboard := FullPath
+	return
+	
+;---------------------------------------------------------------------------
+;	End File Explorer
+;---------------------------------------------------------------------------
+
 #IfWinActive
+
+;====================================================================================================
+;	Email
+;====================================================================================================
+
+;--------------------------------------------------
+;	Ws Processing Complete Email
+;--------------------------------------------------
+
+Ws_Processing_completed_email:
+	FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared				; Select file	; 1: File Must Exist	; 2: Path Must Exist
+	SplitPath, WsDoneFile1, , , , WsDoneFile2																		; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+	;~ WsDoneFile := Explorer_GetSelection()																	; gets current selection in windows explorer	; removed to for file selection window
+	StringRight, WsDoneName1, WsDoneFile2, 17
+	StringLeft, WsDoneName2, WsDoneName1, 4
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"															; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
+	MailItem.CC := "importmgmt@millercoors.com`;"
+	MailItem.Attachments.Add(WsDoneFile1)
+	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
+	MailItem.Subject := "Ws Processing Completed on " TodayDateWsDone 
+	MailItem.Display 																						; Make email visible
+	sleep, 100
+	send, {tab 4}
+	sleep, 100
+	send, 
+(
+Hello @%WsDoneName2%{tab},
+
+I have completed processing your file and have attached it here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+
+Cheers,
+)
+sleep, 100
+	;~ MailItemWsDone.Send()
+	return
 
 ;====================================================================================================
 ;	Advanced Window Snap
@@ -607,48 +655,6 @@ GetMonitorIndexFromWindow(windowHandle) {
 ^#!Numpad2::SnapActiveWindow("bottom","full","third")
 
 ;====================================================================================================
-;	Folder Loops
-;====================================================================================================
-
-;---------------------------------------------------------------------------
-;	Ws - Completed -> Email
-;---------------------------------------------------------------------------
-/*
-loop, \\mbsus238\trfshare\FM36\Ws - Completed\
-{
-    if (A_LoopFileName != "")
-        {
-            WsDoneFile := A_LoopFileName
-			StringRight, WsDoneName1, WsDoneFile, 15
-			StringLeft, WsDoneName2, WsDoneName1, 4
-			MailItemWsDone.TO := WsDoneName2 "@millercoors.com`;"																; Add recipients 	-> use ; between email names inside the outer quotes
-            olMailItem := 0
-            o:= ComObjActive("Outlook.Application").Session()
-            MailItemWsDone := ComObjActive("Outlook.Application").CreateItem(olMailItem)
-            MailItemWsDone.BodyFormat := 2 
-            MailItemWsDone.Attachments.Add("\\mbsus238\trfshare\FM36\Ws - Completed\" . WsDoneFile)
-            TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
-            MailItemWsDone.Subject := "Ws Processing Completed for " " on " TodayDateWsDone 
-            MailItemWsDone.Display 
-			;~ MailItemWsDone.Send
-        }
-}
-*/
-
-/*
-right 15
-left 4
-
-StringRight, WsDone1, WsDone1, 15
-StringLeft, WsDone2, WsDone1, 4
-
-Batches - FM36 - MMDDYYYY
-IBDs - FM36 - MMDDYYYY
-OBDs - FM36 - MMDDYYYY
-*/
-
-
-;====================================================================================================
 ;	Universal GUI Subroutines
 ;====================================================================================================
 
@@ -693,7 +699,7 @@ Sub1:
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		gosub, date_change_email1
 		gosub, date_change_email2
-		gosub, email_signature
+		; gosub, email_signature
 		}
 	Else {
 		run, outlook.exe
@@ -701,7 +707,7 @@ Sub1:
 		sleep, 3000
 		gosub, date_change_email1
 		gosub, date_change_email2
-		gosub, email_signature
+		; gosub, email_signature
 		}
 	return
 
@@ -710,19 +716,19 @@ Sub2:
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		gosub, Ws_Processing_email1
-		gosub, Ws_Processing_email2
+		gosub, Ws_Processing_schedule_mail1
+		gosub, Ws_Processing_schedule_mail2
 		sleep, 500
-		gosub, Ws_Processing_email3
+		gosub, Ws_Processing_schedule_mail3
 		}
 	Else {
 		run, outlook.exe
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		sleep, 3000
-		gosub, Ws_Processing_email1
-		gosub, Ws_Processing_email2
+		gosub, Ws_Processing_schedule_mail1
+		gosub, Ws_Processing_schedule_mail2
 		sleep, 500
-		gosub, Ws_Processing_email3
+		gosub, Ws_Processing_schedule_mail3
 		}
 	return
 
@@ -864,16 +870,9 @@ Sub6:
 		}
 	return
 	
-Sub7:
+Sub7:				; WDone
 	Gui, Destroy
-	if WinExist("Ws Batch Creation - FM36 - Template_New") {
-		winactivate, Ws Batch Creation - FM36 - Template_New
-		winwaitactive, Ws Batch Creation - FM36 - Template_New
-		}
-	Else {
-		run, \\mbsus238\trfshare\FM36\Templates\Ws Batch Creation - FM36 - Template_New.xlsx
-		winwaitactive, Ws Batch Creation - FM36 - Template_New
-		}
+	gosub, Ws_Processing_completed_email
 	return
 	
 Sub8:
