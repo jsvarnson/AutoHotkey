@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v4.01
+;	Universal Subroutines v4.02
 ;====================================================================================================
 /*
 -------------------------
@@ -220,14 +220,27 @@ UpdateClock:
 ;--------------------------------------------------
 
 Save_Universal_Notes:
-	;msgbox, % UTextBox
-	if (UTextBox <> "") {
+	guicontrolget, UTextBox
+	StringLeft, UTextCheck1, UTextBox, 35
+	StringLeft, UTextCheck2, UNotesText, 35
+	if (UTextCheck1 = UTextCheck2)
+	{
+		guicontrolget, UTextBox
+		UTextBox2 = %UTextBox%
+		UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
+		FileDelete, %UNotesFile%
+		UTextFile = %UNotesFile%
+		FileAppend, %UTextBox2%`n, %UTextFile%																						; saves Edit box Text as a new file
+	}
+	else if (UTextBox <> "")
+	{
 		guicontrolget, UTextBox
 		UTextBox2 = %UTextBox%
 		UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
 		UTextFile = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\%UniversalDate%.txt
 		FileAppend, %UTextBox2%, %UTextFile%																						; saves Edit box Text as a new file
 	}
+	else
 	return
 
 #Ifwinactive, ahk_class AutoHotkeyGUI
