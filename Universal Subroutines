@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v3.04
+;	Universal Subroutines v4.01
 ;====================================================================================================
 /*
 -------------------------
@@ -88,8 +88,15 @@ return
 ;	Universal	
 ;====================================================================================================
 
+~Esc::
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
+	Gui, Destroy
+	return
 
 ~^+Esc::								; Exits all active scripts
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Exitapp
 	return
@@ -106,6 +113,7 @@ return
 	return	
 	
 ~^s::									; Reloads scipt upon save
+	Gui, Submit, NoHide
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
 		FileGetAttrib,attribs,%A_ScriptFullPath%
@@ -116,32 +124,32 @@ return
 		}
 	return
 
-
 ;====================================================================================================
 ;	Main
 ;====================================================================================================
 
-
 ^!#+u::
 	if WinExist("Universal") 
 	{																											; check if the GUI is already open, then coses it
+		Gui, Submit, NoHide
+		gosub, Save_Universal_Notes
 		Gui, Destroy
 	}	
 	else 
-	{																											; check if the GUI isn't open, then opens it
+	{																											; check if the GUI isn't open, then opens it	
 		SetTimer, UpdateClock, 1000
+		Loop, Files, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\*.txt
+		If ( A_LoopFileTimeModified >= Time ) {
+			Time := A_LoopFileTimeModified, UNotesFile := A_LoopFileLongPath
+		}	
+		FileRead, UNotesText, %UNotesFile%
 
 ;--------------------------------------------------
 ;	SF Alien Encounters Style GUI
 ;--------------------------------------------------	
 	
 ; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/	
-; VCR OSD Mono download https://www.hipsthetic.com/vcr-osd-mono-free-pixel-font/
-; Lazer84 download https://www.dafont.com/lazer84.font
-; Indelible download https://indieground.net/product/indelible-font/
-; Px437 VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
-; PxPlus VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
-	
+
 		Gui, Margin, 16, 16
 		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
 		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border	+HwndUGUI										; removes the toolbar
@@ -192,19 +200,41 @@ return
 		Gui, Font, S4, SF Alien Encounters																		; select font and size	; Rage Italic		
 		Gui, Add, MonthCal, y+16 0x4 0x8 0x16 Background1d1f21 													; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
 		GuiControl, Show, MonthCal, 
-		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
-
-;--------------------------------------------------
-;	GUI End
-;--------------------------------------------------
-	
+		Gui, Font, s11 cf0c674, Inconsolata																		; choses font size and color for title bar
+		Gui, Add, Edit, R18 xm w950 y300 vUTextBox, 
+		GuiControl, , UTextBox, %UNotesText%
+		GUI, Show, x0 y0 w985 h640, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
 	}
 	return
+
+;--------------------------------------------------
+;	Universal Clock
+;--------------------------------------------------
 	
 UpdateClock:
-	GuiControl,, ClockTime1, % A_Hour ":" A_Min ":" A_Sec
+	GuiControl, , ClockTime1, % A_Hour ":" A_Min ":" A_Sec
 	return		
+	
+;--------------------------------------------------
+;	Universal Notes
+;--------------------------------------------------
 
+Save_Universal_Notes:
+	;msgbox, % UTextBox
+	if (UTextBox <> "") {
+		guicontrolget, UTextBox
+		UTextBox2 = %UTextBox%
+		UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
+		UTextFile = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\%UniversalDate%.txt
+		FileAppend, %UTextBox2%, %UTextFile%																						; saves Edit box Text as a new file
+	}
+	return
+
+#Ifwinactive, ahk_class AutoHotkeyGUI
+:*:[[::
+	TodayDateUniversal := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min					; gets current date time stamp formatting
+	send, %TodayDateUniversal%
+#Ifwinactive
 
 ;====================================================================================================
 ;	Global
@@ -494,35 +524,80 @@ F1::
 ;--------------------------------------------------
 
 Ws_Processing_completed_email:
-	FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared				; Select file	; 1: File Must Exist	; 2: Path Must Exist
-	SplitPath, WsDoneFile1, , , , WsDoneFile2																		; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-	;~ WsDoneFile := Explorer_GetSelection()																	; gets current selection in windows explorer	; removed to for file selection window
-	StringRight, WsDoneName1, WsDoneFile2, 17
-	StringLeft, WsDoneName2, WsDoneName1, 4
+	InputBox, WsDoneNumCompleted, Number of Files Completed, , , 300, 100, center, center, , , 2					; InputBox	; default -> 2
+	if WsDoneNumCompleted = 1 
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	else if WsDoneNumCompleted = 2 
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	else if WsDoneNumCompleted = 3
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	Else
+	{
+		msgbox, No files completed
+		exitapp
+	}				
 	olMailItem := 0	
 	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
 	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
 	MailItem.BodyFormat := 2 																					; olFormatHTML	
 	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"															; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
 	MailItem.CC := "importmgmt@millercoors.com`;"
-	MailItem.Attachments.Add(WsDoneFile1)
+	if (WsDoneFile1 != "")
+		MailItem.Attachments.Add(WsDoneFile1)
+	if (WsDoneFile3 != "")
+		MailItem.Attachments.Add(WsDoneFile3)
+	if (WsDoneFile4 != "")
+		MailItem.Attachments.Add(WsDoneFile4)
 	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
 	MailItem.Subject := "Ws Processing Completed on " TodayDateWsDone 
-	MailItem.Display 																						; Make email visible
+	MailItem.Display 																							; Make email visible
 	sleep, 100
 	send, {tab 4}
 	sleep, 100
+	if (WsDoneNumCompleted = 1)
+	{
 	send, 
 (
 Hello @%WsDoneName2%{tab},
 
-I have completed processing your file and have attached it here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+I have completed your Winshuttle processing and attached the file here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
 
 Cheers,
 )
-sleep, 100
-	;~ MailItemWsDone.Send()
-	return
+		sleep, 100
+		return
+	}
+	else 
+	{
+		send, 
+(
+Hello @%WsDoneName2%{tab},
+
+I have completed your Winshuttle processing and attached the files here for your convenience. As always, please make sure to review the files for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+
+Cheers,
+)
+		sleep, 100
+		return
+	}
 
 ;====================================================================================================
 ;	Advanced Window Snap
@@ -693,7 +768,9 @@ GetMonitorIndexFromWindow(windowHandle) {
 ;---------------------------------------------------------------------------
 
 Sub1:
-	Gui, Destroy
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
+	gui, destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -712,6 +789,8 @@ Sub1:
 	return
 
 Sub2:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -754,6 +833,8 @@ Sub2:
 	return
 */	
 Sub3:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -773,6 +854,8 @@ Sub3:
 	return
 	
 Sub4:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -834,6 +917,8 @@ Sub4:
 	return
 	
 Sub5:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -857,6 +942,8 @@ Sub5:
 ;---------------------------------------------------------------------------	
 	
 Sub6:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("ECC-TM Import Shipment Report") {
 		winactivate, ECC-TM Import Shipment Report
@@ -871,11 +958,15 @@ Sub6:
 	return
 	
 Sub7:				; WDone
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, Ws_Processing_completed_email
 	return
 	
 Sub8:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Ws IBD Creation - FM36 - Template") {
 		winactivate, Ws IBD Creation - FM36 - Template
@@ -888,6 +979,8 @@ Sub8:
 	return
 	
 Sub9:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Ws OBD Creation - FM36 - template_new") {
 		winactivate, Ws OBD Creation - FM36 - template_new
@@ -900,6 +993,8 @@ Sub9:
 	return
 	
 Sub10:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Winshuttle Import Playbook") {
 		winactivate, Winshuttle Import Playbook
@@ -916,26 +1011,36 @@ Sub10:
 ;---------------------------------------------------------------------------
 
 Sub11:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_distributors
 	return
 	
 Sub12:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_plants
 	return
 	
 Sub13:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_SKUs
 	return
 	
 Sub14:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_lanes
 	return
 	
 Sub15:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	msgbox, Subroutine here
 	return	
@@ -945,26 +1050,36 @@ Sub15:
 ;---------------------------------------------------------------------------	
 
 Sub16:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, dashmail_activator
 	return
 
 Sub17:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub18:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub19:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Gosub, stayactive
 	return
 	
 Sub20:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Gosub, imback
 	return		
@@ -974,26 +1089,36 @@ Sub20:
 ;---------------------------------------------------------------------------	
 
 Sub21:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Containers
 	return
 
 Sub22:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Sail
 	return
 	
 Sub23:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_ETA
 	return
 	
 Sub24:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_ATA
 	return
 	
 Sub25:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Unexp
 	return		
@@ -1003,18 +1128,29 @@ Sub25:
 ;---------------------------------------------------------------------------	
 	
 Close:
+	Gui, Submit, NoHide
+	gosub, Save_Universal_Notes
 	GUI, Destroy
 	return	
 
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
-
+	
+;--------------------------------------------------
+;	Fonts and downlaods
+;--------------------------------------------------
 /*
+; VCR OSD Mono download https://www.hipsthetic.com/vcr-osd-mono-free-pixel-font/
+; Lazer84 download https://www.dafont.com/lazer84.font
+; Indelible download https://indieground.net/product/indelible-font/
+; Px437 VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
+; PxPlus VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
+*/
 ;--------------------------------------------------
 ;	Rage Italic Style GUI
 ;--------------------------------------------------	
-	
+/*	
 		Gui, Margin, 16, 16
 		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
 		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
