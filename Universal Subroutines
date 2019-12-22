@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v4.02
+;	Universal Subroutines v4.06
 ;====================================================================================================
 /*
 -------------------------
@@ -22,7 +22,7 @@
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
-
+{{
 #Singleinstance, Force					; Recommended for all scripts to prevent old instances
 #NoEnv									; Recommended for all scripts to disable environment variables
 #MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
@@ -38,11 +38,11 @@ SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
 #Persistent								; Script will stay running after the auto-execute section
-
+}}
 ;====================================================================================================
 ;	AutoExecute
 ;====================================================================================================
-
+{{
 ;--------------------------------------------------
 ;	Activate Universal GUI on MouseOver		
 ;--------------------------------------------------
@@ -68,7 +68,6 @@ MouseIsOver(Universal) {
 ;--------------------------------------------------
 ;	Watch Cursor
 ;--------------------------------------------------
-
 /*
 ; Display window information under mouse
 
@@ -83,16 +82,21 @@ WinGetClass, class, ahk_id %id%
 ToolTip, ahk_id %id%`nahk_class %class%`n%title%`nControl: %control%
 return
 */
-
+;--------------------------------------------------
+;	AutoExecute End
+;--------------------------------------------------
+}}
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-
+{{
+#Ifwinactive, ahk_class AutoHotkeyGUI
 ~Esc::
 	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	return
+#Ifwinactive
 
 ~^+Esc::								; Exits all active scripts
 	Gui, Submit, NoHide
@@ -124,9 +128,13 @@ return
 		}
 	return
 
-;====================================================================================================
+;---------------------------------------------------------------------------
 ;	Main
-;====================================================================================================
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+;	Universal GUI
+;---------------------------------------------------------------------------
 
 ^!#+u::
 	if WinExist("Universal") 
@@ -147,7 +155,7 @@ return
 ;--------------------------------------------------
 ;	SF Alien Encounters Style GUI
 ;--------------------------------------------------	
-	
+
 ; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/	
 
 		Gui, Margin, 16, 16
@@ -176,7 +184,7 @@ return
 		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
 		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
 		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
-		GUI, Add, Button, w80 h35 x+7 gSub15, Sub15
+		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
 		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
 		GUI, Add, Text, x+6, Tables
 		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
@@ -210,7 +218,7 @@ return
 ;--------------------------------------------------
 ;	Universal Clock
 ;--------------------------------------------------
-	
+
 UpdateClock:
 	GuiControl, , ClockTime1, % A_Hour ":" A_Min ":" A_Sec
 	return		
@@ -221,26 +229,27 @@ UpdateClock:
 
 Save_Universal_Notes:
 	guicontrolget, UTextBox
-	StringLeft, UTextCheck1, UTextBox, 35
-	StringLeft, UTextCheck2, UNotesText, 35
-	if (UTextCheck1 = UTextCheck2)
+	UTextBox2 = %UTextBox%
+	if (UTextBox2 = "")						; if the output is blank => do nothing
 	{
-		guicontrolget, UTextBox
-		UTextBox2 = %UTextBox%
-		UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
-		FileDelete, %UNotesFile%
-		UTextFile = %UNotesFile%
-		FileAppend, %UTextBox2%`n, %UTextFile%																						; saves Edit box Text as a new file
+		return
 	}
-	else if (UTextBox <> "")
+	else if (UTextBox2 != "") 				; if the output is not blank => continue
 	{
-		guicontrolget, UTextBox
-		UTextBox2 = %UTextBox%
-		UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
-		UTextFile = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\%UniversalDate%.txt
-		FileAppend, %UTextBox2%, %UTextFile%																						; saves Edit box Text as a new file
+		StringLeft, UTextCheck1, UTextBox, 35
+		StringLeft, UTextCheck2, UNotesText, 35
+		if (UTextCheck1 = UTextCheck2)		; if the beginning of the input and output match => append input file
+		{
+			FileDelete, %UNotesFile%
+			FileAppend, %UTextBox2%`n, %UNotesFile%																						; saves Edit box Text as a new file
+		}
+		else									; if the beginning of the input and ouput do not match => make new file
+		{
+			UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
+			UTextFile = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\%UniversalDate%.txt
+			FileAppend, %UTextBox2%, %UTextFile%																						; saves Edit box Text as a new file
+		}
 	}
-	else
 	return
 
 #Ifwinactive, ahk_class AutoHotkeyGUI
@@ -249,502 +258,13 @@ Save_Universal_Notes:
 	send, %TodayDateUniversal%
 #Ifwinactive
 
-;====================================================================================================
-;	Global
-;====================================================================================================	
-
-;-------------------------------------------------------------------------------------
-;	Key Mapping
-;-------------------------------------------------------------------------------------
-
-/*
-Capslock							->  Enter
-ctrl + Capslock						->  Toggle Capslock
-`									->  Backwards Tab
-Numlock Always On
-*/
-
-;--------------------------------------------------
-;	Capslock as Enter
-;--------------------------------------------------
-
-Capslock::
-	send, {enter}
-	return
-
-;--------------------------------------------------
-;	Set Capslock
-;--------------------------------------------------	
-	
-^CapsLock::
-    GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
-    if capsstate = U
-        SetCapsLockState, AlwaysOn
-    else
-        SetCapsLockState, AlwaysOff
-    return
-	
-;--------------------------------------------------
-;	Tilde as Backwards Tab
-;--------------------------------------------------
-
-`::
-	send, {shift down}
-	send, {tab}
-	send, {shift up}
-	return
-
-;--------------------------------------------------
-;	Numlock Always On
-;--------------------------------------------------
-
-SetNumLockState , on
-return
-
-
 ;---------------------------------------------------------------------------
-;	Activate Window Under Mouse
-;---------------------------------------------------------------------------
-/*
-#Persistent
-SetTimer, ActivateUGUI, 100
-return
-
-ahk_pid 14768	; universal gui pid
-ahk_id 0x2a0638	; universal gui id
-
-ActivateUGUI:
-MouseGetPos,,, UGUIUMID
-if UGUIUMID = 0x2a0638 {
-	WinActivate, ahk_id %WinUMID%
-}
-return
-*/
-
-;---------------------------------------------------------------------------
-;	Activate Window Under Mouse
-;---------------------------------------------------------------------------
-/*						; interrupts Ditto window
-#Persistent
-SetTimer, ActivateWinUM, 100
-return
-
-ActivateWinUM:
-MouseGetPos,,, WinUMID
-WinActivate, ahk_id %WinUMID%
-return
-*/
-;---------------------------------------------------------------------------
-;	AutoCapitalize
-;---------------------------------------------------------------------------
-/*
-#SingleInstance force
-#NoEnv
-Process Priority,,High
-SetBatchLines -1
-*/
-
-Loop {
-   Input key, I L1 V,
-(  Join
-{ScrollLock}{CapsLock}{NumLock}{Esc}{BS}{PrintScreen}{Pause}{LControl}{RControl}
-{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}
-{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}
-)
-   If StrLen(ErrorLevel) > 3  ; NewInput, EndKey
-      state =
-   Else If InStr(".!?",key)   ; Sentence end
-      state = 1
-   Else If InStr("`t `n",key) ; White space
-      state += (state = 1)    ; state1 -> state2
-   Else {
-      StringUpper key, key
-      If state = 2            ; End-Space*-Letter
-         Send {BS}{%key%}     ; Letter -> Upper case
-      state =
-   }
-}
-
-~LButton::
-~RButton::
-~MButton::
-~WheelDown::
-~WheelUp::
-~XButton1::
-~XButton2::State =
-
-;---------------------------------------------------------------------------
-;	Expo
-;---------------------------------------------------------------------------
-
-^!#+z::			
-	oldclipboard:= clipboard
-	clipboard:=""
-	send, ^c ; copies selected text
-	clipwait
-	run, https://expo.expeditors.com/expotr/expotr?action=com.expd.webapp.tracking.action.searches.SearchWebAction&SearchType=advancedshipment.BaseAdvancedShipmentSearch&reference=%Clipboard%
-	winactivate
-	clipboard:= oldclipboard
-Return
-
-;---------------------------------------------------------------------------
-;	Systems
-;---------------------------------------------------------------------------
-/*
-ctrl + alt + win + shift + b		->	Run File Explorer
-ctrl + alt + win + shift + i		->	Run/Cycle Excel
-ctrl + alt + win + shift + /		->  Run Calculator
-ctrl + alt + win + shift + n		->  Run Notepad++
-ctrl + alt + win + shift + d		->  Run Notepad
-ctrl + alt + win + shift + Space	->  Always On Top
-ctrl + alt + win + shift + F1		->  Protect
-ctrl + alt + win + shift + q		->  picking - temp
-*/
-;--------------------------------------------------
-;	Run Explorer
-;--------------------------------------------------
-
-^!#+b::
-	if WinExist("File Explorer") {
-		WinClose
-		}
-	else
-		{
-		Run Explorer.exe
-		WinActivate
-		}
-	return
-	
-;--------------------------------------------------
-;	Excel Cycler
-;--------------------------------------------------
-
-^!#+i::
-	if winexist("ahk_class XLMAIN") {
-		winactivate
-		send, ^+{tab}
-		}
-	else
-		{
-		run excel.exe
-		winactivate
-		}
-	return	
-
-;--------------------------------------------------
-;	Run Calculator
-;--------------------------------------------------
-
-^!#+/::
-	if WinExist("ahk_exe ApplicationFrameHost.exe") {
-		WinClose
-		}
-	else
-		{
-		Run calc.exe
-		WinActivate
-		}
-	return
-	
-;--------------------------------------------------
-;	Run Notepad++
-;--------------------------------------------------	
-	
-^!#+n::
-	if WinExist("ahk_class Notepad++") {
-		WinClose
-		}
-	else
-		{
-		Run notepad++.exe
-		WinActivate
-		}
-	return
-
-;--------------------------------------------------
-;	Run Notepad
-;--------------------------------------------------
-
-^!#+d::
-	if WinExist("ahk_class Notepad") {
-		WinClose
-		}
-	else
-		{
-		Run Notepad.exe
-		WinActivate
-		}
-	return
-	
-;--------------------------------------------------
-;	Always On Top
-;--------------------------------------------------
-
-^!#+Space::  Winset, Alwaysontop, , A
-	return
-	
-;--------------------------------------------------
-;	Protect
-;--------------------------------------------------
-
-^!#+F1::
-	send, Josecian13
-	return	
-
-;-------------------------------------------------------------------------------------
-;	File Explorer
-;-------------------------------------------------------------------------------------
-
-#IfWinActive, ahk_exe Explorer.exe
-
-;--------------------------------------------------
-;	Explorer Get Selection Handler
-;--------------------------------------------------
-
-Explorer_GetSelection(hwnd="") {
-	hwnd := hwnd ? hwnd : WinExist("A")
-	WinGetClass class, ahk_id %hwnd%
-	if (class="CabinetWClass" or class="ExploreWClass" or class="Progman")
-		for window in ComObjCreate("Shell.Application").Windows
-			if (window.hwnd==hwnd)
-    sel := window.Document.SelectedItems
-	for item in sel
-	ToReturn .= item.path "`n"
-	return Trim(ToReturn,"`n")
-}
-
-;--------------------------------------------------
-;	Get File Path
-;--------------------------------------------------
-
-F1::
-	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
-	Clipboard := FullPath
-	return
-	
-;---------------------------------------------------------------------------
-;	End File Explorer
-;---------------------------------------------------------------------------
-
-#IfWinActive
-
-;====================================================================================================
-;	Email
-;====================================================================================================
-
-;--------------------------------------------------
-;	Ws Processing Complete Email
-;--------------------------------------------------
-
-Ws_Processing_completed_email:
-	InputBox, WsDoneNumCompleted, Number of Files Completed, , , 300, 100, center, center, , , 2					; InputBox	; default -> 2
-	if WsDoneNumCompleted = 1 
-	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
-		StringRight, WsDoneName1, WsDoneFile2, 17
-		StringLeft, WsDoneName2, WsDoneName1, 4
-	}
-	else if WsDoneNumCompleted = 2 
-	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		StringRight, WsDoneName1, WsDoneFile2, 17
-		StringLeft, WsDoneName2, WsDoneName1, 4
-	}
-	else if WsDoneNumCompleted = 3
-	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		StringRight, WsDoneName1, WsDoneFile2, 17
-		StringLeft, WsDoneName2, WsDoneName1, 4
-	}
-	Else
-	{
-		msgbox, No files completed
-		exitapp
-	}				
-	olMailItem := 0	
-	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
-	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
-	MailItem.BodyFormat := 2 																					; olFormatHTML	
-	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"															; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
-	MailItem.CC := "importmgmt@millercoors.com`;"
-	if (WsDoneFile1 != "")
-		MailItem.Attachments.Add(WsDoneFile1)
-	if (WsDoneFile3 != "")
-		MailItem.Attachments.Add(WsDoneFile3)
-	if (WsDoneFile4 != "")
-		MailItem.Attachments.Add(WsDoneFile4)
-	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
-	MailItem.Subject := "Ws Processing Completed on " TodayDateWsDone 
-	MailItem.Display 																							; Make email visible
-	sleep, 100
-	send, {tab 4}
-	sleep, 100
-	if (WsDoneNumCompleted = 1)
-	{
-	send, 
-(
-Hello @%WsDoneName2%{tab},
-
-I have completed your Winshuttle processing and attached the file here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
-
-Cheers,
-)
-		sleep, 100
-		return
-	}
-	else 
-	{
-		send, 
-(
-Hello @%WsDoneName2%{tab},
-
-I have completed your Winshuttle processing and attached the files here for your convenience. As always, please make sure to review the files for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
-
-Cheers,
-)
-		sleep, 100
-		return
-	}
-
-;====================================================================================================
-;	Advanced Window Snap
-;====================================================================================================
-/**
- * Advanced Window Snap
- * Snaps the Active Window to one of nine different window positions.
- *
- * @author Andrew Moore <andrew+github@awmoore.com>
- * @version 1.0
- */
-
-/**
- * SnapActiveWindow resizes and moves (snaps) the active window to a given position.
- * @param {string} winPlaceVertical   The vertical placement of the active window.
- *                                    Expecting "bottom" or "middle", otherwise assumes
- *                                    "top" placement.
- * @param {string} winPlaceHorizontal The horizontal placement of the active window.
- *                                    Expecting "left" or "right", otherwise assumes
- *                                    window should span the "full" width of the monitor.
- * @param {string} winSizeHeight      The height of the active window in relation to
- *                                    the active monitor's height. Expecting "half" size,
- *                                    otherwise will resize window to a "third".
- */
-;---------------------------------------------------------------------------
-;	Sizing
-;---------------------------------------------------------------------------
-
-SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
-    WinGet activeWin, ID, A
-    activeMon := GetMonitorIndexFromWindow(activeWin)
-
-    SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
-
-    if (winSizeHeight == "half") {
-        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
-    } else {
-        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
-    }
-
-    if (winPlaceHorizontal == "left") {
-        posX  := MonitorWorkAreaLeft
-        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
-    } else if (winPlaceHorizontal == "right") {
-        posX  := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
-        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
-    } else {
-        posX  := MonitorWorkAreaLeft
-        width := MonitorWorkAreaRight - MonitorWorkAreaLeft
-    }
-
-    if (winPlaceVertical == "bottom") {
-        posY := MonitorWorkAreaBottom - height
-    } else if (winPlaceVertical == "middle") {
-        posY := MonitorWorkAreaTop + height
-    } else {
-        posY := MonitorWorkAreaTop
-    }
-
-    WinMove,A,,%posX%,%posY%,%width%,%height%
-}
-
-;---------------------------------------------------------------------------
-;	Positioning
-;---------------------------------------------------------------------------
-
-/**
- * GetMonitorIndexFromWindow retrieves the HWND (unique ID) of a given window.
- * @param {Uint} windowHandle
- * @author shinywong
- * @link http://www.autohotkey.com/board/topic/69464-how-to-determine-a-window-is-in-which-monitor/?p=440355
- */
-GetMonitorIndexFromWindow(windowHandle) {
-    ; Starts with 1.
-    monitorIndex := 1
-
-    VarSetCapacity(monitorInfo, 40)
-    NumPut(40, monitorInfo)
-
-    if (monitorHandle := DllCall("MonitorFromWindow", "uint", windowHandle, "uint", 0x2))
-        && DllCall("GetMonitorInfo", "uint", monitorHandle, "uint", &monitorInfo) {
-        monitorLeft   := NumGet(monitorInfo,  4, "Int")
-        monitorTop    := NumGet(monitorInfo,  8, "Int")
-        monitorRight  := NumGet(monitorInfo, 12, "Int")
-        monitorBottom := NumGet(monitorInfo, 16, "Int")
-        workLeft      := NumGet(monitorInfo, 20, "Int")
-        workTop       := NumGet(monitorInfo, 24, "Int")
-        workRight     := NumGet(monitorInfo, 28, "Int")○
-        workBottom    := NumGet(monitorInfo, 32, "Int")
-        isPrimary     := NumGet(monitorInfo, 36, "Int") & 1
-
-        SysGet, monitorCount, MonitorCount
-
-        Loop, %monitorCount% {
-            SysGet, tempMon, Monitor, %A_Index%
-
-            ; Compare location to determine the monitor index.
-            if ((monitorLeft = tempMonLeft) and (monitorTop = tempMonTop)
-                and (monitorRight = tempMonRight) and (monitorBottom = tempMonBottom)) {
-                monitorIndex := A_Index
-                break
-            }
-        }
-    }
-
-    return %monitorIndex%
-}
-
-;---------------------------------------------------------------------------
-;	Hotkeys
-;---------------------------------------------------------------------------
-
-; Directional Arrow Hotkeys
-#!Up::SnapActiveWindow("top","full","half")
-#!Down::SnapActiveWindow("bottom","full","half")
-^#!Up::SnapActiveWindow("top","full","third")
-^#!Down::SnapActiveWindow("bottom","full","third")
-
-; Numberpad Hotkeys (Landscape)
-#!Numpad7::SnapActiveWindow("top","left","half")
-#!Numpad8::SnapActiveWindow("top","full","half")
-#!Numpad9::SnapActiveWindow("top","right","half")
-#!Numpad1::SnapActiveWindow("bottom","left","half")
-#!Numpad2::SnapActiveWindow("bottom","full","half")
-#!Numpad3::SnapActiveWindow("bottom","right","half")
-
-; Numberpad Hotkeys (Portrait)
-^#!Numpad8::SnapActiveWindow("top","full","third")
-^#!Numpad5::SnapActiveWindow("middle","full","third")
-^#!Numpad2::SnapActiveWindow("bottom","full","third")
-
-;====================================================================================================
 ;	Universal GUI Subroutines
-;====================================================================================================
+;---------------------------------------------------------------------------
+
+;---------------------------------------------------------------------------
+;	Universal Includes
+;---------------------------------------------------------------------------
 
 ; Include DashMail
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
@@ -949,11 +469,11 @@ Sub5:
 		gosub, email_signature
 		}
 	return
-	
+
 ;---------------------------------------------------------------------------
 ;	File Buttons
 ;---------------------------------------------------------------------------	
-	
+
 Sub6:
 	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
@@ -1055,9 +575,9 @@ Sub15:
 	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
-	msgbox, Subroutine here
+	gosub, ref_table_MSKUs
 	return	
-	
+
 ;---------------------------------------------------------------------------
 ;	System Buttons
 ;---------------------------------------------------------------------------	
@@ -1135,21 +655,538 @@ Sub25:
 	Gui, Destroy
 	gosub, TM_Unexp
 	return		
-	
+
 ;---------------------------------------------------------------------------
 ;	GUI Controls
 ;---------------------------------------------------------------------------	
-	
+
 Close:
 	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	GUI, Destroy
 	return	
 
+;---------------------------------------------------------------------------
+;	Email
+;---------------------------------------------------------------------------
+
+;--------------------------------------------------
+;	Ws Processing Complete Email
+;--------------------------------------------------
+
+Ws_Processing_completed_email:
+	InputBox, WsDoneNumCompleted, Number of Files Completed, , , 300, 100, center, center, , , 2					; InputBox	; default -> 2
+	if WsDoneNumCompleted = 1 
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	else if WsDoneNumCompleted = 2 
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	else if WsDoneNumCompleted = 3
+	{
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		StringRight, WsDoneName1, WsDoneFile2, 17
+		StringLeft, WsDoneName2, WsDoneName1, 4
+	}
+	Else
+	{
+		msgbox, No files completed
+		exitapp
+	}				
+	olMailItem := 0	
+	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
+	MailItem.BodyFormat := 2 																					; olFormatHTML	
+	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"															; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
+	MailItem.CC := "importmgmt@millercoors.com`;"
+	if (WsDoneFile1 != "")
+		MailItem.Attachments.Add(WsDoneFile1)
+	if (WsDoneFile3 != "")
+		MailItem.Attachments.Add(WsDoneFile3)
+	if (WsDoneFile4 != "")
+		MailItem.Attachments.Add(WsDoneFile4)
+	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
+	MailItem.Subject := "Ws Processing Completed on " TodayDateWsDone 
+	MailItem.Display 																							; Make email visible
+	sleep, 100
+	send, {tab 4}
+	sleep, 100
+	if (WsDoneNumCompleted = 1)
+	{
+	send, 
+(
+Hello @%WsDoneName2%{tab},
+
+I have completed your Winshuttle processing and attached the file here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+
+Cheers,
+)
+		sleep, 100
+		return
+	}
+	else 
+	{
+		send, 
+(
+Hello @%WsDoneName2%{tab},
+
+I have completed your Winshuttle processing and attached the files here for your convenience. As always, please make sure to review the files for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+
+Cheers,
+)
+		sleep, 100
+		return
+	}
+
+;--------------------------------------------------
+;	Universal End
+;--------------------------------------------------
+}}
+;====================================================================================================
+;	Global
+;====================================================================================================	
+{{
+;-------------------------------------------------------------------------------------
+;	Key Mapping
+;-------------------------------------------------------------------------------------
+/*
+Capslock							->  Enter
+ctrl + Capslock						->  Toggle Capslock
+`									->  Backwards Tab
+Numlock Always On
+*/
+;--------------------------------------------------
+;	Capslock as Enter
+;--------------------------------------------------
+{{
+Capslock::
+	send, {enter}
+	return
+}}
+;--------------------------------------------------
+;	Set Capslock
+;--------------------------------------------------	
+{{	
+^CapsLock::
+    GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
+    if capsstate = U
+        SetCapsLockState, AlwaysOn
+    else
+        SetCapsLockState, AlwaysOff
+    return
+}}	
+;--------------------------------------------------
+;	Tilde as Backwards Tab
+;--------------------------------------------------
+{{
+`::
+	send, {shift down}
+	send, {tab}
+	send, {shift up}
+	return
+}}
+;--------------------------------------------------
+;	Numlock Always On
+;--------------------------------------------------
+{{
+SetNumLockState , on
+return
+}}
+;---------------------------------------------------------------------------
+;	Activate Window Under Mouse
+;---------------------------------------------------------------------------
+{{
+/*
+#Persistent
+SetTimer, ActivateUGUI, 100
+return
+
+ahk_pid 14768	; universal gui pid
+ahk_id 0x2a0638	; universal gui id
+
+ActivateUGUI:
+MouseGetPos,,, UGUIUMID
+if UGUIUMID = 0x2a0638 {
+	WinActivate, ahk_id %WinUMID%
+}
+return
+*/
+}}
+;---------------------------------------------------------------------------
+;	Activate Window Under Mouse
+;---------------------------------------------------------------------------
+{{
+/*						; interrupts Ditto window
+#Persistent
+SetTimer, ActivateWinUM, 100
+return
+
+ActivateWinUM:
+MouseGetPos,,, WinUMID
+WinActivate, ahk_id %WinUMID%
+return
+*/
+}}
+;---------------------------------------------------------------------------
+;	AutoCapitalize
+;---------------------------------------------------------------------------
+{{
+/*
+#SingleInstance force
+#NoEnv
+Process Priority,,High
+SetBatchLines -1
+*/
+
+Loop {
+   Input key, I L1 V,
+(  Join
+{ScrollLock}{CapsLock}{NumLock}{Esc}{BS}{PrintScreen}{Pause}{LControl}{RControl}
+{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}
+{Left}{Right}{Up}{Down}{Home}{End}{PgUp}{PgDn}{Del}{Ins}
+)
+   If StrLen(ErrorLevel) > 3  ; NewInput, EndKey
+      state =
+   Else If InStr(".!?",key)   ; Sentence end
+      state = 1
+   Else If InStr("`t `n",key) ; White space
+      state += (state = 1)    ; state1 -> state2
+   Else {
+      StringUpper key, key
+      If state = 2            ; End-Space*-Letter
+         Send {BS}{%key%}     ; Letter -> Upper case
+      state =
+   }
+}
+
+~LButton::
+~RButton::
+~MButton::
+~WheelDown::
+~WheelUp::
+~XButton1::
+~XButton2::State =
+}}
+;---------------------------------------------------------------------------
+;	Expo
+;---------------------------------------------------------------------------
+{{
+^!#+z::			
+	oldclipboard:= clipboard
+	clipboard:=""
+	send, ^c ; copies selected text
+	clipwait
+	run, https://expo.expeditors.com/expotr/expotr?action=com.expd.webapp.tracking.action.searches.SearchWebAction&SearchType=advancedshipment.BaseAdvancedShipmentSearch&reference=%Clipboard%
+	winactivate
+	clipboard:= oldclipboard
+Return
+}}
+;---------------------------------------------------------------------------
+;	Systems
+;---------------------------------------------------------------------------
+{{
+/*
+ctrl + alt + win + shift + b		->	Run File Explorer
+ctrl + alt + win + shift + i		->	Run/Cycle Excel
+ctrl + alt + win + shift + /		->  Run Calculator
+ctrl + alt + win + shift + n		->  Run Notepad++
+ctrl + alt + win + shift + d		->  Run Notepad
+ctrl + alt + win + shift + Space	->  Always On Top
+ctrl + alt + win + shift + F1		->  Protect
+ctrl + alt + win + shift + q		->  picking - temp
+*/
+;--------------------------------------------------
+;	Run Explorer
+;--------------------------------------------------
+{{
+^!#+b::
+	if WinExist("File Explorer") {
+		WinClose
+		}
+	else
+		{
+		Run Explorer.exe
+		WinActivate
+		}
+	return
+}}	
+;--------------------------------------------------
+;	Excel Cycler
+;--------------------------------------------------
+{{
+^!#+i::
+	if winexist("ahk_class XLMAIN") {
+		winactivate
+		send, ^+{tab}
+		}
+	else
+		{
+		run excel.exe
+		winactivate
+		}
+	return	
+}}
+;--------------------------------------------------
+;	Run Calculator
+;--------------------------------------------------
+{{
+^!#+/::
+	if WinExist("ahk_exe ApplicationFrameHost.exe") {
+		WinClose
+		}
+	else
+		{
+		Run calc.exe
+		WinActivate
+		}
+	return
+}}	
+;--------------------------------------------------
+;	Run Notepad++
+;--------------------------------------------------	
+{{	
+^!#+n::
+	if WinExist("ahk_class Notepad++") {
+		WinClose
+		}
+	else
+		{
+		Run notepad++.exe
+		WinActivate
+		}
+	return
+}}
+;--------------------------------------------------
+;	Run Notepad
+;--------------------------------------------------
+{{
+/*
+^!#+d::
+	if WinExist("ahk_class Notepad") {
+		WinClose
+		}
+	else
+		{
+		Run Notepad.exe
+		WinActivate
+		}
+	return
+*/	
+}}	
+;--------------------------------------------------
+;	Always On Top
+;--------------------------------------------------
+{{
+^!#+Space::  Winset, Alwaysontop, , A
+	return
+}}	
+;--------------------------------------------------
+;	Protect
+;--------------------------------------------------
+{{
+^!#+F1::
+	send, Josecian13
+	return	
+}}
+;--------------------------------------------------
+;	Systems End
+;--------------------------------------------------
+}}
+;-------------------------------------------------------------------------------------
+;	File Explorer
+;-------------------------------------------------------------------------------------
+
+#IfWinActive, ahk_exe Explorer.exe
+;--------------------------------------------------
+;	Explorer Get Selection Handler
+;--------------------------------------------------
+
+Explorer_GetSelection(hwnd="") {
+	hwnd := hwnd ? hwnd : WinExist("A")
+	WinGetClass class, ahk_id %hwnd%
+	if (class="CabinetWClass" or class="ExploreWClass" or class="Progman")
+		for window in ComObjCreate("Shell.Application").Windows
+			if (window.hwnd==hwnd)
+    sel := window.Document.SelectedItems
+	for item in sel
+	ToReturn .= item.path "`n"
+	return Trim(ToReturn,"`n")
+}
+
+;--------------------------------------------------
+;	Get File Path
+;--------------------------------------------------
+{{
+F1::
+	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
+	Clipboard := FullPath
+	return
+}}	
+;---------------------------------------------------------------------------
+;	End File Explorer
+;---------------------------------------------------------------------------
+#IfWinActive
+
+;--------------------------------------------------
+;	Global End
+;--------------------------------------------------
+}}
+;====================================================================================================
+;	Advanced Window Snap
+;====================================================================================================
+{{
+/**
+ * Advanced Window Snap
+ * Snaps the Active Window to one of nine different window positions.
+ *
+ * @author Andrew Moore <andrew+github@awmoore.com>
+ * @version 1.0
+ */
+
+/**
+ * SnapActiveWindow resizes and moves (snaps) the active window to a given position.
+ * @param {string} winPlaceVertical   The vertical placement of the active window.
+ *                                    Expecting "bottom" or "middle", otherwise assumes
+ *                                    "top" placement.
+ * @param {string} winPlaceHorizontal The horizontal placement of the active window.
+ *                                    Expecting "left" or "right", otherwise assumes
+ *                                    window should span the "full" width of the monitor.
+ * @param {string} winSizeHeight      The height of the active window in relation to
+ *                                    the active monitor's height. Expecting "half" size,
+ *                                    otherwise will resize window to a "third".
+ */
+
+;---------------------------------------------------------------------------
+;	Sizing
+;---------------------------------------------------------------------------
+
+SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
+    WinGet activeWin, ID, A
+    activeMon := GetMonitorIndexFromWindow(activeWin)
+
+    SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
+
+    if (winSizeHeight == "half") {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
+    } else {
+        height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
+    }
+
+    if (winPlaceHorizontal == "left") {
+        posX  := MonitorWorkAreaLeft
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else if (winPlaceHorizontal == "right") {
+        posX  := MonitorWorkAreaLeft + (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+        width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
+    } else {
+        posX  := MonitorWorkAreaLeft
+        width := MonitorWorkAreaRight - MonitorWorkAreaLeft
+    }
+
+    if (winPlaceVertical == "bottom") {
+        posY := MonitorWorkAreaBottom - height
+    } else if (winPlaceVertical == "middle") {
+        posY := MonitorWorkAreaTop + height
+    } else {
+        posY := MonitorWorkAreaTop
+    }
+
+    WinMove,A,,%posX%,%posY%,%width%,%height%
+}
+
+;---------------------------------------------------------------------------
+;	Positioning
+;---------------------------------------------------------------------------
+
+/**
+ * GetMonitorIndexFromWindow retrieves the HWND (unique ID) of a given window.
+ * @param {Uint} windowHandle
+ * @author shinywong
+ * @link http://www.autohotkey.com/board/topic/69464-how-to-determine-a-window-is-in-which-monitor/?p=440355
+ */
+GetMonitorIndexFromWindow(windowHandle) {
+    ; Starts with 1.
+    monitorIndex := 1
+
+    VarSetCapacity(monitorInfo, 40)
+    NumPut(40, monitorInfo)
+
+    if (monitorHandle := DllCall("MonitorFromWindow", "uint", windowHandle, "uint", 0x2))
+        && DllCall("GetMonitorInfo", "uint", monitorHandle, "uint", &monitorInfo) {
+        monitorLeft   := NumGet(monitorInfo,  4, "Int")
+        monitorTop    := NumGet(monitorInfo,  8, "Int")
+        monitorRight  := NumGet(monitorInfo, 12, "Int")
+        monitorBottom := NumGet(monitorInfo, 16, "Int")
+        workLeft      := NumGet(monitorInfo, 20, "Int")
+        workTop       := NumGet(monitorInfo, 24, "Int")
+        workRight     := NumGet(monitorInfo, 28, "Int")○
+        workBottom    := NumGet(monitorInfo, 32, "Int")
+        isPrimary     := NumGet(monitorInfo, 36, "Int") & 1
+
+        SysGet, monitorCount, MonitorCount
+
+        Loop, %monitorCount% {
+            SysGet, tempMon, Monitor, %A_Index%
+
+            ; Compare location to determine the monitor index.
+            if ((monitorLeft = tempMonLeft) and (monitorTop = tempMonTop)
+                and (monitorRight = tempMonRight) and (monitorBottom = tempMonBottom)) {
+                monitorIndex := A_Index
+                break
+            }
+        }
+    }
+
+    return %monitorIndex%
+}
+
+;---------------------------------------------------------------------------
+;	Hotkeys
+;---------------------------------------------------------------------------
+
+; Directional Arrow Hotkeys
+#!Up::SnapActiveWindow("top","full","half")
+#!Down::SnapActiveWindow("bottom","full","half")
+^#!Up::SnapActiveWindow("top","full","third")
+^#!Down::SnapActiveWindow("bottom","full","third")
+
+; Numberpad Hotkeys (Landscape)
+#!Numpad7::SnapActiveWindow("top","left","half")
+#!Numpad8::SnapActiveWindow("top","full","half")
+#!Numpad9::SnapActiveWindow("top","right","half")
+#!Numpad1::SnapActiveWindow("bottom","left","half")
+#!Numpad2::SnapActiveWindow("bottom","full","half")
+#!Numpad3::SnapActiveWindow("bottom","right","half")
+
+; Numberpad Hotkeys (Portrait)
+^#!Numpad8::SnapActiveWindow("top","full","third")
+^#!Numpad5::SnapActiveWindow("middle","full","third")
+^#!Numpad2::SnapActiveWindow("bottom","full","third")
+
+;--------------------------------------------------
+;	Advanced Window Snapping End
+;--------------------------------------------------
+}}
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
-	
+;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;====================================================================================================
+;	Archive
+;====================================================================================================
+{{
 ;--------------------------------------------------
 ;	Fonts and downlaods
 ;--------------------------------------------------
@@ -1273,6 +1310,12 @@ Close:
 ;--------------------------------------------------
 ;	GUI End
 ;--------------------------------------------------
+*/
+}}
+;====================================================================================================
+;	Archive End	
+;====================================================================================================
+
 
 
 
