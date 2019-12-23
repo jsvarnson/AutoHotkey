@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v4.06
+;	Universal Subroutines v4.07
 ;====================================================================================================
 /*
 -------------------------
@@ -13,8 +13,6 @@
 6.	File Buttons
 7.  Ref Table Buttons
 8.  System Buttons
-9.	
-10.	
 -------------------------
 |		  END			|
 -------------------------
@@ -46,7 +44,6 @@ SendMode Input							; Recommended to set sendinput as the default send method
 ;--------------------------------------------------
 ;	Activate Universal GUI on MouseOver		
 ;--------------------------------------------------
-
 /*
 ;#Persistent
 ;SetTimer, ActivateUGUI, 100
@@ -64,7 +61,6 @@ MouseIsOver(Universal) {
     return WinExist(Universal . " ahk_id " . Win)
 }
 */
-
 ;--------------------------------------------------
 ;	Watch Cursor
 ;--------------------------------------------------
@@ -228,27 +224,21 @@ UpdateClock:
 ;--------------------------------------------------
 
 Save_Universal_Notes:
+	UFilePath = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\
 	guicontrolget, UTextBox
-	UTextBox2 = %UTextBox%
-	if (UTextBox2 = "")						; if the output is blank => do nothing
+	UTextBox2 := UTextBox
+	if (UTextBox2 = "")																												; if the output is blank => do nothing
 	{
+		msgbox, Blank
 		return
 	}
-	else if (UTextBox2 != "") 				; if the output is not blank => continue
+	else (UTextBox2 != "") 																										; if the output is not blank => continue
 	{
-		StringLeft, UTextCheck1, UTextBox, 35
-		StringLeft, UTextCheck2, UNotesText, 35
-		if (UTextCheck1 = UTextCheck2)		; if the beginning of the input and output match => append input file
-		{
-			FileDelete, %UNotesFile%
-			FileAppend, %UTextBox2%`n, %UNotesFile%																						; saves Edit box Text as a new file
-		}
-		else									; if the beginning of the input and ouput do not match => make new file
-		{
-			UniversalDate = %A_YYYY%-%A_MM%-%A_DD%_%A_Hour%-%A_Min%-%A_Sec%
-			UTextFile = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\%UniversalDate%.txt
-			FileAppend, %UTextBox2%, %UTextFile%																						; saves Edit box Text as a new file
-		}
+		UTitleEnd := InStr(UTextBox2, "`n")-1
+		UTitleStart := SubStr(UTextBox2,1,UTitleEnd)
+		UFileName = %UFilePath%%UTitleStart%.txt
+		FileDelete, %UNotesFile%
+		FileAppend, %UTextBox2%`n, %UFileName%				; %UNotesFile% -> input file																					; saves Edit box Text as a new file
 	}
 	return
 
@@ -1182,7 +1172,7 @@ GetMonitorIndexFromWindow(windowHandle) {
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
-;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 ;====================================================================================================
 ;	Archive
 ;====================================================================================================
