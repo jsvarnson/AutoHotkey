@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v4.07
+;	Universal Subroutines v4.08
 ;====================================================================================================
 /*
 -------------------------
@@ -244,8 +244,14 @@ Save_Universal_Notes:
 
 #Ifwinactive, ahk_class AutoHotkeyGUI
 :*:[[::
-	TodayDateUniversal := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min					; gets current date time stamp formatting
-	send, %TodayDateUniversal%
+	TodayDateUniversal1 := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min					; gets current date time stamp formatting
+	send, %TodayDateUniversal1%
+	return
+	
+:*:]]::
+	TodayDateUniversal2 := A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min					; gets current date time stamp formatting
+	send, %TodayDateUniversal2%
+	return
 #Ifwinactive
 
 ;---------------------------------------------------------------------------
