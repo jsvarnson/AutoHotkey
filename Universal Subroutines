@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v5.03
+;	Universal Subroutines v5.04
 ;====================================================================================================
 /*
 -------------------------
@@ -160,20 +160,30 @@ UhdrYPos	= 28
 ; Standard Window Position #1 - x0 y0
 ; Standard Window Position #2 - x0 y641
 ; Standard Window Position #3 - x0 y1281
+;----------------------- Colors ----------------------------
+; c33DCBD - synth blue
+; cDC33A6 - synth purple
+; 
+; cf0c674 - gold
 ;----------------------- Gui Calc Var ----------------------
 UclockXPos := UguiWdt - 330
 UcalXPos	:= UguiWdt - 170
+OutSunPos	:= (UguiWdt - 70) / 2
 ;----------------------- Gui Settings ----------------------
 		Gui, Margin, 16, 16
 		Gui, Color, 1d1f21, 282a2e												; colors the background dark gray
 		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border +HwndUGUI		; removes the toolbar
-		Gui, Font, s42 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s42 c33DCBD , SF Alien Encounters 							; choses font size and color for title bar
 		GUI, Add, Text, x%UhdrXPos% y%UhdrYPos%, Universal						; sets the title of the GUI	
+		UguiHdrPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\vaporhead3.png
+		SplitPath, UguiHdrPic, , , , UguiHdrPic1																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
+		FileInstall, UguiHdrPic1.png, %UguiHdrPic%, 1
+		Gui, Add, Picture, x%OutSunPos% y10 w70 h90, %UguiHdrPic%
 ;--------------- Clock ---------------				
 		Gui, Add, Text, x%UclockXPos% y%UhdrYPos% vClockTime1, 00:00:00		; set transparency	; set color	; select output variable	; cOrange
 ;----------------------- Tab Settings ----------------------		
-		Gui, Font, s10 cf0c674, SF Alien Encounters								; choses font size and color
-		Gui, Add, Tab3, x0 w984 h550, Main|System|Calendar|Settings			; creates tabs 
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, Tab3, x0 y90 w984 h550, Main|System|Calendar|Settings			; creates tabs 
 ;-------------------------- Tab 1 --------------------------
 		Gui, Tab, 1																	; sets below controls to tab		
 ;--------------- Row 1 ---------------		
@@ -183,7 +193,7 @@ UcalXPos	:= UguiWdt - 170
 		GUI, Add, Button, w80 h35 x+7 gSub3, &Orders
 		GUI, Add, Button, w80 h35 x+7 gSub4, &Directs
 		GUI, Add, Button, w80 h35 x+7 gSub5, &Claims
-		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6 , Emails
 ;--------------- Row 2 ---------------				
 		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
@@ -192,7 +202,7 @@ UcalXPos	:= UguiWdt - 170
 		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
 		GUI, Add, Button, w80 h35 x+7 gSub9, PlayBK
 		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
-		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, Files
 ;--------------- Row 3 ---------------				
 		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
@@ -201,7 +211,7 @@ UcalXPos	:= UguiWdt - 170
 		GUI, Add, Button, w80 h35 x+7 gSub23, ETA
 		GUI, Add, Button, w80 h35 x+7 gSub24, ATA
 		GUI, Add, Button, w80 h35 x+7 gSub25, Unexp
-		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, TM
 ;--------------- Row 4 ---------------				
 		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
@@ -210,40 +220,42 @@ UcalXPos	:= UguiWdt - 170
 		GUI, Add, Button, w80 h35 x+7 gSub18, Sub18
 		GUI, Add, Button, w80 h35 x+7 gSub19, &Stay
 		GUI, Add, Button, w80 h35 x+7 gSub20, &Back
-		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, System
 ;-------------- Calendar -------------			
 		Gui, Font, S4, SF Alien Encounters										; select font and size		
 		Gui, Add, MonthCal, x%UclockXPos% y120 0x4 0x8 0x16 Background1d1f21	; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
 		GuiControl, Show, MonthCal, 
 ;--------------- Notes ---------------				
-		Gui, Font, s11 cf0c674, Inconsolata										; choses font size and color for title bar
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
 		Gui, Add, Edit, R20 xm y295 w950 vUTextBox, 
 		GuiControl, , UTextBox, %UNotesText%
 		GuiControl, Focus, UTextBox
 ;-------------------------- Tab 2 --------------------------
 		Gui, Tab, 2																	; sets below controls to tab
+;--------------- Row 1 ---------------				
 		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
 		GUI, Add, Button, w80 h35 xs y+18 gSub11, Dists
 		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
 		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
 		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
 		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
-		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, Tables
-
-
 ;-------------------------- Tab 3 --------------------------
-Gui, Tab, 3																			; sets below controls to tab
+		Gui, Tab, 3																	; sets below controls to tab
 ;-------------- Calendar -------------			
 		Gui, Font, S4, SF Alien Encounters										; select font and size		
-		Gui, Add, MonthCal, W-3 R3 multi x15 y120 0x4 vUDateRange gUDateRange1				; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		Gui, Add, MonthCal, W-3 R3 multi x15 y120 0x4 vUDateRange gUDateRange1 ; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		;GuiControl, Move , MonthCal, w750 h560
 		GuiControl, Show, MonthCal, 
 		Gui, Font, S12, SF Alien Encounters										; select font and size		
 		GUI, Add, Button, w190 h35 x780 y120 gUDateRange, Range
-		Gui, Font, s11 cf0c674, Inconsolata										; choses font size and color for title bar
+		Gui, Font, s11 cDC33A6, Inconsolata										; choses font size and color for title bar
 		GUI, Add, Edit, w190 x780 y165 vUDateDisplay, 
 		GUI, Add, Edit, w190 x780 y200 vUDateDist, 
+;-------------------------- Tab 3 --------------------------
+		Gui, Tab, 3																	; sets below controls to tab		
 ;-------------------------- Show ---------------------------		
 		GUI, Show, x0 y0 w%UguiWdt% h%UguiHgt%, Universal						; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
 	}
@@ -277,12 +289,12 @@ UDateRange:
 	FormatTime, UStrtDate1, %UStrtDate1%, yyyyMMdd ; format date
 	FormatTime, UEndDate1, %UEndDate1%, yyyyMMdd ; format date
 ;--------------- Date Range ------------------	
-	UStrtEndCom := UStrtDate " - " UEndDate	; format variable
+	UStrtEndCom := " "UStrtDate " - " UEndDate	; format variable
 	GuiControl, Text, UDateDisplay, %UStrtEndCom%	; set Edit box
 ;--------------- Calc Range ------------------		
 	;EnvAdd, UStrtDate1, %UEndDate1%, days ; calc date range
 	UEndDate1 -= %UStrtDate1%, days
-	UDateDistStr := UEndDate1 " days"	; format variable
+	UDateDistStr := " "UEndDate1 " days"	; format variable
 	GuiControl, Text, UDateDist, %UDateDistStr%	; set Edit box
 	return
 
