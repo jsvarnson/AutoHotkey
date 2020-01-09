@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v5.04
+;	Universal Subroutines v5.05
 ;====================================================================================================
 /*
 -------------------------
@@ -183,7 +183,7 @@ OutSunPos	:= (UguiWdt - 70) / 2
 		Gui, Add, Text, x%UclockXPos% y%UhdrYPos% vClockTime1, 00:00:00		; set transparency	; set color	; select output variable	; cOrange
 ;----------------------- Tab Settings ----------------------		
 		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
-		Gui, Add, Tab3, x0 y90 w984 h550, Main|System|Calendar|Settings			; creates tabs 
+		Gui, Add, Tab3, x0 y90 w984 h550, Main|System|Calendar|Alarms|Settings			; creates tabs 
 ;-------------------------- Tab 1 --------------------------
 		Gui, Tab, 1																	; sets below controls to tab		
 ;--------------- Row 1 ---------------		
@@ -254,8 +254,12 @@ OutSunPos	:= (UguiWdt - 70) / 2
 		Gui, Font, s11 cDC33A6, Inconsolata										; choses font size and color for title bar
 		GUI, Add, Edit, w190 x780 y165 vUDateDisplay, 
 		GUI, Add, Edit, w190 x780 y200 vUDateDist, 
-;-------------------------- Tab 3 --------------------------
-		Gui, Tab, 3																	; sets below controls to tab		
+;-------------------------- Tab 4 --------------------------
+		Gui, Tab, 4																	; sets below controls to tab		
+;-------------- Alarms ----------------
+		
+;-------------------------- Tab 5 --------------------------
+		Gui, Tab, 5																	; sets below controls to tab		
 ;-------------------------- Show ---------------------------		
 		GUI, Show, x0 y0 w%UguiWdt% h%UguiHgt%, Universal						; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
 	}
