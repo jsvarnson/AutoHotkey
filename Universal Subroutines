@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v4.08
+;	Universal Subroutines v5.03
 ;====================================================================================================
 /*
 -------------------------
@@ -88,31 +88,29 @@ return
 {{
 #Ifwinactive, ahk_class AutoHotkeyGUI
 ~Esc::
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	return
 #Ifwinactive
 
-~^+Esc::								; Exits all active scripts
-	Gui, Submit, NoHide
+~^+Esc::					; Exits all active scripts
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Exitapp
 	return
 
-~^Esc::									; Pauses all active scripts
+~^Esc::					; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
 
-~^!#+r::								; Unpauses and reloads all active scripts
+~^!#+r::					; Unpauses and reloads all active scripts
 	Suspend, off
 	Pause, off
 	SetTimer,UPDATEDSCRIPT,1000
 	return	
 	
-~^s::									; Reloads scipt upon save
+~^s::						; Reloads scipt upon save
 	Gui, Submit, NoHide
 	SetTimer,UPDATEDSCRIPT,1000
 	UPDATEDSCRIPT:
@@ -134,13 +132,12 @@ return
 
 ^!#+u::
 	if WinExist("Universal") 
-	{																											; check if the GUI is already open, then coses it
-		Gui, Submit, NoHide
+	{																				; check if the GUI is already open, then coses it
 		gosub, Save_Universal_Notes
 		Gui, Destroy
 	}	
 	else 
-	{																											; check if the GUI isn't open, then opens it	
+	{																				; check if the GUI isn't open, then opens it	
 		SetTimer, UpdateClock, 1000
 		Loop, Files, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\*.txt
 		If ( A_LoopFileTimeModified >= Time ) {
@@ -151,63 +148,104 @@ return
 ;--------------------------------------------------
 ;	SF Alien Encounters Style GUI
 ;--------------------------------------------------	
+; SF Alien Encounters download
+;		https://www.pixartprinting.co.uk/blog/best-80s-fonts/
 
-; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/	
-
+;----------------------- Gui Set Var -----------------------
+; Standard Window Size
+UguiHgt	= 640
+UguiWdt	= 985
+UhdrXPos	= 30
+UhdrYPos	= 28
+; Standard Window Position #1 - x0 y0
+; Standard Window Position #2 - x0 y641
+; Standard Window Position #3 - x0 y1281
+;----------------------- Gui Calc Var ----------------------
+UclockXPos := UguiWdt - 330
+UcalXPos	:= UguiWdt - 170
+;----------------------- Gui Settings ----------------------
 		Gui, Margin, 16, 16
-		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
-		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border	+HwndUGUI										; removes the toolbar
-		Gui, Font, s38 cf0c674, SF Alien Encounters																; choses font size and color for title bar
-		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
-		Gui, Font, s12 w400 cf0c674, SF Alien Encounters														; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+16 gSub1, Dates
+		Gui, Color, 1d1f21, 282a2e												; colors the background dark gray
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border +HwndUGUI		; removes the toolbar
+		Gui, Font, s42 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x%UhdrXPos% y%UhdrYPos%, Universal						; sets the title of the GUI	
+;--------------- Clock ---------------				
+		Gui, Add, Text, x%UclockXPos% y%UhdrYPos% vClockTime1, 00:00:00		; set transparency	; set color	; select output variable	; cOrange
+;----------------------- Tab Settings ----------------------		
+		Gui, Font, s10 cf0c674, SF Alien Encounters								; choses font size and color
+		Gui, Add, Tab3, x0 w984 h550, Main|System|Calendar|Settings			; creates tabs 
+;-------------------------- Tab 1 --------------------------
+		Gui, Tab, 1																	; sets below controls to tab		
+;--------------- Row 1 ---------------		
+		Gui, Font, s12 w400 cf0c674, SF Alien Encounters						; sets font for the bottom half of the GUI
+		GUI, Add, Button, default w80 h35 xs y+16 gSub1, Dates
 		GUI, Add, Button, w80 h35 x+7 gSub2, WinS
 		GUI, Add, Button, w80 h35 x+7 gSub3, &Orders
 		GUI, Add, Button, w80 h35 x+7 gSub4, &Directs
 		GUI, Add, Button, w80 h35 x+7 gSub5, &Claims
-		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6 , Emails
-		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+;--------------- Row 2 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
 		GUI, Add, Button, w80 h35 xs y+18 gSub6, &ECC
 		GUI, Add, Button, w80 h35 x+7 gSub7, WsDE
 		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
-		GUI, Add, Button, w80 h35 x+7 gSub9, OBDs
+		GUI, Add, Button, w80 h35 x+7 gSub9, PlayBK
 		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
-		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, Files
-		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+18 gSub11, Dists
-		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
-		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
-		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
-		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
-		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
-		GUI, Add, Text, x+6, Tables
-		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+;--------------- Row 3 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
 		GUI, Add, Button, w80 h35 xs y+18 gSub21, Ship
 		GUI, Add, Button, w80 h35 x+7 gSub22, Sail
 		GUI, Add, Button, w80 h35 x+7 gSub23, ETA
 		GUI, Add, Button, w80 h35 x+7 gSub24, ATA
 		GUI, Add, Button, w80 h35 x+7 gSub25, Unexp
-		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, TM
-		Gui, Font, s12 cf0c674, SF Alien Encounters																; sets font for the bottom half of the GUI
+;--------------- Row 4 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
 		GUI, Add, Button, w80 h35 xs y+18 gSub16, Dash
 		GUI, Add, Button, w80 h35 x+7 gSub17, Sub17
 		GUI, Add, Button, w80 h35 x+7 gSub18, Sub18
 		GUI, Add, Button, w80 h35 x+7 gSub19, &Stay
 		GUI, Add, Button, w80 h35 x+7 gSub20, &Back
-		Gui, Font, s20 cf0c674, SF Alien Encounters																; choses font size and color for title bar
+		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
 		GUI, Add, Text, x+6, System
-		Gui, Font, S42, SF Alien Encounters																		; select font and size	; Rage Italic		
-		Gui, Add, Text, x+72 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
-		Gui, Font, S4, SF Alien Encounters																		; select font and size	; Rage Italic		
-		Gui, Add, MonthCal, y+16 0x4 0x8 0x16 Background1d1f21 													; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+;-------------- Calendar -------------			
+		Gui, Font, S4, SF Alien Encounters										; select font and size		
+		Gui, Add, MonthCal, x%UclockXPos% y120 0x4 0x8 0x16 Background1d1f21	; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
 		GuiControl, Show, MonthCal, 
-		Gui, Font, s11 cf0c674, Inconsolata																		; choses font size and color for title bar
-		Gui, Add, Edit, R18 xm w950 y300 vUTextBox, 
+;--------------- Notes ---------------				
+		Gui, Font, s11 cf0c674, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, R20 xm y295 w950 vUTextBox, 
 		GuiControl, , UTextBox, %UNotesText%
-		GUI, Show, x0 y0 w985 h640, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
+		GuiControl, Focus, UTextBox
+;-------------------------- Tab 2 --------------------------
+		Gui, Tab, 2																	; sets below controls to tab
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub11, Dists
+		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
+		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
+		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
+		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
+		Gui, Font, s20 cf0c674, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Tables
+
+
+;-------------------------- Tab 3 --------------------------
+Gui, Tab, 3																			; sets below controls to tab
+;-------------- Calendar -------------			
+		Gui, Font, S4, SF Alien Encounters										; select font and size		
+		Gui, Add, MonthCal, W-3 R3 multi x15 y120 0x4 vUDateRange gUDateRange1				; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		GuiControl, Show, MonthCal, 
+		Gui, Font, S12, SF Alien Encounters										; select font and size		
+		GUI, Add, Button, w190 h35 x780 y120 gUDateRange, Range
+		Gui, Font, s11 cf0c674, Inconsolata										; choses font size and color for title bar
+		GUI, Add, Edit, w190 x780 y165 vUDateDisplay, 
+		GUI, Add, Edit, w190 x780 y200 vUDateDist, 
+;-------------------------- Show ---------------------------		
+		GUI, Show, x0 y0 w%UguiWdt% h%UguiHgt%, Universal						; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
 	}
 	return
 
@@ -217,19 +255,49 @@ return
 
 UpdateClock:
 	GuiControl, , ClockTime1, % A_Hour ":" A_Min ":" A_Sec
-	return		
-	
+	return	
+
+;--------------------------------------------------
+;	Universal Calendar
+;--------------------------------------------------
+
+UDateRange1:	
+UDateRange:
+	gui, submit, nohide ; submit variables
+	UDateRgFnd = %UDateRange% ; grab selected date
+	UDateRg_Array := StrSplit(UDateRgFnd,"-") ; split into two dates
+;--------------- Set Date Var ----------------
+	UStrtDate := UDateRg_Array[1] ; grab 1st date
+	UEndDate := UDateRg_Array[2] ; grab 2nd date
+	UStrtDate1 := UStrtDate ; assign to other var
+	UEndDate1 := UEndDate ; assign to other var
+;--------------- Format Dates ----------------	
+	FormatTime, UStrtDate, %UStrtDate%, MM/dd/yyyy ; format date
+	FormatTime, UEndDate, %UEndDate%, MM/dd/yyyy ; format date
+	FormatTime, UStrtDate1, %UStrtDate1%, yyyyMMdd ; format date
+	FormatTime, UEndDate1, %UEndDate1%, yyyyMMdd ; format date
+;--------------- Date Range ------------------	
+	UStrtEndCom := UStrtDate " - " UEndDate	; format variable
+	GuiControl, Text, UDateDisplay, %UStrtEndCom%	; set Edit box
+;--------------- Calc Range ------------------		
+	;EnvAdd, UStrtDate1, %UEndDate1%, days ; calc date range
+	UEndDate1 -= %UStrtDate1%, days
+	UDateDistStr := UEndDate1 " days"	; format variable
+	GuiControl, Text, UDateDist, %UDateDistStr%	; set Edit box
+	return
+
 ;--------------------------------------------------
 ;	Universal Notes
 ;--------------------------------------------------
 
 Save_Universal_Notes:
+	Gui, Submit, NoHide
 	UFilePath = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\
 	guicontrolget, UTextBox
 	UTextBox2 := UTextBox
-	if (UTextBox2 = "")																												; if the output is blank => do nothing
+	if (UTextBox2 = "")																											; if the output is blank => do nothing
 	{
-		msgbox, Blank
+		; msgbox, Blank
 		return
 	}
 	else (UTextBox2 != "") 																										; if the output is not blank => continue
@@ -237,19 +305,19 @@ Save_Universal_Notes:
 		UTitleEnd := InStr(UTextBox2, "`n")-1
 		UTitleStart := SubStr(UTextBox2,1,UTitleEnd)
 		UFileName = %UFilePath%%UTitleStart%.txt
-		FileDelete, %UNotesFile%
-		FileAppend, %UTextBox2%`n, %UFileName%				; %UNotesFile% -> input file																					; saves Edit box Text as a new file
+		FileDelete, %UFileName%
+		FileAppend, %UTextBox2%, %UFileName%				; %UNotesFile% -> input file		; `n								; saves Edit box Text as a new file
 	}
 	return
 
 #Ifwinactive, ahk_class AutoHotkeyGUI
 :*:[[::
-	TodayDateUniversal1 := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min					; gets current date time stamp formatting
+	TodayDateUniversal1 := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min				; gets current date time stamp formatting
 	send, %TodayDateUniversal1%
 	return
 	
 :*:]]::
-	TodayDateUniversal2 := A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min					; gets current date time stamp formatting
+	TodayDateUniversal2 := A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min										; gets current date time stamp formatting
 	send, %TodayDateUniversal2%
 	return
 #Ifwinactive
@@ -264,15 +332,6 @@ Save_Universal_Notes:
 
 ; Include DashMail
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
-
-; Include Global
-;~ #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Global.ahk
-
-; Include Notepad++
-;Notepad++Setup:
-; #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
-;Run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Notepad++.ahk
-;return
 
 ; Include Outlook Automation
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Outlook Automation.ahk
@@ -297,7 +356,6 @@ Save_Universal_Notes:
 ;---------------------------------------------------------------------------
 
 Sub1:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	gui, destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
@@ -318,7 +376,6 @@ Sub1:
 	return
 
 Sub2:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
@@ -362,7 +419,6 @@ Sub2:
 	return
 */	
 Sub3:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
@@ -383,7 +439,6 @@ Sub3:
 	return
 	
 Sub4:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
@@ -446,7 +501,6 @@ Sub4:
 	return
 	
 Sub5:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
@@ -471,7 +525,6 @@ Sub5:
 ;---------------------------------------------------------------------------	
 
 Sub6:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("ECC-TM Import Shipment Report") {
@@ -487,14 +540,12 @@ Sub6:
 	return
 	
 Sub7:				; WDone
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, Ws_Processing_completed_email
 	return
 	
 Sub8:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Ws IBD Creation - FM36 - Template") {
@@ -508,21 +559,20 @@ Sub8:
 	return
 	
 Sub9:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
-	if WinExist("Ws OBD Creation - FM36 - template_new") {
-		winactivate, Ws OBD Creation - FM36 - template_new
-		winwaitactive, Ws Batch Creation - FM36 - Template_New
+	
+	if WinExist("Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word") {
+		winactivate, Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word
+		winwaitactive, Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word
 		}
 	Else {
-		run, \\mbsus238\trfshare\FM36\Templates\Ws OBD Creation - FM36 - template_new.xlsx
-		winwaitactive, Ws Batch Creation - FM36 - Template_New
+		run, \\mbsus238\trfshare\FM36\Ws Import Playbook\Import_Over_the_Ocean-Indirect_Playbook.docx
+		winwaitactive, Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word
 		}
 	return
 	
 Sub10:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	if WinExist("Winshuttle Import Playbook") {
@@ -540,35 +590,30 @@ Sub10:
 ;---------------------------------------------------------------------------
 
 Sub11:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_distributors
 	return
 	
 Sub12:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_plants
 	return
 	
 Sub13:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_SKUs
 	return
 	
 Sub14:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_lanes
 	return
 	
 Sub15:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, ref_table_MSKUs
@@ -579,35 +624,30 @@ Sub15:
 ;---------------------------------------------------------------------------	
 
 Sub16:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, dashmail_activator
 	return
 
 Sub17:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub18:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub19:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Gosub, stayactive
 	return
 	
 Sub20:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	Gosub, imback
@@ -618,35 +658,30 @@ Sub20:
 ;---------------------------------------------------------------------------	
 
 Sub21:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Containers
 	return
 
 Sub22:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Sail
 	return
 	
 Sub23:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_ETA
 	return
 	
 Sub24:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_ATA
 	return
 	
 Sub25:
-	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	Gui, Destroy
 	gosub, TM_Unexp
