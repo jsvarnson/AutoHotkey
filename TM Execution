@@ -1,5 +1,5 @@
 ;=======================================================================
-;	TM Execution v2.05
+;	TM Execution v2.08
 ;=======================================================================	
 /* 
 ;-------------------- Setup Advice ---------------------------------------------
@@ -50,40 +50,22 @@ SetTitleMatchMode 2                     ; Compares window title names
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
 
-gosub, TM_Execution_activator
+;gosub, TM_Execution_activator
+FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
+TMexVersion = 2.08
+TMexVersion := "v"TMexVersion		; remember to change in HTML manually
+applicationname := "TM Execution " TMexVersion
 
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
-;=======================================================================
-;	Main
-;=======================================================================
-FormatTime, Time, ,mm/dd/yyyy hh:mm:ss      									
-;=======================================================================
-;	ETA Date Loop
-;=======================================================================
-;--------------------------------------------------
-;	Save reset to next loop -> continuation
-;--------------------------------------------------
-/*
-#Ifwinactive ahk_class IEFrame
-~^s::
-	send, {ctrl down}{s}{ctrl up}												; save doc
-	sleep, 30
-	send, {ctrl down}{w}{ctrl up}												; close window
-	sleep, 30
-	Winactivate, ahk_class IEFrame												; reactivate owner IE window
-	Winshow																		; display
-	; image search for Edit ocean freight booking hyperlink
-#Ifwinactive
-*/
 ;=======================================================================
 ;	TM 
 ;=======================================================================	
 ;--------------------------------------------------
 ;	Gui Activator
 ;--------------------------------------------------
-^!#+j::								; toggle gui window
-	TM_Execution_activator:
+;^!#+j::								; toggle gui window
+TM_Execution_activator:
 	if winexist("TM Execution") {												; check if the GUI is already open, then coses it
 		doc := ""
 		Gui, Destroy
@@ -93,7 +75,7 @@ FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
 		Gui, -ToolWindow ;-Caption 
 		Gui Add, ActiveX, w530 h265 x0 y0 vdoc, HTMLFile					; activates the HTML GUI, written above
 		doc.write(html)
-		Gui, Show, w530 h265 Center, TM Execution							; titles the GUI and chooses the size
+		Gui, Show, w530 h265 Center, %applicationname%						; titles the GUI and chooses the size
 		ComObjConnect(doc, "Doc_")												; connects to html file
 		}
 	return
@@ -162,7 +144,7 @@ TM_Execution_HTML:
 		<button id='ETA'>ETA</button>
 		<button id='ATA'>ATA</button>
 		<button id='Departure'>Departure</button><br>
-	
+
 		<button id=''></button>
 		<button id='Info'>Info</button>
 		<button id='Cancel'>Cancel</button>	
@@ -209,15 +191,21 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 		gosub, 	TM_Dep_onclick			; Departure sub
 		}		
 	else if (id = "Info")
-		msgbox, Insert instruction readme here.
+		{
+		msgbox, why god why
+		;gosub, TM_INFO_onclick		; launch info menu
+		}
 	else if (id="Cancel") 
 		{
 		doc := ""
 		Gui, Destroy 
+		Exitapp
 		}
 	else if (id = "About")
-		msgbox, Credit myself here for making the program.	
-	}
+		{
+		gosub, TM_ABOUT_onclick		; launch about menu
+		}
+	}			; close section
 	return
 ;--------------------------------------------------
 ;	Temporary Button Routines
@@ -291,7 +279,139 @@ TMprintLV:
 TMmsgboxDelay:
 	InputBox, TMmsgWaitTime, TM Message Box Delay, Please enter the delay`, in seconds`, between message prompts.`r`n`r`nConsider this the time it takes you to place the cursor in the field that needs updating., , 200, 100, center, center,,, 5 			; Show the InputBox to tell how many loops to complete
 	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
+	if ErrorLevel   ; cancel run if inputbox is cancelled
+		gosub, EarlyTerm3A
 	return	
+;--------------------------------------------------
+;	Save reset to next loop -> continuation
+;--------------------------------------------------
+/*
+#Ifwinactive ahk_class IEFrame
+~^s::
+	send, {ctrl down}{s}{ctrl up}												; save doc
+	sleep, 30
+	send, {ctrl down}{w}{ctrl up}												; close window
+	sleep, 30
+	Winactivate, ahk_class IEFrame												; reactivate owner IE window
+	Winshow																		; display
+	; image search for Edit ocean freight booking hyperlink
+#Ifwinactive
+*/
+;----------------------------------------------------------------
+;	About Submenu	
+;----------------------------------------------------------------
+TM_ABOUT_onclick:
+;---------- Sub menu setup ----------
+;---------- Section 1 ----------
+	Gui,99:Destroy
+	Gui,99:Margin,20,20
+	Gui,99:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10,%applicationname%
+	Gui,99:Font
+	Gui,99:Add,Text,y+10, TM data entry automator and assistant
+	Gui,99:Add,Text,y+10, - Drastically reduce data entry time in TM
+	Gui,99:Add,Text,y+10, - Designed for all inbound execution needs
+	Gui,99:Add,Text,y+10, - Created for MolsonCoors Import group
+;---------- Section 2 ----------
+	Gui,99:Add,Picture,xm y+20 Icon2,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10, Developed by Joseph Arnson
+	Gui,99:Font
+	Gui,99:Add,Text,y+10, For more information, please contact me at
+	Gui,99:Add,Text,y+10, - Work:
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text, x+30 gTMemailtoClip1, joseph.arnson@millercoors.com
+	Gui,99:Font
+	Gui,99:Add,Text, xm+10 y+10, - Personal:
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text, x+15 gTMemailtoClip2, jsvarnson@gmail.com
+	Gui,99:Font
+;---------- Section 3 ----------
+	Gui,99:Add,Picture,xm y+20 Icon4,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10,AutoHotkey
+	Gui,99:Font
+	Gui,99:Add,Text,y+10,This tool was made using the powerful
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text,y+5 GAUTOHOTKEY,www.AutoHotkey.com
+	Gui,99:Font
+;---------- Sub menu Show -----------
+	Gui,99:Show,, About
+	Return
+;---------- Tooltip Removal ------------	
+TMRemoveToolTip:
+	ToolTip
+	return
+;----- email 1 to clip -----	
+TMemailtoClip1:
+	clipboard := ""	
+	clipboard := "joseph.arnson@millercoors.com"
+	clipwait
+	tooltip, joseph.arnson@millercoors.com copied to clipboard
+	SetTimer, TMRemoveToolTip, -3000
+	return
+;----- email 2 to clip -----	
+TMemailtoClip2:
+	clipboard := ""	
+	clipboard := "jsvarnson@gmail.com"
+	clipwait
+	tooltip, jsvarnson@gmail.com copied to clipboard
+	SetTimer, TMRemoveToolTip, -3000
+	return
+;----- AHK website ---------	
+AUTOHOTKEY:
+  Run,http://www.autohotkey.com,,UseErrorLevel
+Return
+;----- gui close -----
+99GuiClose:
+  Gui,99:Destroy
+  OnMessage(0x200,"")
+  DllCall("DestroyCursor","Uint",hCur)
+Return
+;----------------------------------------------------------------
+;	Info Submenu	
+;----------------------------------------------------------------
+TM_INFO_onclick:
+;---------- Sub menu setup ----------
+;---------- Section 1 ----------
+	Gui,99:Destroy
+	Gui,99:Margin,20,20
+	Gui,99:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10,%applicationname%
+	Gui,99:Font
+	Gui,99:Add,Text,y+10, Instructions and Setup
+	Gui,99:Add,Text,y+10, 1) close notepad
+	Gui,99:Add,Text,y+10, 2) close all excel except execution file
+	Gui,99:Add,Text,y+10, 3) place cursor in the edit search box in TM
+;---------- Section 2 ----------
+	Gui,99:Add,Picture,xm y+20 Icon2,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10, Developed by Joseph Arnson
+	Gui,99:Font
+	Gui,99:Add,Text,y+10, For more information, please contact me at
+	Gui,99:Add,Text,y+10, - Work:
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text, x+30 gTMemailtoClip1, joseph.arnson@millercoors.com
+	Gui,99:Font
+	Gui,99:Add,Text, xm+10 y+10, - Personal:
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text, x+15 gTMemailtoClip2, jsvarnson@gmail.com
+	Gui,99:Font
+;---------- Section 3 ----------
+	Gui,99:Add,Picture,xm y+20 Icon4,%applicationname%.exe
+	Gui,99:Font,Bold
+	Gui,99:Add,Text,x+10 yp+10,AutoHotkey
+	Gui,99:Font
+	Gui,99:Add,Text,y+10,This tool was made using the powerful
+	Gui,99:Font,CBlue Underline
+	Gui,99:Add,Text,y+5 GAUTOHOTKEY,www.AutoHotkey.com
+	Gui,99:Font
+;---------- Sub menu Show -----------
+	Gui,99:Show,, Info
+	Return
+*/
 ;=======================================================================
 ;	TM 5 Transactions Start Here
 ;=======================================================================	
@@ -306,11 +426,14 @@ TMmsgboxDelay:
 TM_ETA_onclick:
 ;---------- Run Settings ----------
 	InputBox, LoopNum3, ETA Date Loops,,, 200, 100, center, center,,, 		; Show the InputBox
+	if ErrorLevel   ; cancel run if inputbox is cancelled
+		gosub, EarlyTerm3A
 	InputBox, TMRowStart3, TM Row Start, What row will you start with?,, 200, 100, center, center,,, 		; Show the InputBox
+	if ErrorLevel   ; cancel run if inputbox is cancelled
+		gosub, EarlyTerm3A
 	gosub, TMmsgboxDelay
 	TMRowStart3 := TMRowStart3 - 1											; set starting row variable - A_Index will +1 each loop
 	TmStartTime := A_Hour . ":" . A_Min . ":" . A_Sec
-
 ;---------- Window Sizing ---------
 ;----- LV GUI ----------	
 	TMguiLVHt := A_ScreenHeight - 150
@@ -354,10 +477,10 @@ TM_ETA_onclick:
 	{                                      										; OPEN BRACKET { TO GROUP 'IF' COMMANDS 
 	MsgBox, 262148, Start Process?, OK to Start Update Message Process? 		; POP-UP WITH OPTIONS OF YES/NO
 	   IfMsgBox Yes                        									; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
-	   Goto StartJob3                     										; CONTINUE TO StartJob3 TO RUN THE SCRIPT 
+	   gosub, StartJob3                     										; CONTINUE TO StartJob3 TO RUN THE SCRIPT 
 	else                                   										; IF NO, IT WILL GO TO EarlyTerm3  
 	  IfMsgBox No                         										; POP-UP OPTION FOR USER TO HIT NO
-	  GoTo EarlyTerm3                       									; NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
+	  gosub, EarlyTerm3                       									; NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
 	}                                      										; CLOSE THE BRACKET } FOR 'IF' COMMANDS
 	return
 ;-----------------------------------------------------------------------
@@ -467,9 +590,38 @@ EarlyTerm3:
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
+;--------------------------------------------------
+;	Script Cancelled Function
+;--------------------------------------------------
+EarlyTerm3A:                             										
+	msgbox, , TM Execution, Script run was cancelled.`r`n`r`nPress OK to terminate the script.
+	gui, destroy
+	reload
+	sleep, 1000
+	msgbox, , TM Execution, Script should've reloaded
+	return
 ;=======================================================================
-;	END
+;	TM ETA END
 ;=======================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
