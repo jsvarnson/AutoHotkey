@@ -1,17 +1,27 @@
 ;=======================================================================
-;	TM Execution v1.05
+;	TM Execution v2.05
 ;=======================================================================	
 /* 
+;-------------------- Setup Advice ---------------------------------------------
+1. Only have one IE window open on TM in Addition to the Edit window.
+2. Only have the execution excel file open.
+3. execution excel file must be open and stay open on the TM Script tab.
+4. don't move rearrange windows if you dont have to.
+5. minimize or move any Additional windows to other monitors if possible.
+6. Close out any notepad files. Have none open when starting a run.
+;-------------------------------------------------------------------------------
 
-Setup Advice
-
-1. Only have one internet explorer window open on TM in Addition to the Edit window
-2. Only have the execution excel file open
-3. execution excel file must be open and stay open on the TM Script tab
-4. don't move rearrange windows if you dont have to
-5. minimize or move any Additional windows to other monitors if possible
-
-
+----------------------------
+| List of Names per Cycle  |
+----------------------------
+LoopNum1
+TMRowStart1
+StartJob1
+EarlyTerm1
+BreakTMLoop1
+----------------------------
+|                          |
+----------------------------
 */
 ;=======================================================================
 ;	Settings
@@ -32,28 +42,22 @@ SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
 SetTitleMatchMode 2                     ; Compares window title names
-;#Persistent							; Script will stay running after the auto-execute section
+#Persistent								; Script will stay running after the auto-execute section
 }}
+;=======================================================================
+;	AUTOEXECUTE
+;=======================================================================	
+;?????????????????????????????????????????????????????????????????????
+;?????????????????????????????????????????????????????????????????????
+
+gosub, TM_Execution_activator
+
+;?????????????????????????????????????????????????????????????????????
+;?????????????????????????????????????????????????????????????????????
 ;=======================================================================
 ;	Main
 ;=======================================================================
-
-;----------------------------------------------------------------
-;	Variables
-;----------------------------------------------------------------
-FormatTime, Time, ,mm/dd/yyyy hh:mm:ss      									; ADDED THIS FOR TIME STAMP TO BE POSTED TO NOTEPAD ERROR LOG
-/*
-----------------------------
-| List of Names per Cycle  |
-----------------------------
-LoopNum1
-TMRowStart1
-StartJob1
-EarlyTerm1
-BreakTMLoop1
-----------------------------
-|                          |
-----------------------------
+FormatTime, Time, ,mm/dd/yyyy hh:mm:ss      									
 ;=======================================================================
 ;	ETA Date Loop
 ;=======================================================================
@@ -65,7 +69,6 @@ BreakTMLoop1
 ~^s::
 	send, {ctrl down}{s}{ctrl up}												; save doc
 	sleep, 30
-	LV_Add("", MyVar1, MyVar2)													; Adds completed records to listview
 	send, {ctrl down}{w}{ctrl up}												; close window
 	sleep, 30
 	Winactivate, ahk_class IEFrame												; reactivate owner IE window
@@ -73,19 +76,241 @@ BreakTMLoop1
 	; image search for Edit ocean freight booking hyperlink
 #Ifwinactive
 */
-;----------------------------------------------------------------
-;	Script Setup Subroutine
-;----------------------------------------------------------------
+;=======================================================================
+;	TM 
+;=======================================================================	
 ;--------------------------------------------------
-;	Loop Setup
+;	Gui Activator
 ;--------------------------------------------------
-^!#+-::								; launch update script
-TM_ETA:
+^!#+j::								; toggle gui window
+	TM_Execution_activator:
+	if winexist("TM Execution") {												; check if the GUI is already open, then coses it
+		doc := ""
+		Gui, Destroy
+	}	
+	else {																		; check if the GUI isn't open, then opens it
+		GoSub, TM_Execution_HTML
+		Gui, -ToolWindow ;-Caption 
+		Gui Add, ActiveX, w530 h265 x0 y0 vdoc, HTMLFile					; activates the HTML GUI, written above
+		doc.write(html)
+		Gui, Show, w530 h265 Center, TM Execution							; titles the GUI and chooses the size
+		ComObjConnect(doc, "Doc_")												; connects to html file
+		}
+	return
+;=======================================================================
+;	HTML
+;=======================================================================	
+;--------------------------------------------------
+;	HTML GUI 
+;--------------------------------------------------
+TM_Execution_HTML:
+{
+	html=
+	(
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<style type="text/css">
+		html {overflow:hidden}
+		body {background:#1d1f21;}
+		#title	{							; title style settings
+			height:        80px;
+			color:         #f0c674;
+			display:       inline-block;
+			font:          normal 64px/68px "Rage Italic";
+			text-align:    center;
+			text-shadow:   1px 1px #000000;
+			}
+		#btnClear{margin-left:10px;}
+		Button {
+			width:         100px;
+			height:        40px;
+			background-color:#373b41;
+			-moz-border-radius:28px;
+			-webkit-border-radius:28px;
+			border-radius:28px;
+			border:1px solid #000000;
+			display:inline-block;
+			cursor:pointer;
+			color:#f0c674;
+			font: normal  18px/40px "segoe ui";
+			text-decoration:none;
+			text-shadow:0px 1px 0px #2f6627;
+			text-align:    center;
+			line-height: 15px;
+			margin: 1px;
+			}
+			button:hover {background: #f0c674; color: #000000};
+		p	{									; p style settings
+			background:    #f0c674;
+			border-radius: 50px;
+			color:         #f0c674;
+			display:       relative;
+			font:          normal 22px/40px "segoe ui";
+			text-align:    center;
+			line-height: 30px;
+			text-shadow:   1px 1px #000000;
+			}
+			</style>
+	</head>
+	<body>
+		<br>
+		<div id="title">TM Execution</div>
+		<p>Data entry automator and assistant</p>
+		<button id='Container'>Container</button>
+		<button id='Sail'>Sail</button>
+		<button id='ETA'>ETA</button>
+		<button id='ATA'>ATA</button>
+		<button id='Departure'>Departure</button><br>
+	
+		<button id=''></button>
+		<button id='Info'>Info</button>
+		<button id='Cancel'>Cancel</button>	
+		<button id='About'>About</button>	
+		<button id=''></button>
+	</body>
+	</html>
+	)
+	return
+}
+;--------------------------------------------------
+;	Gui events
+;--------------------------------------------------
+Doc_OnClick(doc) {															; defines actions for gui events ie. clicking buttons
+	id := doc.parentWindow.event.srcElement.id
+	if (id = "Container")
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, 	TM_cntnr_onclick		; container sub
+		}
+	else if (id = "Sail") 
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, 	TM_sail_onclick		; sail date sub
+		}
+	else if (id = "ETA") 
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, 	TM_ETA_onclick			; eta date sub
+		}
+	else if (id="ATA") 
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, 	TM_ATA_onclick			; ata date sub
+		}
+	else if (id="Departure") 
+		{
+		doc := ""
+		Gui, Destroy 
+		gosub, 	TM_Dep_onclick			; Departure sub
+		}		
+	else if (id = "Info")
+		msgbox, Insert instruction readme here.
+	else if (id="Cancel") 
+		{
+		doc := ""
+		Gui, Destroy 
+		}
+	else if (id = "About")
+		msgbox, Credit myself here for making the program.	
+	}
+	return
+;--------------------------------------------------
+;	Temporary Button Routines
+;--------------------------------------------------
+
+;  Button that starts the script for each transaction
+;	reroute to real subroutine later
+
+TM_cntnr_onclick:
+	msgbox, Tm update script routine here.
+	return
+	
+TM_sail_onclick:
+	msgbox, Tm update script routine here.
+	return	
+
+TM_ATA_onclick:
+	msgbox, Tm update script routine here.
+	return	
+
+TM_Dep_onclick:
+	msgbox, Tm update script routine here.
+	return	
+;=======================================================================
+;	TM Execution Program Functions
+;=======================================================================	
+;--------------------------------------------------
+;	Print Script Listview Results
+;--------------------------------------------------
+TMprintLV:
+	Gui,submit,nohide
+	Gui,ListView, ; A1
+	run, notepad.exe
+    WinActivate, ahk_exe notepad.exe
+	winwaitactive, ahk_exe notepad.exe 
+	winshow
+	send, Document
+	send, {tab}
+	send, Update
+	send, {enter}
+	send, {- 26}
+	send, {enter}
+	TMRF:=1
+	TMGD:=LV_GetCount()
+	loop,%TMGD%
+	 {
+		I2++
+		LV_GetText(TM1,TMRF,1)
+		LV_GetText(TM2,TMRF,2)
+		TM1 := trim(TM1)
+		TM2 := trim(TM2)
+		WinActivate, ahk_exe notepad.exe
+		winwaitactive, ahk_exe notepad.exe 
+		send, %TM1%
+		sleep, 3
+		send, {backspace 2}
+		sleep, 3
+		send, {tab}
+		send, %TM2%
+		sleep, 3
+		send, {backspace 2}
+		sleep, 3
+		send, {enter}
+		TMRF:=(TMRF+1)
+	  }
+	gui, destroy  
+	return	
+;--------------------------------------------------
+;	Set Message Box Delay
+;--------------------------------------------------
+TMmsgboxDelay:
+	InputBox, TMmsgWaitTime, TM Message Box Delay, Please enter the delay`, in seconds`, between message prompts.`r`n`r`nConsider this the time it takes you to place the cursor in the field that needs updating., , 200, 100, center, center,,, 5 			; Show the InputBox to tell how many loops to complete
+	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
+	return	
+;=======================================================================
+;	TM 5 Transactions Start Here
+;=======================================================================	
+
+;??????????????????????????????????????????????????????????????????????
+;??????????????????????????????????????????????????????????????????????
+;??????????????????????????????????????????????????????????????????????	
+	
+;=======================================================================
+;	TM ETA Update
+;=======================================================================	
+TM_ETA_onclick:
 ;---------- Run Settings ----------
 	InputBox, LoopNum3, ETA Date Loops,,, 200, 100, center, center,,, 		; Show the InputBox
 	InputBox, TMRowStart3, TM Row Start, What row will you start with?,, 200, 100, center, center,,, 		; Show the InputBox
+	gosub, TMmsgboxDelay
 	TMRowStart3 := TMRowStart3 - 1											; set starting row variable - A_Index will +1 each loop
 	TmStartTime := A_Hour . ":" . A_Min . ":" . A_Sec
+
 ;---------- Window Sizing ---------
 ;----- LV GUI ----------	
 	TMguiLVHt := A_ScreenHeight - 150
@@ -114,25 +339,26 @@ TM_ETA:
 	Gui, Margin, 16, 16
 	Gui, Color, 1d1f21, 282a2e												; colors the background dark gray
 	Gui, Font, s24 cf0c674, Rage Italic
-	gui, Add, Text, x20 y10, TM Execution
+	gui, Add, Text, x40 y10, TM Execution
+	Gui, Font, s12 cf0c674, Calibri
+	Gui, +AlwaysOnTop -ToolWindow +Border				; removes the toolbar ; -caption -SysMenu 
+	Gui, Add, ListView, x16 y50 w%TMguiWd1% h%TMguiLVHt% grid nosorthdr altsubmit, Booking|ETA		; -hdr +hscroll
 	Gui, Font, s10 cf0c674, Inconsolata
-	Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border				; removes the toolbar
-	Gui, Add, ListView, x16 y50 w%TMguiWd1% h%TMguiLVHt% -hdr grid +hscroll nosorthdr altsubmit, Booking|ETA
 	LV_ModifyCol(auto)  		; autohdr - autosize to headers				; Auto-size each column to fit its contents and header
 	LV_ModifyCol(1, TMguiWd2, "Booking")
 	LV_ModifyCol(2, TMguiWd2, "ETA")
-	gui, show, x%TMsplitpos1% y0 h%A_ScreenHeight% w%TMguiWd%, TM Execution
+	gui, show, x%TMsplitpos1% y0 h%A_ScreenHeight% w%TMguiWd%, TM ETA Update
 ;--------------------------------------------------
 ;	Ready to Process Message
 ;--------------------------------------------------
-	{                                      					;;;OPEN BRACKET { TO GROUP 'IF' COMMANDS 
-	MsgBox, 262148, Start Process?, OK to Start Update Message Process?  ;;;POP-UP WITH OPTIONS OF YES/NO
-	   IfMsgBox Yes                        					;;;POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
-	   Goto StartJob3                     					;;;CONTINUE TO StartJob3 TO RUN THE SCRIPT 
-	else                                   					;;;IF NO, IT WILL GO TO EarlyTerm3  
-	  IfMsgBox No                         					;;;POP-UP OPTION FOR USER TO HIT NO
-	  GoTo EarlyTerm3                       				;;;NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
-	}                                      					;;;CLOSE THE BRACKET } FOR 'IF' COMMANDS
+	{                                      										; OPEN BRACKET { TO GROUP 'IF' COMMANDS 
+	MsgBox, 262148, Start Process?, OK to Start Update Message Process? 		; POP-UP WITH OPTIONS OF YES/NO
+	   IfMsgBox Yes                        									; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
+	   Goto StartJob3                     										; CONTINUE TO StartJob3 TO RUN THE SCRIPT 
+	else                                   										; IF NO, IT WILL GO TO EarlyTerm3  
+	  IfMsgBox No                         										; POP-UP OPTION FOR USER TO HIT NO
+	  GoTo EarlyTerm3                       									; NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
+	}                                      										; CLOSE THE BRACKET } FOR 'IF' COMMANDS
 	return
 ;-----------------------------------------------------------------------
 ;	Loop Start
@@ -147,7 +373,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 ;--------------------------------------------------
 ;	Loop
 ;--------------------------------------------------
-	Loop %LoopNum3%															; CHANGE LOOP NUMBER TO HOW MANY ROWS OF DATA determined above from InputBox
+	Loop %LoopNum3%															; number of loops/rows to process
 	{
 		if (BreakTMLoop3 = 1)
 			break
@@ -176,7 +402,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 					send, %MyVar1%												; send search var
 					sleep, 10
 					send, {enter}
-					sleep, 2000
+					sleep, %TMmsgWaitTime%
 					MsgBox, 262148, TM Execution, Are you ready to update the ETA to %MyVar2%?	; POP-UP WITH OPTIONS OF YES/NO
 						IfMsgBox Yes                          					; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
 						{
@@ -186,6 +412,8 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 10
 							send, {tab}
 							send, %MyVar3%										; send auxiliary var
+							sleep, 10
+							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
 							sleep, 10
 						}
 						IfMsgBox No                            				; POP-UP OPTION FOR USER TO HIT NO
@@ -197,18 +425,18 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 				{
 					gosub, TM_ETA_Script_End
 				}
-			Sleep, 200
+			Sleep, 100
 		}
 ;--------------------------------------------------
 ;	Loop Complete Message
 ;--------------------------------------------------
-	TmEndTime := A_Hour . ":" . A_Min . ":" . A_Sec							; Stores script end time
-	MsgBox, 262148, TM Execution, CHECK??   									; POP-UP WITH OPTIONS OF YES/NO
-	IfMsgBox Yes                          										; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
-		Msgbox, , TM Execution, See error results.
-		return                
-	IfMsgBox No                            									; POP-UP OPTION FOR USER TO HIT NO
-		gosub, TM_ETA_Script_End
+;	TmEndTime := A_Hour . ":" . A_Min . ":" . A_Sec							; Stores script end time
+	MsgBox, 262148, TM Execution, Script completed.`r`n`r`nWould you like to print the results of this run?
+		IfMsgBox Yes   ; print results subroutine if yes             				          					
+			gosub, TMprintLV
+			gosub, TM_Execution_activator
+		IfMsgBox No 	; just continue if no
+			gosub, TM_Execution_activator
 		return
 ;-----------------------------------------------------------------------
 ;	Loop End
@@ -218,43 +446,30 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 ;--------------------------------------------------
 TM_ETA_Script_End:
 	TMrowend := A_Index + TMRowStart3
+	MsgBox, 262148, TM Execution, Would you like to print the results of the run?
+		IfMsgBox Yes   ; print results subroutine if yes             				          					
+			gosub, TMprintLV
+		IfMsgBox No 	; just continue if no
 	msgbox, , TM Execution, The script ended on %MyVar1% in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
-	Reload
+	gui, destroy
+	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
 ;--------------------------------------------------
 ;	Script End Function
 ;--------------------------------------------------
-EarlyTerm3:                             										; STEP TO END THE HOTKEY FROM RUNNING
+EarlyTerm3:                             										
 	TMrowend := 1 + TMRowStart3
 	msgbox, , TM Execution, Script run was cancelled with set start in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
-	Reload
+	gui, destroy
+	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
 ;=======================================================================
 ;	END
 ;=======================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
