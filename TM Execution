@@ -1,7 +1,12 @@
 ;=======================================================================
-;	TM Execution v2.11
+;	TM Execution v2.15
 ;=======================================================================	
 /* 
+	TO DO 
+1)	copy and convert the ETA script to the other 4
+2)	connect the other 4 scripts to their respective main menu buttons
+3)	save routine that saves doc, exits, selects new doc, move cursor to input
+
 ----------------------------
 | List of Names per Cycle  |
 ----------------------------
@@ -42,24 +47,43 @@ SetTitleMatchMode 2                     ; Compares window title names
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
 ;---------- Version Num ----------
-TMexVersion = 2.11
+TMexVersion = 2.15
 TMexVersion := "v"TMexVersion		; remember to change in HTML manually
 applicationname := "TM Execution " TMexVersion
 ;---------- Default Var ----------	
-TMcontcolum1 = A
-TMcontcolum2 = B
-TMsailcolum1 = D
-TMsailcolum2 = E
-TMetaDcolum1 = G
-TMetaDcolum2 = H
-TMataDcolum1 = J
-TMataDcolum2 = K
-TMdepacolum1 = M
-TMdepacolum2 = N
-TMmsgWaitTime = 5
-;---------- Time Setting ---------
+TMcontcolum1	= A
+TMcontcolum2	= B
+TMsailcolum1	= D
+TMsailcolum2	= E
+TMetaDcolum1	= G
+TMetaDcolum2	= H
+TMataDcolum1	= J
+TMataDcolum2	= K
+TMdepacolum1	= M
+TMdepacolum2	= N
+TMmsgWaitTime	= 5
+TMdtimestamp	= 08:00:00AM
+TMcontCode		= ZS2 
+TMtrnscode1	:= "" 
+;---------- Settings ---------
+CoordMode, Pixel, Screen  ; Interprets the coordinates below as relative to the screen rather than the active window.
+CoordMode, Mouse, Screen  ; Interprets the coordinates below as relative to the screen rather than the active window.
 FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
 ;---------------------------------
+;---------- Window Sizing --------
+;----- LV GUI ----------	
+	TMguiLVHt := A_ScreenHeight - 150
+	TMguiWd := 272																; change lv gui width here
+	TMguiWd1 := (TMguiWd - 34)
+	TMguiWd1 := Round(TMguiWd1, 0)
+	TMguiWd2 := (TMguiWd - 32) / 2
+	TMguiWd2 := Round(TMguiWd2, 0)
+;----- 3 Win Split -----	
+	TMsplitscreen1 := Round(A_ScreenWidth / 2,0)	- 40						; screen halfway point
+	TMsplitscreen2 := TMsplitscreen1 - TMguiWd	+ 8 						; excel x axis start point
+	TMsplitpos1 := 0															; listview gui position`
+	TMsplitpos2 := TMguiWd + 1												; excel win position
+	TMsplitpos3 := TMsplitscreen1 + 2										; IE win position
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
 }}
@@ -226,21 +250,29 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 ;  Button that starts the script for each transaction
 ;	reroute to real subroutine later
 TM_cntnr_onclick:
+	TMtrnscode1 := "Container"
+	msgbox, trans code %TMtrnscode1%
 	msgbox, Tm update script routine here.
 	gosub, TM_Execution_activator
 	return
 	
 TM_sail_onclick:
+	TMtrnscode1 := "Sail Date"
+	msgbox, trans code %TMtrnscode1%
 	msgbox, Tm update script routine here.
 	gosub, TM_Execution_activator
 	return	
 
 TM_ATA_onclick:
+	TMtrnscode1 := "ATA Date"
+	msgbox, trans code %TMtrnscode1%
 	msgbox, Tm update script routine here.
 	gosub, TM_Execution_activator
 	return	
 
 TM_Dep_onclick:
+	TMtrnscode1 := "Departure"
+	msgbox, trans code %TMtrnscode1%
 	msgbox, Tm update script routine here.
 	gosub, TM_Execution_activator
 	return	
@@ -254,13 +286,14 @@ TMprintLV:
 {{
 	Gui,submit,nohide
 	Gui,ListView, ; A1
+	msgbox, transaction code %TMtrnscode2%
 	run, notepad.exe
     WinActivate, ahk_exe notepad.exe
 	winwaitactive, ahk_exe notepad.exe 
 	winshow
 	send, Document
 	send, {tab}
-	send, Update
+	send, %TMtrnscode1%
 	send, {enter}
 	send, {- 26}
 	send, {enter}
@@ -295,15 +328,53 @@ TMprintLV:
 ;--------------------------------------------------
 /*
 #Ifwinactive ahk_class IEFrame
-~^s::
-	send, {ctrl down}{s}{ctrl up}												; save doc
-	sleep, 30
-	send, {ctrl down}{w}{ctrl up}												; close window
-	sleep, 30
-	Winactivate, ahk_class IEFrame												; reactivate owner IE window
-	Winshow																		; display
-	; image search for Edit ocean freight booking hyperlink
+;~^s::
+^!#+j::
+	SetTitleMatchMode, 2														; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+/*
+	IfWinActive, Edit Import 
+	{	
+		send, {ctrl down}{s}{ctrl up}
+		sleep, 500
+		send, {ctrl down}{w}{ctrl up}
+		sleep, 500
+		; Winactivate, ahk_class IEFrame										; reactivate owner IE window
+		; WinWaitActive, Edit - Internet Explorer, , 5					
+		; Winshow			
+*/
+/*
+		ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\edit_hyperlink.png
+		if (ErrorLevel = 2)
+			MsgBox Could not conduct the search.
+		else if (ErrorLevel = 1)
+			MsgBox Icon could not be found on the screen.
+		else
+			MouseClick, left, %TMFoundX%, %TMFoundY%
+			;MouseClick, right, %TMFoundX%, %TMFoundY%
+			sleep, 5					00
+*/
+/*			
+			ImageSearch, TMFoundX2, TMFoundY2, 0, 0, A_ScreenWidth, A_ScreenHeight, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\tm_open_neww.png
+			if (ErrorLevel = 2)
+				MsgBox Could not conduct the search.
+			else if (ErrorLevel = 1)
+				MsgBox Icon could not be found on the screen.
+			else
+				MouseClick, left, %TMFoundX2%, %TMFoundY2%
+*/	
+/*
+				sleep, 200
+				Winactivate, Edit - Internet Explorer											; reactivate owner IE window
+				WinWaitActive, Edit - Internet Explorer, , 5
+				Winshow
+				WinMove, Edit - Internet Explorer, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%	; adjust window size
+				sleep, 20
+				send, {tab 5}			
+			return
+	;	}					
 #Ifwinactive
+
+; 60011131					
 */
 ;----------------------------------------------------------------
 ;	About Submenu	
@@ -325,7 +396,7 @@ TM_ABOUT_onclick:
 ;---------- Section 2 ----------
 	Gui,99:Add,Picture,xm y+20 Icon2,%applicationname%.exe
 	Gui,99:Font,Bold
-	Gui,99:Add,Text,x+10 yp+10, Developed by Joseph Arnson
+	Gui,99:Add,Text,x+10 yp+10, Developed by Joseph Arnson 					; © 2020 doesn't display symbol correctly
 	Gui,99:Font
 	Gui,99:Add,Text,y+10, For more information, please contact me at
 	Gui,99:Add,Text,y+10, - Work:
@@ -386,7 +457,7 @@ Return
 ;----------------------------------------------------------------
 TM_INFO_onclick:
 {{
-	TMinfowidth1 = 400
+	TMinfowidth1 = 460
 	TMinfowidth2 := TMinfowidth - 20
 ;---------- Sub menu setup ----------
 ;---------- Section 1 ----------
@@ -402,7 +473,7 @@ TM_INFO_onclick:
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Close all Internet Explorer windows before starting.
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Minimize or close all unnecessary windows if possible.
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Avoid moving or rearranging active windows if possible.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Check the Settings menu and adjust them to your preference.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Check the Settings menu and adjust them respectively to your needs.
 	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
 	Gui,98:Font,Bold
 	Gui,98:Add,Text,x+10 yp+10, Instructions
@@ -411,12 +482,15 @@ TM_INFO_onclick:
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Select Edit Freight Booking for the transaction you are processing. 
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Place cursor in the search box.
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Open the Import Execution file to the TM Script tab.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 8.  
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 9.  
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 10.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Enter the number of documents (rows) to be processed.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Enter the row number of the first document to be processed.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Click Yes when you are ready to begin processing or No to exit the run.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 8.  Press Enter, or click Yes, to search the first document number. 
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 9.  Navigate to the field that will be updated -- ideally before the next message appears.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 10. Press Ctrl + S to save the document and continue to the next update.  
+	
+	Gui,98:Add,Text,y+15  %TMinfowidth2%, i.    Click No on any message box to exit the run at any time.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%,  ii.   Optionally, you can have a Notepad file printed of the run results.
 ;---------- Sub menu Show -----------
 	Gui,98:Show, w%TMinfowidth1%, Info
 	Return
@@ -433,12 +507,13 @@ TM_SETTINGS_onclick:
 {{
 ;---------- Variables ----------
 ;----- Siz and Pos -----
-	TMsetUpd = 170		; column title x pos
-	TMsetCol = 181		; column edit x pos
+	TMsetUpd = 176		; column title x pos
+	TMsetCol = 165		; column edit x pos
 	TMsetYsp = 7		; line spacing
 	TMsetYbr = 15		; page break
 	TMsetWid = 250		; gui settings width
-	TMBtnW := 80 		; button width
+	TMBtnW  := 80 		; button width
+	TMedtW  := 70 		; Edit width
 	TMBtnX1 := ((TMsetWid - TMBtnW) / 4) * 1
 	TMBtnX2 := ((TMsetWid - TMBtnW) / 4) * 3
 ;---------- Section 1 ----------
@@ -447,52 +522,61 @@ TM_SETTINGS_onclick:
 	Gui,97:Add,Picture,xm Icon1,%applicationname%.exe
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm yp+10, Container Updates
-	Gui,97:Add,Text,x%TMsetUpd% yp, Column
+	Gui,97:Add,Text,x%TMsetUpd% yp, Columns
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y50 h18, Freight Order 
-	Gui,97:Add,Edit,x%TMsetCol% y50 h18 w20 +Center vTMcontcolum1, %TMcontcolum1% 
+	Gui,97:Add,Edit,x%TMsetCol% y50 h18 w%TMedtW% +Center vTMcontcolum1, %TMcontcolum1% 
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Container 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMcontcolum2, %TMcontcolum2%
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMcontcolum2, %TMcontcolum2%
 ;---------- Section 2 ----------
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm y+%TMsetYbr%, Sail Date Updates
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMsailcolum1, %TMsailcolum1% 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMsailcolum1, %TMsailcolum1% 
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Sail Date 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMsailcolum2, %TMsailcolum2%
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMsailcolum2, %TMsailcolum2%
 ;---------- Section 3 ----------
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm y+%TMsetYbr%, ETA Date Updates
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMetaDcolum1, %TMetaDcolum1% 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMetaDcolum1, %TMetaDcolum1% 
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, ETA Date 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMetaDcolum2, %TMetaDcolum2%	
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMetaDcolum2, %TMetaDcolum2%	
 ;---------- Section 4 ----------
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm y+%TMsetYbr%, ATA Date Updates
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMataDcolum1, %TMataDcolum1% 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMataDcolum1, %TMataDcolum1% 
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, ATA Date 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMataDcolum2, %TMataDcolum2%
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMataDcolum2, %TMataDcolum2%
 ;---------- Section 5 ----------
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm y+%TMsetYbr%, Container Updates
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMdepacolum1, %TMdepacolum1% 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMdepacolum1, %TMdepacolum1% 
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Departure Date 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMdepacolum2, %TMdepacolum2%
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMdepacolum2, %TMdepacolum2%
 ;---------- Section 6 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, Miscellaneous 
+	Gui,97:Add,Text,x%TMsetUpd% yp, Variables
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Date Time Stamp 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMdtimestamp, %TMdtimestamp%	
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Container Code
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMcontCode, %TMcontCode%	
+;---------- Section 7 ----------	
 	Gui,97:Font,Bold
 	Gui,97:Add,Text,xm y+%TMsetYbr%, Message Box Delay
 	Gui,97:Add,Text,x%TMsetUpd% yp, Seconds
 	Gui,97:Font
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Delay 
-	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMmsgWaitTime, %TMmsgWaitTime%
-;---------- Section 7 ----------	
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMmsgWaitTime, %TMmsgWaitTime%
+;---------- Section 8 ----------	
 	Gui, 97:Add, Button, Default x%TMBtnX1% y+%TMsetYbr% w%TMBtnW% gTMsetSubmit, Submit
 	Gui, 97:Add, Button, x%TMBtnX2% yp w%TMBtnW% gTMsetReset, Default
 ;---------- Sub menu Show -----------
@@ -520,7 +604,8 @@ TMsetReset:
 	GuiControl, Text, TMdepacolum1 , M
 	GuiControl, Text, TMdepacolum2 , N
 	GuiControl, Text, TMmsgWaitTime , 5
-	;Gui,97:Destroy
+	GuiControl, Text, TMdtimestamp , 08:00:00AM
+	GuiControl, Text, TMcontCode , ZS2
 	gui, submit, nohide
 	Return	
 }}
@@ -542,6 +627,8 @@ TMsetReset:
 TM_ETA_onclick:
 {{
 ;---------- Run Settings ----------
+	TMtrnscode1 := "Sail Date"
+	msgbox, trans code %TMtrnscode1%
 	InputBox, LoopNum3, ETA Date Loops,,, 200, 100, center, center,,, 		; Show the InputBox
 	if ErrorLevel   ; cancel run if inputbox is cancelled
 		gosub, EarlyTerm3A
@@ -551,20 +638,6 @@ TM_ETA_onclick:
 	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
 	TMRowStart3 := TMRowStart3 - 1											; set starting row variable - A_Index will +1 each loop
 	TmStartTime := A_Hour . ":" . A_Min . ":" . A_Sec
-;---------- Window Sizing ---------
-;----- LV GUI ----------	
-	TMguiLVHt := A_ScreenHeight - 150
-	TMguiWd := 272																; change lv gui width here
-	TMguiWd1 := (TMguiWd - 34)
-	TMguiWd1 := Round(TMguiWd1, 0)
-	TMguiWd2 := (TMguiWd - 32) / 2
-	TMguiWd2 := Round(TMguiWd2, 0)
-;----- 3 Win Split -----	
-	TMsplitscreen1 := Round(A_ScreenWidth / 2,0)	- 40						; screen halfway point
-	TMsplitscreen2 := TMsplitscreen1 - TMguiWd	+ 8 						; excel x axis start point
-	TMsplitpos1 := 0															; listview gui position`
-	TMsplitpos2 := TMguiWd + 1												; excel win position
-	TMsplitpos3 := TMsplitscreen1 + 2										; IE win position
 ;---------- Activate Excel and IE ----------	
 	Winactivate, ahk_class IEFrame
 	Winshow
@@ -631,7 +704,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 			Xl.Range(TMetaDcolum2 A_Index + TMRowStart3).Copy    			; Copies the cell
 			MyVar2 := Clipboard             		   							; Creates MyVar2
 ;---------- Get Var 3 --------------
-			MyVar3 := "08:00:00 AM"             		   						; Creates MyVar3
+			MyVar3 :=  TMdtimestamp            		   						; Creates MyVar3
 ;---------- Navigate to TM ---------	
 			;msgbox, , TM Execution, Ready, 1
 			WinActivate ahk_class IEFrame                    					; Activates TM
@@ -679,7 +752,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 			gosub, TM_Execution_activator
 		IfMsgBox No 	; just continue if no
 			gosub, TM_Execution_activator
-		return
+	return
 }}
 ;-----------------------------------------------------------------------
 ;	Loop End
@@ -696,9 +769,10 @@ TM_ETA_Script_End:
 		IfMsgBox No 	; just continue if no
 	msgbox, , TM Execution, The script ended on %MyVar1% in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
-	reload
-	sleep, 1000
-	msgbox, , TM Execution, Script should've reloaded
+	gosub, TM_Execution_activator
+	;reload
+	;sleep, 1000
+	;msgbox, , TM Execution, Script should've reloaded
 	return
 }}	
 ;--------------------------------------------------
@@ -709,6 +783,7 @@ EarlyTerm3:
 	TMrowend := 1 + TMRowStart3
 	msgbox, , TM Execution, Script run was cancelled with set start in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
+	;gosub, TM_Execution_activator
 	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
@@ -721,6 +796,7 @@ EarlyTerm3A:
 {{
 	msgbox, , TM Execution, Script run was cancelled.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
+	;gosub, TM_Execution_activator
 	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
@@ -729,7 +805,6 @@ EarlyTerm3A:
 ;=======================================================================
 ;	TM ETA END
 ;=======================================================================
-
 
 
 
