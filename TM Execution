@@ -1,16 +1,7 @@
 ;=======================================================================
-;	TM Execution v2.08
+;	TM Execution v2.11
 ;=======================================================================	
 /* 
-;-------------------- Setup Advice ---------------------------------------------
-1. Only have one IE window open on TM in Addition to the Edit window.
-2. Only have the execution excel file open.
-3. execution excel file must be open and stay open on the TM Script tab.
-4. don't move rearrange windows if you dont have to.
-5. minimize or move any Additional windows to other monitors if possible.
-6. Close out any notepad files. Have none open when starting a run.
-;-------------------------------------------------------------------------------
-
 ----------------------------
 | List of Names per Cycle  |
 ----------------------------
@@ -47,17 +38,31 @@ SetTitleMatchMode 2                     ; Compares window title names
 ;=======================================================================
 ;	AUTOEXECUTE
 ;=======================================================================	
+{{
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
-
-;gosub, TM_Execution_activator
-FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
-TMexVersion = 2.08
+;---------- Version Num ----------
+TMexVersion = 2.11
 TMexVersion := "v"TMexVersion		; remember to change in HTML manually
 applicationname := "TM Execution " TMexVersion
-
+;---------- Default Var ----------	
+TMcontcolum1 = A
+TMcontcolum2 = B
+TMsailcolum1 = D
+TMsailcolum2 = E
+TMetaDcolum1 = G
+TMetaDcolum2 = H
+TMataDcolum1 = J
+TMataDcolum2 = K
+TMdepacolum1 = M
+TMdepacolum2 = N
+TMmsgWaitTime = 5
+;---------- Time Setting ---------
+FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
+;---------------------------------
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
+}}
 ;=======================================================================
 ;	TM 
 ;=======================================================================	
@@ -66,7 +71,8 @@ applicationname := "TM Execution " TMexVersion
 ;--------------------------------------------------
 ;^!#+j::								; toggle gui window
 TM_Execution_activator:
-	if winexist("TM Execution") {												; check if the GUI is already open, then coses it
+{{
+	if winexist(applicationname) {												; check if the GUI is already open, then coses it
 		doc := ""
 		Gui, Destroy
 	}	
@@ -79,6 +85,7 @@ TM_Execution_activator:
 		ComObjConnect(doc, "Doc_")												; connects to html file
 		}
 	return
+}}
 ;=======================================================================
 ;	HTML
 ;=======================================================================	
@@ -86,6 +93,7 @@ TM_Execution_activator:
 ;	HTML GUI 
 ;--------------------------------------------------
 TM_Execution_HTML:
+{{
 {
 	html=
 	(
@@ -144,8 +152,7 @@ TM_Execution_HTML:
 		<button id='ETA'>ETA</button>
 		<button id='ATA'>ATA</button>
 		<button id='Departure'>Departure</button><br>
-
-		<button id=''></button>
+		<button id='Settings'>Settings</button>	
 		<button id='Info'>Info</button>
 		<button id='Cancel'>Cancel</button>	
 		<button id='About'>About</button>	
@@ -155,10 +162,12 @@ TM_Execution_HTML:
 	)
 	return
 }
+}}
 ;--------------------------------------------------
 ;	Gui events
 ;--------------------------------------------------
 Doc_OnClick(doc) {															; defines actions for gui events ie. clicking buttons
+{{
 	id := doc.parentWindow.event.srcElement.id
 	if (id = "Container")
 		{
@@ -190,14 +199,17 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 		Gui, Destroy 
 		gosub, 	TM_Dep_onclick			; Departure sub
 		}		
+	else if (id = "Settings")
+		{
+		gosub, TM_SETTINGS_onclick	; launch info menu
+		}	
 	else if (id = "Info")
 		{
-		msgbox, why god why
-		;gosub, TM_INFO_onclick		; launch info menu
+		gosub, TM_INFO_onclick		; launch info menu
 		}
 	else if (id="Cancel") 
 		{
-		doc := ""
+		doc := ""						; exit the program
 		Gui, Destroy 
 		Exitapp
 		}
@@ -207,27 +219,30 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 		}
 	}			; close section
 	return
+}}
 ;--------------------------------------------------
 ;	Temporary Button Routines
 ;--------------------------------------------------
-
 ;  Button that starts the script for each transaction
 ;	reroute to real subroutine later
-
 TM_cntnr_onclick:
 	msgbox, Tm update script routine here.
+	gosub, TM_Execution_activator
 	return
 	
 TM_sail_onclick:
 	msgbox, Tm update script routine here.
+	gosub, TM_Execution_activator
 	return	
 
 TM_ATA_onclick:
 	msgbox, Tm update script routine here.
+	gosub, TM_Execution_activator
 	return	
 
 TM_Dep_onclick:
 	msgbox, Tm update script routine here.
+	gosub, TM_Execution_activator
 	return	
 ;=======================================================================
 ;	TM Execution Program Functions
@@ -236,6 +251,7 @@ TM_Dep_onclick:
 ;	Print Script Listview Results
 ;--------------------------------------------------
 TMprintLV:
+{{
 	Gui,submit,nohide
 	Gui,ListView, ; A1
 	run, notepad.exe
@@ -273,15 +289,7 @@ TMprintLV:
 	  }
 	gui, destroy  
 	return	
-;--------------------------------------------------
-;	Set Message Box Delay
-;--------------------------------------------------
-TMmsgboxDelay:
-	InputBox, TMmsgWaitTime, TM Message Box Delay, Please enter the delay`, in seconds`, between message prompts.`r`n`r`nConsider this the time it takes you to place the cursor in the field that needs updating., , 200, 100, center, center,,, 5 			; Show the InputBox to tell how many loops to complete
-	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
-	if ErrorLevel   ; cancel run if inputbox is cancelled
-		gosub, EarlyTerm3A
-	return	
+}}	
 ;--------------------------------------------------
 ;	Save reset to next loop -> continuation
 ;--------------------------------------------------
@@ -301,6 +309,7 @@ TMmsgboxDelay:
 ;	About Submenu	
 ;----------------------------------------------------------------
 TM_ABOUT_onclick:
+{{
 ;---------- Sub menu setup ----------
 ;---------- Section 1 ----------
 	Gui,99:Destroy
@@ -339,26 +348,31 @@ TM_ABOUT_onclick:
 ;---------- Sub menu Show -----------
 	Gui,99:Show,, About
 	Return
+}}
 ;---------- Tooltip Removal ------------	
 TMRemoveToolTip:
 	ToolTip
 	return
 ;----- email 1 to clip -----	
 TMemailtoClip1:
+{{
 	clipboard := ""	
 	clipboard := "joseph.arnson@millercoors.com"
 	clipwait
 	tooltip, joseph.arnson@millercoors.com copied to clipboard
-	SetTimer, TMRemoveToolTip, -3000
+	SetTimer, TMRemoveToolTip, -2000
 	return
+}}
 ;----- email 2 to clip -----	
 TMemailtoClip2:
+{{
 	clipboard := ""	
 	clipboard := "jsvarnson@gmail.com"
 	clipwait
 	tooltip, jsvarnson@gmail.com copied to clipboard
-	SetTimer, TMRemoveToolTip, -3000
+	SetTimer, TMRemoveToolTip, -2000
 	return
+}}
 ;----- AHK website ---------	
 AUTOHOTKEY:
   Run,http://www.autohotkey.com,,UseErrorLevel
@@ -366,52 +380,154 @@ Return
 ;----- gui close -----
 99GuiClose:
   Gui,99:Destroy
-  OnMessage(0x200,"")
-  DllCall("DestroyCursor","Uint",hCur)
 Return
 ;----------------------------------------------------------------
 ;	Info Submenu	
 ;----------------------------------------------------------------
 TM_INFO_onclick:
+{{
+	TMinfowidth1 = 400
+	TMinfowidth2 := TMinfowidth - 20
 ;---------- Sub menu setup ----------
 ;---------- Section 1 ----------
-	Gui,99:Destroy
-	Gui,99:Margin,20,20
-	Gui,99:Add,Picture,xm Icon1,%applicationname%.exe
-	Gui,99:Font,Bold
-	Gui,99:Add,Text,x+10 yp+10,%applicationname%
-	Gui,99:Font
-	Gui,99:Add,Text,y+10, Instructions and Setup
-	Gui,99:Add,Text,y+10, 1) close notepad
-	Gui,99:Add,Text,y+10, 2) close all excel except execution file
-	Gui,99:Add,Text,y+10, 3) place cursor in the edit search box in TM
-;---------- Section 2 ----------
-	Gui,99:Add,Picture,xm y+20 Icon2,%applicationname%.exe
-	Gui,99:Font,Bold
-	Gui,99:Add,Text,x+10 yp+10, Developed by Joseph Arnson
-	Gui,99:Font
-	Gui,99:Add,Text,y+10, For more information, please contact me at
-	Gui,99:Add,Text,y+10, - Work:
-	Gui,99:Font,CBlue Underline
-	Gui,99:Add,Text, x+30 gTMemailtoClip1, joseph.arnson@millercoors.com
-	Gui,99:Font
-	Gui,99:Add,Text, xm+10 y+10, - Personal:
-	Gui,99:Font,CBlue Underline
-	Gui,99:Add,Text, x+15 gTMemailtoClip2, jsvarnson@gmail.com
-	Gui,99:Font
-;---------- Section 3 ----------
-	Gui,99:Add,Picture,xm y+20 Icon4,%applicationname%.exe
-	Gui,99:Font,Bold
-	Gui,99:Add,Text,x+10 yp+10,AutoHotkey
-	Gui,99:Font
-	Gui,99:Add,Text,y+10,This tool was made using the powerful
-	Gui,99:Font,CBlue Underline
-	Gui,99:Add,Text,y+5 GAUTOHOTKEY,www.AutoHotkey.com
-	Gui,99:Font
+	Gui,98:Destroy
+	Gui,98:Margin,20,20
+	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,98:Font,Bold
+	Gui,98:Add,Text,x+10 yp+10, Setup
+	Gui,98:Font
+	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  Close all Excel windows except the Import Execution file.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Close all Internet Explorer windows except TM.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Close all Notepad files before starting.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Close all Internet Explorer windows before starting.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Minimize or close all unnecessary windows if possible.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Avoid moving or rearranging active windows if possible.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Check the Settings menu and adjust them to your preference.
+	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,98:Font,Bold
+	Gui,98:Add,Text,x+10 yp+10, Instructions
+	Gui,98:Font
+	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  Open TM in Internet Explorer to Freight Order Management.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Select Edit Freight Booking for the transaction you are processing. 
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Place cursor in the search box.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Open the Import Execution file to the TM Script tab.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 8.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 9.  
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 10.  
 ;---------- Sub menu Show -----------
-	Gui,99:Show,, Info
+	Gui,98:Show, w%TMinfowidth1%, Info
 	Return
-*/
+}}
+;----- gui close -----
+98GuiClose:
+  Gui,98:Destroy
+	Return
+;----------------------------------------------------------------
+;	Settings Submenu	
+;----------------------------------------------------------------
+TM_SETTINGS_onclick:
+;---------- Sub menu setup ----------
+{{
+;---------- Variables ----------
+;----- Siz and Pos -----
+	TMsetUpd = 170		; column title x pos
+	TMsetCol = 181		; column edit x pos
+	TMsetYsp = 7		; line spacing
+	TMsetYbr = 15		; page break
+	TMsetWid = 250		; gui settings width
+	TMBtnW := 80 		; button width
+	TMBtnX1 := ((TMsetWid - TMBtnW) / 4) * 1
+	TMBtnX2 := ((TMsetWid - TMBtnW) / 4) * 3
+;---------- Section 1 ----------
+	Gui,97:Destroy
+	Gui,97:Margin,20,20
+	Gui,97:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm yp+10, Container Updates
+	Gui,97:Add,Text,x%TMsetUpd% yp, Column
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y50 h18, Freight Order 
+	Gui,97:Add,Edit,x%TMsetCol% y50 h18 w20 +Center vTMcontcolum1, %TMcontcolum1% 
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Container 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMcontcolum2, %TMcontcolum2%
+;---------- Section 2 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, Sail Date Updates
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMsailcolum1, %TMsailcolum1% 
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Sail Date 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMsailcolum2, %TMsailcolum2%
+;---------- Section 3 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, ETA Date Updates
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMetaDcolum1, %TMetaDcolum1% 
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, ETA Date 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMetaDcolum2, %TMetaDcolum2%	
+;---------- Section 4 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, ATA Date Updates
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMataDcolum1, %TMataDcolum1% 
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, ATA Date 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMataDcolum2, %TMataDcolum2%
+;---------- Section 5 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, Container Updates
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Freight Booking 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMdepacolum1, %TMdepacolum1% 
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Departure Date 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMdepacolum2, %TMdepacolum2%
+;---------- Section 6 ----------
+	Gui,97:Font,Bold
+	Gui,97:Add,Text,xm y+%TMsetYbr%, Message Box Delay
+	Gui,97:Add,Text,x%TMsetUpd% yp, Seconds
+	Gui,97:Font
+	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Delay 
+	Gui,97:Add,Edit,x%TMsetCol% yp h18 w20 +Center vTMmsgWaitTime, %TMmsgWaitTime%
+;---------- Section 7 ----------	
+	Gui, 97:Add, Button, Default x%TMBtnX1% y+%TMsetYbr% w%TMBtnW% gTMsetSubmit, Submit
+	Gui, 97:Add, Button, x%TMBtnX2% yp w%TMBtnW% gTMsetReset, Default
+;---------- Sub menu Show -----------
+	Gui,97:Show,w%TMsetWid%, Settings
+	Return
+}}
+;----- gui submit ----
+TMsetSubmit:
+{{
+	gui, submit, nohide
+	Gui,97:Destroy
+	Return
+}}
+;----- gui reset -----
+TMsetReset:
+{{
+	GuiControl, Text, TMcontcolum1 , A
+	GuiControl, Text, TMcontcolum2 , B
+	GuiControl, Text, TMsailcolum1 , D
+	GuiControl, Text, TMsailcolum2 , E
+	GuiControl, Text, TMetaDcolum1 , G
+	GuiControl, Text, TMetaDcolum2 , H
+	GuiControl, Text, TMataDcolum1 , J
+	GuiControl, Text, TMataDcolum2 , K
+	GuiControl, Text, TMdepacolum1 , M
+	GuiControl, Text, TMdepacolum2 , N
+	GuiControl, Text, TMmsgWaitTime , 5
+	;Gui,97:Destroy
+	gui, submit, nohide
+	Return	
+}}
+;----- gui close -----
+97GuiClose:
+  Gui,97:Destroy
+	Return
 ;=======================================================================
 ;	TM 5 Transactions Start Here
 ;=======================================================================	
@@ -424,6 +540,7 @@ TM_INFO_onclick:
 ;	TM ETA Update
 ;=======================================================================	
 TM_ETA_onclick:
+{{
 ;---------- Run Settings ----------
 	InputBox, LoopNum3, ETA Date Loops,,, 200, 100, center, center,,, 		; Show the InputBox
 	if ErrorLevel   ; cancel run if inputbox is cancelled
@@ -431,7 +548,7 @@ TM_ETA_onclick:
 	InputBox, TMRowStart3, TM Row Start, What row will you start with?,, 200, 100, center, center,,, 		; Show the InputBox
 	if ErrorLevel   ; cancel run if inputbox is cancelled
 		gosub, EarlyTerm3A
-	gosub, TMmsgboxDelay
+	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
 	TMRowStart3 := TMRowStart3 - 1											; set starting row variable - A_Index will +1 each loop
 	TmStartTime := A_Hour . ":" . A_Min . ":" . A_Sec
 ;---------- Window Sizing ---------
@@ -483,6 +600,7 @@ TM_ETA_onclick:
 	  gosub, EarlyTerm3                       									; NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
 	}                                      										; CLOSE THE BRACKET } FOR 'IF' COMMANDS
 	return
+}}
 ;-----------------------------------------------------------------------
 ;	Loop Start
 ;-----------------------------------------------------------------------
@@ -490,6 +608,7 @@ TM_ETA_onclick:
 ;	ComObject
 ;--------------------------------------------------
 StartJob3:                                										; THIS STARTS THE MAIN PROCESSING PART OF SCRIPT
+{{
 	WinActivate, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
 	WinWaitActive, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
 	Xl := ComObjActive("Excel.Application")
@@ -505,11 +624,11 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 			WinWaitActive, ahk_class IEFrame
 			Winshow
 ;---------- Grab Column 1 ----------
-			Xl.Range("G" A_Index + TMRowStart3).Copy    					; Copies the cell
+			Xl.Range(TMetaDcolum1 A_Index + TMRowStart3).Copy    			; Copies the cell
 			MyVar1 := Clipboard                 								; Creates MyVar1
 ;---------- Grab Column 2 ----------
 			Xl := ComObjActive("Excel.Application")
-			Xl.Range("H" A_Index + TMRowStart3).Copy    					; Copies the cell
+			Xl.Range(TMetaDcolum2 A_Index + TMRowStart3).Copy    			; Copies the cell
 			MyVar2 := Clipboard             		   							; Creates MyVar2
 ;---------- Get Var 3 --------------
 			MyVar3 := "08:00:00 AM"             		   						; Creates MyVar3
@@ -561,6 +680,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 		IfMsgBox No 	; just continue if no
 			gosub, TM_Execution_activator
 		return
+}}
 ;-----------------------------------------------------------------------
 ;	Loop End
 ;-----------------------------------------------------------------------
@@ -568,6 +688,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 ;	ETA Script Terminated
 ;--------------------------------------------------
 TM_ETA_Script_End:
+{{
 	TMrowend := A_Index + TMRowStart3
 	MsgBox, 262148, TM Execution, Would you like to print the results of the run?
 		IfMsgBox Yes   ; print results subroutine if yes             				          					
@@ -579,10 +700,12 @@ TM_ETA_Script_End:
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
+}}	
 ;--------------------------------------------------
 ;	Script End Function
 ;--------------------------------------------------
-EarlyTerm3:                             										
+EarlyTerm3:           
+{{
 	TMrowend := 1 + TMRowStart3
 	msgbox, , TM Execution, Script run was cancelled with set start in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
@@ -590,16 +713,19 @@ EarlyTerm3:
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
+}}
 ;--------------------------------------------------
 ;	Script Cancelled Function
 ;--------------------------------------------------
-EarlyTerm3A:                             										
+EarlyTerm3A:    
+{{
 	msgbox, , TM Execution, Script run was cancelled.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
 	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
 	return
+}}
 ;=======================================================================
 ;	TM ETA END
 ;=======================================================================
