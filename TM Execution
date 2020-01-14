@@ -1,5 +1,5 @@
 ;=======================================================================
-;	TM Execution v2.15
+;	TM Execution v2.16
 ;=======================================================================	
 /* 
 	TO DO 
@@ -47,7 +47,7 @@ SetTitleMatchMode 2                     ; Compares window title names
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
 ;---------- Version Num ----------
-TMexVersion = 2.15
+TMexVersion = 2.16
 TMexVersion := "v"TMexVersion		; remember to change in HTML manually
 applicationname := "TM Execution " TMexVersion
 ;---------- Default Var ----------	
@@ -61,7 +61,7 @@ TMataDcolum1	= J
 TMataDcolum2	= K
 TMdepacolum1	= M
 TMdepacolum2	= N
-TMmsgWaitTime	= 5
+TMmsgWaitTime	= 3
 TMdtimestamp	= 08:00:00AM
 TMcontCode		= ZS2 
 TMtrnscode1	:= "" 
@@ -249,13 +249,7 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 ;--------------------------------------------------
 ;  Button that starts the script for each transaction
 ;	reroute to real subroutine later
-TM_cntnr_onclick:
-	TMtrnscode1 := "Container"
-	msgbox, trans code %TMtrnscode1%
-	msgbox, Tm update script routine here.
-	gosub, TM_Execution_activator
-	return
-	
+
 TM_sail_onclick:
 	TMtrnscode1 := "Sail Date"
 	msgbox, trans code %TMtrnscode1%
@@ -286,7 +280,6 @@ TMprintLV:
 {{
 	Gui,submit,nohide
 	Gui,ListView, ; A1
-	msgbox, transaction code %TMtrnscode2%
 	run, notepad.exe
     WinActivate, ahk_exe notepad.exe
 	winwaitactive, ahk_exe notepad.exe 
@@ -326,6 +319,7 @@ TMprintLV:
 ;--------------------------------------------------
 ;	Save reset to next loop -> continuation
 ;--------------------------------------------------
+{{
 /*
 #Ifwinactive ahk_class IEFrame
 ;~^s::
@@ -376,6 +370,7 @@ TMprintLV:
 
 ; 60011131					
 */
+}}
 ;----------------------------------------------------------------
 ;	About Submenu	
 ;----------------------------------------------------------------
@@ -577,6 +572,9 @@ TM_SETTINGS_onclick:
 	Gui,97:Add,Text,xm+20 y+%TMsetYsp% h18, Delay 
 	Gui,97:Add,Edit,x%TMsetCol% yp h18 w%TMedtW% +Center vTMmsgWaitTime, %TMmsgWaitTime%
 ;---------- Section 8 ----------	
+	Gui,97:Font
+	Gui,97:Add,Text,x%TMBtnX1% y+%TMsetYbr%  %TMinfowidth2%, *  Settings are reset after each run  *
+;---------- Section 9 ----------	
 	Gui, 97:Add, Button, Default x%TMBtnX1% y+%TMsetYbr% w%TMBtnW% gTMsetSubmit, Submit
 	Gui, 97:Add, Button, x%TMBtnX2% yp w%TMBtnW% gTMsetReset, Default
 ;---------- Sub menu Show -----------
@@ -613,6 +611,20 @@ TMsetReset:
 97GuiClose:
   Gui,97:Destroy
 	Return
+;--------------------------------------------------
+;	Loop Break
+;--------------------------------------------------
+{{
+/*
+TM_Loop_Break:	
+	BreakTMLoop1 = 1	
+	BreakTMLoop2 = 1
+	BreakTMLoop3 = 1
+	BreakTMLoop4 = 1
+	BreakTMLoop5 = 1
+	return
+*/
+}}	
 ;=======================================================================
 ;	TM 5 Transactions Start Here
 ;=======================================================================	
@@ -620,16 +632,209 @@ TMsetReset:
 ;??????????????????????????????????????????????????????????????????????
 ;??????????????????????????????????????????????????????????????????????
 ;??????????????????????????????????????????????????????????????????????	
-	
+
+;=======================================================================
+;	TM Container Update
+;=======================================================================	
+TM_cntnr_onclick:
+{{
+;---------- Run Settings ----------
+	TMtrnscode1 := "Container"
+	InputBox, LoopNum1, %TMtrnscode1% Loops,,, 200, 100, center, center,,, 		; Show the InputBox
+	if ErrorLevel   ; cancel run if inputbox is cancelled
+		gosub, EarlyTerm1A
+	InputBox, TMRowStart1, TM Row Start, What row will you start with?,, 200, 100, center, center,,, 		; Show the InputBox
+	if ErrorLevel   ; cancel run if inputbox is cancelled
+		gosub, EarlyTerm1A
+	TMmsgWaitTime := TMmsgWaitTime * 1000	; convert to milliseconds
+	TMRowStart1 := TMRowStart1 - 1											; set starting row variable - A_Index will +1 each loop
+	TmStartTime := A_Hour . ":" . A_Min . ":" . A_Sec
+;---------- Activate Excel and IE ----------	
+	Winactivate, ahk_class IEFrame
+	Winshow
+	WinMove, ahk_class IEFrame, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%	; adjust window size
+	WinMaximize																	; use the window found above and maximize screen
+	WinActivate, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
+	WinWaitActive, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
+	Winshow
+	WinMove, ahk_class XLMAIN , , %TMsplitpos2%, 0, %TMsplitscreen2%, %A_ScreenHeight%	; adjust window size
+	Sleep 500                               					
+;---------- LV List Completed --------------
+	Gui, Margin, 16, 16
+	Gui, Color, 1d1f21, 282a2e												; colors the background dark gray
+	Gui, Font, s24 cf0c674, Rage Italic
+	gui, Add, Text, x40 y10, TM Execution
+	Gui, Font, s12 cf0c674, Calibri
+	Gui, +AlwaysOnTop -ToolWindow +Border				; removes the toolbar ; -caption -SysMenu 
+	Gui, Add, ListView, x16 y50 w%TMguiWd1% h%TMguiLVHt% grid nosorthdr altsubmit, FO|Container		; -hdr +hscroll
+	Gui, Font, s10 cf0c674, Inconsolata
+	LV_ModifyCol(auto)  		; autohdr - autosize to headers				; Auto-size each column to fit its contents and header
+	LV_ModifyCol(1, TMguiWd2, "FO")
+	LV_ModifyCol(2, TMguiWd2, "Container")
+	gui, show, x%TMsplitpos1% y0 h%A_ScreenHeight% w%TMguiWd%, TM ETA Update
+;--------------------------------------------------
+;	Ready to Process Message
+;--------------------------------------------------
+	{                                      										; OPEN BRACKET { TO GROUP 'IF' COMMANDS 
+	MsgBox, 262148, Start Process?, OK to Start Update Message Process? 		; POP-UP WITH OPTIONS OF YES/NO
+	   IfMsgBox Yes                        									; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
+	   gosub, StartJob1                     										; CONTINUE TO StartJob1 TO RUN THE SCRIPT 
+	else                                   										; IF NO, IT WILL GO TO EarlyTerm1  
+	  IfMsgBox No                         										; POP-UP OPTION FOR USER TO HIT NO
+	  gosub, EarlyTerm1                       									; NORMALLY USE 'break' IN A LOOP, BUT NOT LOOP, WILL KILL APPLICATION
+	}                                      										; CLOSE THE BRACKET } FOR 'IF' COMMANDS
+	return
+}}
+;-----------------------------------------------------------------------
+;	Loop Start
+;-----------------------------------------------------------------------
+;--------------------------------------------------
+;	ComObject
+;--------------------------------------------------
+StartJob1:                                										; THIS STARTS THE MAIN PROCESSING PART OF SCRIPT
+{{
+	WinActivate, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
+	WinWaitActive, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
+	Xl := ComObjActive("Excel.Application")
+;--------------------------------------------------
+;	Loop
+;--------------------------------------------------
+	Loop %LoopNum1%															; number of loops/rows to process
+	{
+		if (BreakTMLoop1 = 1)
+			break
+		else
+			Winactivate, ahk_class IEFrame
+			WinWaitActive, ahk_class IEFrame
+			Winshow
+;---------- Grab Column 1 ----------
+			Xl.Range(TMcontcolum1 A_Index + TMRowStart1).Copy    			; Copies the cell
+			MyVar1 := Clipboard                 								; Creates MyVar1
+;---------- Grab Column 2 ----------
+			Xl := ComObjActive("Excel.Application")
+			Xl.Range(TMcontcolum2 A_Index + TMRowStart1).Copy    			; Copies the cell
+			MyVar2 := Clipboard             		   							; Creates MyVar2
+;---------- Get Var 3 --------------
+			MyVar3 :=  %TMcontCode%	           		   						; Creates MyVar3
+;---------- Navigate to TM ---------	
+			;msgbox, , TM Execution, Ready, 1
+			WinActivate ahk_class IEFrame                    					; Activates TM
+			WinWaitActive ahk_class IEFrame                  					; Wait until active
+			MsgBox, 262148, TM Execution, Are you ready to search FO %MyVar1%?		; POP-UP WITH OPTIONS OF YES/NO
+				IfMsgBox Yes                          							; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
+				{
+					WinActivate ahk_class IEFrame                    			; Activates TM
+					WinWaitActive ahk_class IEFrame                  			; Wait until active         
+					send, %MyVar1%												; send search var
+					sleep, 10
+					send, {enter}
+					sleep, %TMmsgWaitTime%
+					MsgBox, 262148, TM Execution, Are you ready to update the Container to %MyVar2%?	; POP-UP WITH OPTIONS OF YES/NO
+						IfMsgBox Yes                          					; POP-UP OPTION FOR USER TO CLICK YES OR HIT ENTER
+						{
+							WinActivate ahk_class IEFrame                    	; Activates TM
+							WinWaitActive ahk_class IEFrame                  	; Wait until active         
+							send, %MyVar2%										; send update var
+							sleep, 10
+							send, {tab}
+							send, %MyVar3%										; send auxiliary var
+							sleep, 10
+							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
+							sleep, 10
+						}
+						IfMsgBox No                            				; POP-UP OPTION FOR USER TO HIT NO
+						{						
+							gosub, TM_cntnr_Script_End
+						}
+				}
+				IfMsgBox No                            						; POP-UP OPTION FOR USER TO HIT NO
+				{
+					gosub, TM_cntnr_Script_End
+				}
+			Sleep, 100
+		}
+;--------------------------------------------------
+;	Loop Complete Message
+;--------------------------------------------------
+;	TmEndTime := A_Hour . ":" . A_Min . ":" . A_Sec							; Stores script end time
+	MsgBox, 262148, TM Execution, Script completed.`r`n`r`nWould you like to print the results of this run?
+		IfMsgBox Yes   ; print results subroutine if yes             				          					
+			gosub, TMprintLV
+			; gosub, TM_Loop_Break	; all rows completed - no need to break loop
+			gosub, TM_Execution_activator
+		IfMsgBox No 	; just continue if no
+			; gosub, TM_Loop_Break	; all rows completed - no need to break loop
+			gosub, TM_Execution_activator
+	return
+}}
+;-----------------------------------------------------------------------
+;	Loop End
+;-----------------------------------------------------------------------
+;--------------------------------------------------
+;	ETA Script Terminated
+;--------------------------------------------------
+TM_cntnr_Script_End:
+{{
+	TMrowend := A_Index + TMRowStart1
+	MsgBox, 262148, TM Execution, Would you like to print the results of the run?
+		IfMsgBox Yes   ; print results subroutine if yes             				          					
+			gosub, TMprintLV
+		IfMsgBox No 	; just continue if no
+	msgbox, , TM Execution, The script ended on %MyVar1% in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
+	;gosub, TM_Loop_Break
+	gui, destroy
+	;gosub, TM_Execution_activator
+	reload
+	sleep, 1000
+	msgbox, , TM Execution, Script should've reloaded
+	return
+}}	
+;--------------------------------------------------
+;	Script End Function
+;--------------------------------------------------
+EarlyTerm1:           
+{{
+	TMrowend := 1 + TMRowStart1
+	msgbox, , TM Execution, Script run was cancelled with set start in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
+	;gosub, TM_Loop_Break
+	gui, destroy
+	;gosub, TM_Execution_activator
+	reload
+	sleep, 1000
+	msgbox, , TM Execution, Script should've reloaded
+	return
+}}
+;--------------------------------------------------
+;	Script Cancelled Function
+;--------------------------------------------------
+EarlyTerm1A:    
+{{
+	msgbox, , TM Execution, Script run was cancelled.`r`n`r`nPress OK to terminate the script.
+	;gosub, TM_Loop_Break
+	gui, destroy
+	;gosub, TM_Execution_activator
+	reload
+	sleep, 1000
+	msgbox, , TM Execution, Script should've reloaded
+	return
+}}
+;=======================================================================
+;	TM Container END
+;=======================================================================
+
+;??????????????????????????????????????????????????????????????????????
+;??????????????????????????????????????????????????????????????????????
+;??????????????????????????????????????????????????????????????????????	
+
 ;=======================================================================
 ;	TM ETA Update
 ;=======================================================================	
 TM_ETA_onclick:
 {{
 ;---------- Run Settings ----------
-	TMtrnscode1 := "Sail Date"
-	msgbox, trans code %TMtrnscode1%
-	InputBox, LoopNum3, ETA Date Loops,,, 200, 100, center, center,,, 		; Show the InputBox
+	;BreakTMLoop3 = 0
+	TMtrnscode1 := "ETA Date"
+	InputBox, LoopNum3, %TMtrnscode1% Loops,,, 200, 100, center, center,,, 		; Show the InputBox
 	if ErrorLevel   ; cancel run if inputbox is cancelled
 		gosub, EarlyTerm3A
 	InputBox, TMRowStart3, TM Row Start, What row will you start with?,, 200, 100, center, center,,, 		; Show the InputBox
@@ -749,8 +954,10 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 	MsgBox, 262148, TM Execution, Script completed.`r`n`r`nWould you like to print the results of this run?
 		IfMsgBox Yes   ; print results subroutine if yes             				          					
 			gosub, TMprintLV
+			; gosub, TM_Loop_Break	; all rows completed - no need to break loop
 			gosub, TM_Execution_activator
 		IfMsgBox No 	; just continue if no
+			; gosub, TM_Loop_Break	; all rows completed - no need to break loop
 			gosub, TM_Execution_activator
 	return
 }}
@@ -769,10 +976,9 @@ TM_ETA_Script_End:
 		IfMsgBox No 	; just continue if no
 	msgbox, , TM Execution, The script ended on %MyVar1% in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
-	gosub, TM_Execution_activator
-	;reload
-	;sleep, 1000
-	;msgbox, , TM Execution, Script should've reloaded
+	reload
+	sleep, 1000
+	msgbox, , TM Execution, Script should've reloaded
 	return
 }}	
 ;--------------------------------------------------
@@ -783,7 +989,6 @@ EarlyTerm3:
 	TMrowend := 1 + TMRowStart3
 	msgbox, , TM Execution, Script run was cancelled with set start in row %TMrowend%.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
-	;gosub, TM_Execution_activator
 	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
@@ -796,7 +1001,6 @@ EarlyTerm3A:
 {{
 	msgbox, , TM Execution, Script run was cancelled.`r`n`r`nPress OK to terminate the script.
 	gui, destroy
-	;gosub, TM_Execution_activator
 	reload
 	sleep, 1000
 	msgbox, , TM Execution, Script should've reloaded
