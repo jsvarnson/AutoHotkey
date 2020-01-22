@@ -1,12 +1,12 @@
 ;=======================================================================
-;	TM Execution v2.26
+;	TM Execution v3.00
 ;=======================================================================	
 ;--------------------------------------------------
 ;	Version History
 ;--------------------------------------------------
 /*
 TM EXECUTION VERSION HISTORY
-
+;---------------------------------- Alpha -----------------------------------
 v1.00 - Created loop connecting to Excel document
 v1.01 - Created msgbox logic gates to grab and paste next variable
 v1.02 - Changed subroutine to terminate if any msgbox result was No
@@ -29,7 +29,7 @@ v1.18 - Changed main subroutine to launch in autoexecute
 v1.19 - Wrote setup guide and instructions
 v1.20 - Updated listview gui to autosize dynamically
 v1.21 - Updated setup guide and instructions
-
+;---------------------------------- Beta -----------------------------------
 v2.00 - Created menu system with multi-transaction functionality
 v2.01 - Connected ETA date code to ETA button and menu
 v2.02 - Created about and info menus
@@ -57,7 +57,12 @@ v2.23 - Bug fixes for input timing in TM client for internet explorer
 v2.24 - Added set sleep to end of each loop, and msgbox between var 2 and 3
 v2.25 - Added image search to close out and select next edit window upon save
 v2.26 - Bug fixes for timing issues regarding image search and save function
-
+v2.27 - Added a timer to exit the application when the main window is closed
+v2.28 - Added function to turn exit timer off when transaction is selected
+v2.29 - Completed updated instructions with shortcuts
+v2.30 - Reconfigured msgboxes to timeout instead of forcing enter through them
+;---------------------------------- Launch -----------------------------------
+v3.00 - Compiled to application executable for launch
 
 */
 ;=======================================================================
@@ -87,7 +92,7 @@ SetTitleMatchMode 2                     ; Compares window title names
 
 ;?????????????????????????????????????????????????????????????????????
 ;?????????????????????????????????????????????????????????????????????
-;---------- Set Director ---------
+;---------- Set Directory --------
 SetWorkingDir %A_ScriptDir%
 ;---------- Install Pics ---------
 TMsearchPic1 = %A_ScriptDir%\edit_hyperlink.png
@@ -103,7 +108,7 @@ ifnotexist, %TMRoadPic%
 ifnotexist, %TMOceanPic%
 	FileInstall, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\edit_ocean_freight_booking.png, %A_ScriptDir%\edit_ocean_freight_booking.png
 ;---------- Version Num ----------
-TMexVersion = 2.26
+TMexVersion = 3.00
 TMexVersion := "v"TMexVersion		; remember to change in HTML manually
 applicationname := "TM Execution " TMexVersion
 ;---------- Default Var ----------	
@@ -127,6 +132,7 @@ CoordMode, Pixel, Screen  ; Interprets the coordinates below as relative to the 
 CoordMode, Mouse, Screen  ; Interprets the coordinates below as relative to the screen rather than the active window.
 FormatTime, Time, ,mm/dd/yyyy hh:mm:ss
 SetTitleMatchMode, 2		; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+SetTimer, TM_Execution_Close, 10000
 ;---------------------------------
 ;---------- Window Sizing --------
 ;----- LV GUI ----------	
@@ -146,28 +152,32 @@ SetTitleMatchMode, 2		; MatchMode 2: A window's title can contain WinTitle anywh
 ;?????????????????????????????????????????????????????????????????????
 
 ;=======================================================================
-;	TM 
-;=======================================================================	
+;	TM
+;=======================================================================
 ;--------------------------------------------------
 ;	Gui Activator
 ;--------------------------------------------------
-;^!#+j::								; toggle gui window
 TM_Execution_activator:
-
-	if winexist(applicationname) {												; check if the GUI is already open, then coses it
+	if winexist(applicationname) {	; check if the GUI is already open, then coses it
 		doc := ""
 		Gui, Destroy
 	}	
-	else {																		; check if the GUI isn't open, then opens it
+	else {			; check if the GUI isn't open, then opens it
 		GoSub, TM_Execution_HTML
 		Gui, -ToolWindow ;-Caption 
-		Gui Add, ActiveX, w530 h265 x0 y0 vdoc, HTMLFile					; activates the HTML GUI, written above
+		Gui Add, ActiveX, w530 h265 x0 y0 vdoc, HTMLFile	; activates the HTML GUI
 		doc.write(html)
-		Gui, Show, w530 h265 Center, %applicationname%						; titles the GUI and chooses the size
-		ComObjConnect(doc, "Doc_")												; connects to html file
+		Gui, Show, w530 h265 Center, %applicationname%	; titles the GUI and chooses the size
+		ComObjConnect(doc, "Doc_")			; connects to html file
 		}
 	return
-
+;--------------------------------------------------
+;	Exit App on Window Close 
+;--------------------------------------------------
+TM_Execution_Close:
+	if !winexist(applicationname)
+		exitapp
+	return
 ;=======================================================================
 ;	HTML
 ;=======================================================================	
@@ -251,30 +261,35 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 	if (id = "Container")
 		{
 		doc := ""
+		SetTimer, TM_Execution_Close, Off
 		Gui, Destroy 
 		gosub, 	TM_cntnr_onclick		; container sub
 		}
 	else if (id = "Sail") 
 		{
 		doc := ""
+		SetTimer, TM_Execution_Close, Off
 		Gui, Destroy 
 		gosub, 	TM_sail_onclick		; sail date sub
 		}
 	else if (id = "ETA") 
 		{
 		doc := ""
+		SetTimer, TM_Execution_Close, Off
 		Gui, Destroy 
 		gosub, 	TM_ETA_onclick			; eta date sub
 		}
 	else if (id="ATA") 
 		{
 		doc := ""
+		SetTimer, TM_Execution_Close, Off
 		Gui, Destroy 
 		gosub, 	TM_ATA_onclick			; ata date sub
 		}
 	else if (id="Departure") 
 		{
 		doc := ""
+		SetTimer, TM_Execution_Close, Off
 		Gui, Destroy 
 		gosub, 	TM_Dep_onclick			; Departure sub
 		}		
@@ -309,7 +324,6 @@ Doc_OnClick(doc) {															; defines actions for gui events ie. clicking b
 ;	Print Script Listview Results
 ;--------------------------------------------------
 TMprintLV:
-
 	Gui,submit,nohide
 	Gui,ListView, ; A1
 	run, notepad.exe
@@ -347,11 +361,9 @@ TMprintLV:
 	  }
 	gui, destroy  
 	return	
-
 ;--------------------------------------------------
 ;	Activate Msgbox and Enter
 ;--------------------------------------------------
-
 #Ifwinactive ahk_class IEFrame	
 +Capslock::
 +Enter::
@@ -362,19 +374,17 @@ TMprintLV:
 		send, {Enter}
 		return
 #Ifwinactive	
-
 ;--------------------------------------------------
 ;	Save reset to next loop -> continuation
 ;--------------------------------------------------
-
 #Ifwinactive ahk_class IEFrame
-;~^s::
-^!#+j::
+~^s::
+;^!#+j::
 	IfWinExist Edit Import
 	{
-		;send, {ctrl down}{s}{ctrl up}	; save doc
-		;sleep, 100
-		WinClose, Edit Import
+		send, {ctrl down}{s}{ctrl up}	; save doc
+		sleep, 100
+		WinClose, Edit Import	; close window
 		sleep, 100
 		; reactivate main TM window
 		Winactivate, ahk_class IEFrame	; reactivate owner IE window
@@ -424,107 +434,10 @@ Edit_link_select:			; click on Edit blue hyperlink
 	MouseClick, left, %TMFoundX%, %TMFoundY%
 	sleep, 50
 	return
-
-
-{{		
-	;}	
-/*		
-		{
-			send, {ctrl down}{w}{ctrl up}	; close window
-			sleep, 500
-; insert below block here
-		}
-	; reactivates main TM internet explorer window
-
-	}
-	
-	IfWinActive, Edit Import 		; check if window is still open
-	{
-		Winactivate, Edit - Internet Explorer											; reactivate owner IE window
-		WinWaitActive, Edit - Internet Explorer, , 5
-		Winshow
-		WinMove, Edit - Internet Explorer, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%	; adjust window size
-		sleep, 20
-		send, {tab 5}	
-	}
-*/
-	
-
-; insert this block above
-/*	
-			IfWinActive, Edit Import 		; check if window is still open
-			{
-				; checks if you can see "save not required" message
-				ImageSearch, TMFoundXA, TMFoundYA, 0, 0, A_ScreenWidth, A_ScreenHeight, TMsearchPic2		; tm_save_not_req.png
-				if (ErrorLevel = 2)
-					MsgBox, Could not conduct the search.
-				else if (ErrorLevel = 1)
-				; checks if save not required message is on screen
-					MsgBox, Icon could not be found on the screen.
-				else
-				{
-					; if message is found, re-attempt to close the window
-					send, {ctrl down}{w}{ctrl up}
-					sleep, 500
-				}	
-			}
-*/
-
-; other ref below	
-	
-/*
-		; reactivates main TM internet explorer window
-		Winactivate, ahk_class IEFrame										; reactivate owner IE window
-		;WinWaitActive, Edit - Internet Explorer, , 5					
-		Winshow		
-		; searches for Edit blue hyperlink
-		ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, TMsearchPic1	; edit_hyperlink.png
-		if (ErrorLevel = 2)
-			MsgBox Could not conduct the search.
-		else if (ErrorLevel = 1)
-			MsgBox Icon could not be found on the screen.
-		else
-		{
-			; click on Edit blue hyperlink
-			MouseClick, left, %TMFoundX%, %TMFoundY%
-			;MouseClick, right, %TMFoundX%, %TMFoundY%
-			sleep, 500
-			Winactivate, Edit - Internet Explorer											; reactivate owner IE window
-			WinWaitActive, Edit - Internet Explorer, , 5
-			Winshow
-			WinMove, Edit - Internet Explorer, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%	; adjust window size
-			sleep, 20
-			send, {tab 5}	
-		}	
-/*	
-		ImageSearch, TMFoundX2, TMFoundY2, 0, 0, A_ScreenWidth, A_ScreenHeight, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\tm_open_neww.png
-		if (ErrorLevel = 2)
-			MsgBox Could not conduct the search.
-		else if (ErrorLevel = 1)
-			MsgBox Icon could not be found on the screen.
-		else
-			MouseClick, left, %TMFoundX2%, %TMFoundY2%
-			sleep, 200
-		Winactivate, Edit - Internet Explorer											; reactivate owner IE window
-		WinWaitActive, Edit - Internet Explorer, , 5
-		Winshow
-		WinMove, Edit - Internet Explorer, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%	; adjust window size
-		sleep, 20
-		send, {tab 5}			
-*/
-/*	
-	return
-	}					
-#Ifwinactive
-
-; 60011131					
-*/
-}}
 ;----------------------------------------------------------------
 ;	About Submenu	
 ;----------------------------------------------------------------
 TM_ABOUT_onclick:
-
 ;---------- Sub menu setup ----------
 ;---------- Section 1 ----------
 	Gui,99:Destroy
@@ -591,12 +504,10 @@ Return
 99GuiClose:
   Gui,99:Destroy
 Return
-
 ;----------------------------------------------------------------
 ;	Info Submenu	
 ;----------------------------------------------------------------
 TM_INFO_onclick:
-
 	TMinfowidth1 = 460
 	TMinfowidth2 := TMinfowidth - 20
 ;---------- Sub menu setup ----------
@@ -605,31 +516,44 @@ TM_INFO_onclick:
 	Gui,98:Margin,20,20
 	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
 	Gui,98:Font,Bold
+	Gui,98:Add,Text,x+10 yp+10, Keyboard Shortcuts
+	Gui,98:Add,Text,xm+300 yp, Hotkeys
+	Gui,98:Font
+	Gui,98:Add,Text,y+10 xm+10 %TMinfowidth2%, Activate and select Yes on pop - up window 
+	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%, Shift + Capslock
+	Gui,98:Add,Text,y+5 xm+10 %TMinfowidth2%, Activate and select Yes on pop - up window 
+	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%, Shift + Enter
+	Gui,98:Add,Text,y+5 xm+10  %TMinfowidth2%, Save and close Edit window, then open new one
+	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%,	Ctrl + S
+	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
+	Gui,98:Font,Bold
 	Gui,98:Add,Text,x+10 yp+10, Setup
 	Gui,98:Font
-	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  Close all Excel windows except the Import Execution file.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Close all Internet Explorer windows except TM.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Close all Notepad files before starting.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Close all Internet Explorer windows before starting.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Minimize or close all unnecessary windows if possible.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Avoid moving or rearranging active windows if possible.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Check the Settings menu and adjust them respectively to your needs.
+	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  Save and close all Excel files.
+	Gui,98:Add,Text,y+5 %TMinfowidth2%, 2.  Open the latest Import Execution Excel file to the TMx tab.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Save and close all Internet Explorer windows.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Open TM in Internet Explorer to Freight Order Management.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Save and close all Notepad files.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Minimize or close all unnecessary windows if possible.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Avoid moving or rearranging active windows if possible.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 8.  Check the Settings menu and adjust them respectively to your needs.
 	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
 	Gui,98:Font,Bold
 	Gui,98:Add,Text,x+10 yp+10, Instructions
 	Gui,98:Font
-	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  Open TM in Internet Explorer to Freight Order Management.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Select Edit Freight Booking for the transaction you are processing. 
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Place cursor in the search box.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  Open the Import Execution file to the TM Script tab.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Enter the number of documents (rows) to be processed.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Enter the row number of the first document to be processed.
+	Gui,98:Add,Text,y+10 %TMinfowidth2%, 1.  In Internet Explorer, select either the Road or Ocean tab on the left of the screen.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 2.  Select Edit--Road or Ocean-- for the transaction you will be processing. 
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 3.  Place cursor in the search box in the new Edit window.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 4.  In TM Execution, start by selecting a transaction from the main menu.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 5.  Enter the number of documents (loops aka rows) to be processed.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 6.  Enter the starting row number of the first document to be processed from the TMx tab.
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 7.  Click Yes when you are ready to begin processing or No to exit the run.
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 8.  Press Enter, or click Yes, to search the first document number. 
 	Gui,98:Add,Text,y+5  %TMinfowidth2%, 9.  Navigate to the field that will be updated -- ideally before the next message appears.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%, 10. Press Ctrl + S to save the document and continue to the next update.  
-	Gui,98:Add,Text,y+15  %TMinfowidth2%, i.    Click No on any message box to exit the run at any time.
-	Gui,98:Add,Text,y+5  %TMinfowidth2%,  ii.   Optionally, you can have a Notepad file printed of the run results.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, 10. When completed, press Ctrl + S to save the document and continue to the next update.  
+	Gui,98:Add,Text,y+15 %TMinfowidth2%, i.     Click No on any message box to exit the run at any time.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, ii.    Optionally, you can have a Notepad file printed of the run results.
+	Gui,98:Add,Text,y+5  %TMinfowidth2%, iii.   Use [Shift + Capslock] or [Shift + Enter] to reduce mouse movement and save time.
 ;---------- Sub menu Show -----------
 	Gui,98:Show, w%TMinfowidth1%, Info
 	Return
@@ -637,12 +561,10 @@ TM_INFO_onclick:
 98GuiClose:
   Gui,98:Destroy
 	Return
-
 ;----------------------------------------------------------------
 ;	Settings Submenu	
 ;----------------------------------------------------------------
 TM_SETTINGS_onclick:
-
 ;---------- Sub menu setup ----------
 ;---------- Variables ----------
 ;----- Siz and Pos -----
@@ -750,19 +672,6 @@ TMsetReset:
 97GuiClose:
   Gui,97:Destroy
 	Return
-
-;--------------------------------------------------
-;	Loop Break
-;--------------------------------------------------
-/*
-TM_Loop_Break:	
-	BreakTMLoop1 = 1	
-	BreakTMLoop2 = 1
-	BreakTMLoop3 = 1
-	BreakTMLoop4 = 1
-	BreakTMLoop5 = 1
-	return
-*/
 ;=======================================================================
 ;	TM 5 Transactions Start Here
 ;=======================================================================	
@@ -773,7 +682,6 @@ TM_Loop_Break:
 ;	TM Container Update
 ;=======================================================================	
 TM_cntnr_onclick:
-
 ;---------- Run Settings ----------
 	TMtrnscode1 := "Container"
 	InputBox, LoopNum1, %TMtrnscode1% Loops,,, 200, 100, center, center,,, 		; Show the InputBox
@@ -874,7 +782,7 @@ StartJob1:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 1200
 							send, {tab}
 							sleep, 50
-							msgbox, 262148, TM Execution, Sending %TMcontCode%, 1
+							msgbox, 262144, TM Execution, Sending %TMcontCode%, 1
 							send, %TMcontCode%									; send auxiliary var
 							sleep, 500
 							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
@@ -911,7 +819,6 @@ StartJob1:                                										; THIS STARTS THE MAIN PROCE
 ;	Container Script Terminated
 ;--------------------------------------------------
 TM_cntnr_Script_End:
-
 	TMrowend := A_Index + TMRowStart1
 	MsgBox, 262148, TM Execution, Would you like to print the results of the run?
 		IfMsgBox Yes   ; print results subroutine if yes             				          					
@@ -965,7 +872,6 @@ EarlyTerm1A:
 ;	TM Sail Update
 ;=======================================================================	
 TM_sail_onclick:
-
 ;---------- Run Settings ----------
 	;BreakTMLoop2 = 0
 	TMtrnscode1 := "Sail Date"
@@ -1067,7 +973,7 @@ StartJob2:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 1200
 							send, {tab}
 							sleep, 50
-							msgbox, 262148, TM Execution, Sending %TMdtimestamp%, 1
+							msgbox, 262144, TM Execution, Sending %TMdtimestamp%, 1
 							send, %TMdtimestamp%									; send auxiliary var
 							sleep, 500
 							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
@@ -1151,7 +1057,6 @@ EarlyTerm2A:
 ;	TM ETA Update
 ;=======================================================================	
 TM_ETA_onclick:
-
 ;---------- Run Settings ----------
 	;BreakTMLoop3 = 0
 	TMtrnscode1 := "ETA Date"
@@ -1253,7 +1158,7 @@ StartJob3:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 1200
 							send, {tab}
 							sleep, 50
-							msgbox, 262148, TM Execution, Sending %TMdtimestamp%, 1
+							msgbox, 262144, TM Execution, Sending %TMdtimestamp%, 1
 							send, %TMdtimestamp%									; send auxiliary var
 							sleep, 500
 							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
@@ -1337,7 +1242,6 @@ EarlyTerm3A:
 ;	TM ATA Update
 ;=======================================================================	
 TM_ATA_onclick:
-
 ;---------- Run Settings ----------
 	;BreakTMLoop4 = 0
 	TMtrnscode1 := "ATA Date"
@@ -1439,7 +1343,7 @@ StartJob4:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 1200
 							send, {tab}
 							sleep, 50
-							msgbox, 262148, TM Execution, Sending %TMdtimestamp%, 1
+							msgbox, 262144, TM Execution, Sending %TMdtimestamp%, 1
 							send, %TMdtimestamp%									; send auxiliary var
 							sleep, 500
 							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
@@ -1523,7 +1427,6 @@ EarlyTerm4A:
 ;	TM Departure Update
 ;=======================================================================	
 TM_Dep_onclick:
-
 ;---------- Run Settings ----------
 	;BreakTMLoop5 = 0
 	TMtrnscode1 := "Departure"
@@ -1581,7 +1484,6 @@ StartJob5:                                										; THIS STARTS THE MAIN PROCE
 	WinActivate, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
 	WinWaitActive, ahk_class XLMAIN                     						; MAKES SURE FILE IS OPEN
 	Xl := ComObjActive("Excel.Application")
-	
 ;--------------------------------------------------
 ;	Loop
 ;--------------------------------------------------
@@ -1626,7 +1528,7 @@ StartJob5:                                										; THIS STARTS THE MAIN PROCE
 							sleep, 1200
 							send, {tab}
 							sleep, 50
-							msgbox, 262148, TM Execution, Sending %TMdtimestamp%, 1
+							msgbox, 262144, TM Execution, Sending %TMdtimestamp%, 1
 							send, %TMdtimestamp%									; send auxiliary var
 							sleep, 500
 							LV_Add("", MyVar1, MyVar2)						; Adds completed records to listview
