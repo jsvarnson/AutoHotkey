@@ -1,5 +1,5 @@
 ;=======================================================================
-;	TM Execution v3.00
+;	TM Execution v3.02
 ;=======================================================================	
 ;--------------------------------------------------
 ;	Version History
@@ -63,6 +63,8 @@ v2.29 - Completed updated instructions with shortcuts
 v2.30 - Reconfigured msgboxes to timeout instead of forcing enter through them
 ;---------------------------------- Launch -----------------------------------
 v3.00 - Compiled to application executable for launch
+v3.01 - Set imagesearch range to static large area for full coverage
+v3.02 - Adjusted hotkey shortcuts and added capslock as enter remapping
 
 */
 ;=======================================================================
@@ -108,7 +110,7 @@ ifnotexist, %TMRoadPic%
 ifnotexist, %TMOceanPic%
 	FileInstall, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\edit_ocean_freight_booking.png, %A_ScriptDir%\edit_ocean_freight_booking.png
 ;---------- Version Num ----------
-TMexVersion = 3.00
+TMexVersion = 3.02
 TMexVersion := "v"TMexVersion		; remember to change in HTML manually
 applicationname := "TM Execution " TMexVersion
 ;---------- Default Var ----------	
@@ -143,7 +145,7 @@ SetTimer, TM_Execution_Close, 10000
 	TMguiWd2 := (TMguiWd - 32) / 2
 	TMguiWd2 := Round(TMguiWd2, 0)
 ;----- 3 Win Split -----	
-	TMsplitscreen1 := Round(A_ScreenWidth / 2,0)	- 40						; screen halfway point
+	TMsplitscreen1 := Round(A_ScreenWidth / 2,0)	; - 40						; screen halfway point ; don't subtract the taskbar width
 	TMsplitscreen2 := TMsplitscreen1 - TMguiWd	+ 8 						; excel x axis start point
 	TMsplitpos1 := 0															; listview gui position`
 	TMsplitpos2 := TMguiWd + 1												; excel win position
@@ -367,6 +369,7 @@ TMprintLV:
 #Ifwinactive ahk_class IEFrame	
 +Capslock::
 +Enter::
++NumpadEnter::
 	SetTitleMatchMode, 3
 	ifwinexist, TM Execution
 		winactivate, TM Execution
@@ -375,9 +378,23 @@ TMprintLV:
 		return
 #Ifwinactive	
 ;--------------------------------------------------
+;	Capslock as enter	
+;--------------------------------------------------
+#Ifwinactive ahk_class IEFrame	
+Capslock::
+	send, {enter}
+	return
+	
+^CapsLock::
+    GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
+    if capsstate = U
+        SetCapsLockState, AlwaysOn
+    else
+        SetCapsLockState, AlwaysOff
+    return	
+;--------------------------------------------------
 ;	Save reset to next loop -> continuation
 ;--------------------------------------------------
-#Ifwinactive ahk_class IEFrame
 ~^s::
 ;^!#+j::
 	IfWinExist Edit Import
@@ -393,13 +410,17 @@ TMprintLV:
 		WinMove, ahk_class IEFrame, , %TMsplitpos3%, 0, %TMsplitscreen1%, %A_ScreenHeight%
 		sleep, 100
 		; searches for Edit Ocean Freight Booking blue hyperlink
-		ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %A_ScriptDir%\edit_ocean_freight_booking.png	; Edit ocean
-		{
+		; ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %A_ScriptDir%\edit_ocean_freight_booking.png	; Edit ocean	;---original
+		ImageSearch, TMFoundX, TMFoundY, -1200, -600, 3000, -1200, %A_ScriptDir%\edit_ocean_freight_booking.png	; Edit ocean		;---new Edited
+		; top left: x = -1080 y= -407	; bottom right: x = 3839 y = -1079
+				{
 			if (ErrorLevel = 2)
 				MsgBox, ,TM Execution, Could not conduct the search for Edit link. , 1
 			else if (ErrorLevel = 1)
 			{
-				ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %A_ScriptDir%\edit_road_freight_order.png	; Edit road
+				; ImageSearch, TMFoundX, TMFoundY, 0, 0, A_ScreenWidth, A_ScreenHeight, %A_ScriptDir%\edit_road_freight_order.png	; Edit road	;---original
+				ImageSearch, TMFoundX, TMFoundY,-1200, -600, 3000, -1200, %A_ScriptDir%\edit_road_freight_order.png	; Edit road		;---new Edited
+				; top left: x = -1080 y= -407	; bottom right: x = 3839 y = -1079
 				{
 					; searches for Edit Road Freight Order blue hyperlink
 					if (ErrorLevel = 2)
@@ -525,6 +546,10 @@ TM_INFO_onclick:
 	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%, Shift + Enter
 	Gui,98:Add,Text,y+5 xm+10  %TMinfowidth2%, Save and close Edit window, then open new one
 	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%,	Ctrl + S
+	Gui,98:Add,Text,y+5 xm+10  %TMinfowidth2%, Replaces Capslock key with Enter key
+	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%,	Capslock
+	Gui,98:Add,Text,y+5 xm+10  %TMinfowidth2%, Toggle Capslock as normal
+	Gui,98:Add,Text,yp xm+300 %TMinfowidth2%,	Ctrl + Capslock
 	Gui,98:Add,Picture,xm Icon1,%applicationname%.exe
 	Gui,98:Font,Bold
 	Gui,98:Add,Text,x+10 yp+10, Setup
