@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Excel	v1.09
+;	Excel	v1.12
 ;====================================================================================================
 /*
 -------------------------
@@ -41,7 +41,7 @@ SendMode Input							; Recommended to set sendinput as the default send method
 	Exitapp
 	return
 
-~^Esc::									; Pauses all active scripts
+~^Esc::								; Pauses all active scripts
 	Suspend, on
 	Pause, on
 	return
@@ -144,7 +144,7 @@ F3::
 ;	Iferror
 ;--------------------------------------------------	
 
-:*:ifer::
+:*:iffer::
 Iferror:
 	send, iferror(
 	send, {end}
@@ -197,9 +197,9 @@ F1::
 	send, {alt}{j}{t}{a}
 	return
 
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;	Comobjects
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
 /*
 	Colors
 --------------------------
@@ -208,9 +208,9 @@ F1::
 48		-> Medium Gray
 15		-> Light Gray		
 */
-;====================================================================================================
+;=======================================================================
 ;	ComObjects 
-;====================================================================================================
+;=======================================================================
 /*
 -------------------------
 |	Main Directory		|
@@ -223,7 +223,6 @@ F1::
 -------------------------
 |		  END			|
 -------------------------
-
 -----------------------------------------------------------------------
 |||||||||||||||||||||||||||||| Variables ||||||||||||||||||||||||||||||
 -----------------------------------------------------------------------
@@ -235,36 +234,95 @@ F1::
 6.	sel_tbl_rg					-> stores selected table range
 7.	sel_col_rg					-> stores selected column range
 8.	sel_row_rg					-> stores selected row range
+9.	active_tbl_rg
+10.	active_col_rg
+11.	tbl_end_cell				-> stores end used cell
+12.	tbl_end_col					-> stores end used column
+13.	tbl_end_row					-> stores end used row
+14.	
+15.	
 */
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;	Autoformat Used Range of Active Sheet
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
 
 F8::
-	send, ^{home}																								; moves cursor to cell A1 for convenience
+	tbl_end_col_shade	:= 30
+	tbl_end_row_shade	:= 50
+	send, ^{home}																									; moves cursor to cell A1 for convenience
+;------ detect used range ----------------------------------------------	
 	XL_Handle(XL,3) ;1=Application 2=Workbook 3=Worksheet														; get handle to Application	
 	active_header_rg	:= XL_Used_RG(XL,2)																		; finds and stores active header range
 	active_tbl_rg		:= XL_Used_RG(XL,1)																		; finds and stores active table range
 	active_col_rg		= XL_First_Col_Alpha(XL)":"XL_Last_Col_Alpha(XL)										; finds and stores active column range	
 	XL_Format_Wrap(XL,RG:= active_header_rg ,Wrap:=0)															; Unwraps all cells in active header range
 	XL_Format_Wrap(XL,RG:= active_tbl_rg ,Wrap:=0)																; Unwraps all cells in active table range
-	
-	
-	;XL_Col_To_Char(2)																							; Sets columns string
-	;XL_String_To_Number("ab")																					; Sets columns numeric
-	;Xl.Range("J:J").NumberFormat := "#########"																; change the column format to 9 digits
-	
-	;XL_Format_Number(XL,RG:="B:B",Format:="#########")
-	
-	
-	XL_Format_Font(XL,RG:="A1:BM4000",Font:="Roboto Mono",Size:=10)												; Sets whole sheet font and size	;Inconsolata
-	XL_Border(XL,RG:=  active_header_rg ,Weight:=2,Line:=1)														; Outlines the header
-	XL_Format_Cell_Shading(XL,RG:="A1:BM4000",Color:=48)														; shades whole sheet 			; medium gray = 48
-	XL_Format_Cell_Shading(XL,RG:= active_header_rg ,Color:= 37)												; shades active header range 	; light blue = 41	; medium blue = 23	; blue gray = 37
-	XL_Format_Format(XL,RG:= active_header_rg ,Bold:=1,Italic:=0,Underline:=0) 									; sets active header range bold, italic, or underline	;1 = on
-	XL_Format_Cell_Shading(XL,RG:= active_tbl_rg ,Color:= 2) 													; shades active table range		; light gray = 15	; white = 2
-	XL_Col_Width_Set(XL,RG:="A:BM=-1")																			; autofits active column range
-	XL_Row_Height(XL,RG:="1:4000=-1")																			; autofits active row range
+	XL_Format_Wrap(XL,RG:= active_header_rg ,Wrap:=1)															; Rewraps all cells in active header range
+;------ table end location ---------------------------------------------
+	StringGetPos, pos, active_tbl_rg, :, 1		; find colon position
+	tbl_end_cell	:= SubStr(active_tbl_rg, pos+2)	; returns end cell
+	tbl_end_col	:= RegExReplace(tbl_end_cell, "[0-9]")						; end cell col
+	tbl_end_row	:= RegExReplace(tbl_end_cell, tbl_end_col) 					; end cell row
+;------ find dynamic shade range ---------------------------------------
+	tbl_end_col	:= XL_Last_Col_Nmb(XL) + tbl_end_col_shade
+	tbl_end_row	:= XL_Last_Row(XL) + tbl_end_row_shade
+	tbl_last_row	:= XL_Last_Row(XL) 
+;------ convert final column number to character -----------------------
+	in = %tbl_end_col%				; number to convert
+	stringsplit, i, in, `, 			; convert to string
+	Loop % i0							
+	{
+		y := (i%a_index% - 1) // 26		; find multiple of alphabet - 26 
+		i%a_index% -= y * 26				; locate input in alphabet multiple
+		if (y > 0)							; check if above is 1st alpha
+		t .= chr(y + 96)					; convert 1st alpha
+		t.= chr(i%a_index% + 96) ","		; convert multiple alpha
+	}
+	t := StrReplace(t, ",","")			; remove trailing comma
+	StringUpper, t, t
+;------ prepare format area variables ----------------------------------
+	last_tbl_cols	:= t
+	shade_end_rg	:= t . tbl_end_row		; return final shaded cell
+	tbl_start_col	:= XL_First_Col_Alpha(XL)
+	tbl_end_col	:= XL_Last_Col_Alpha(XL)
+	tbl_start_row	:= XL_First_Row(XL)
+	shade_tbl_rg	:= "A1:" . shade_end_rg
+	used_tbl_rows	:= """" . tbl_start_row . ":" . tbl_last_row . """"			;  . "=-1" 
+	used_tbl_cols	:= """" . tbl_start_col . ":" . tbl_end_col . """"			;  . "=-1" 
+	active_tbl_rg2	:= """" . active_tbl_rg . """"
+	tbl_start_cell	:= """" . tbl_start_col . tbl_start_row . """"
+	tblstartcell	:= """" . tbl_start_col . tbl_start_row . """"
+;------ count how many cells to move -----------------------------------	
+	RowCountMove	:= 	tbl_start_row - 1	; start in A1 so subtract 1 row
+	ColCountMove	:= XL_First_Col_Nmb(XL) - 1	; start in A1 so subtract 1 col
+;------ format ranges --------------------------------------------------	
+	XL_Format_Font(XL,RG:=active_tbl_rg,Font:="Roboto Mono",Size:=10)										; Sets whole sheet font and size	;Inconsolata
+	XL_Border(XL,RG:=  active_header_rg ,Weight:=3,Line:=1)													; Outlines the header
+	XL_Format_Cell_Shading(XL,RG:=shade_tbl_rg,Color:=48)														; shades whole sheet 			; medium gray = 48
+;	XL_Format_Cell_Shading(XL,RG:= active_header_rg ,Color:= 37)												; shades active header range 	; light blue = 41	; medium blue = 23	; blue gray = 37
+	XL_Format_Format(XL,RG:= active_header_rg ,Bold:=1,Italic:=0,Underline:=0) 								; sets active header range bold, italic, or underline	;1 = on
+;	XL_Format_Cell_Shading(XL,RG:= active_tbl_rg ,Color:= 2) 													; shades active table range		; light gray = 15	; white = 2
+	XL_Col_Width_Set(XL,RG:="A:BM=-1")										; set col width to 10		; RG:="A:BM=-1" ; autofits active column range
+	XL_Row_Height(XL,RG:="1:100000=-1")																		; autofits active row range
+;------ create table ---------------------------------------------------	
+	send, {right %ColCountMove%}
+	send, {down %RowCountMove%}
+	sleep, 100
+	send, {ctrl down}{shift down}{right}{down}{shift up}{ctrl up}
+	sleep, 100
+	send, {alt}{h}{e}{f}
+	sleep, 100	
+	send, {ctrl down}{t}{ctrl up}
+	sleep, 100
+	send, {enter}
+	sleep, 200
+	send, {down}
+	send, {up}
+	sleep, 1000
+	send, {alt}{j}{t}{a}
+	sleep, 10
+	send, {backspace}
+	reload
 	return
 
 ;---------------------------------------------------------------------------
@@ -620,15 +678,21 @@ XL_Format_Number(PXL,RG="",format="#,##0"){
 ;====================================================================================================
 
 ;~ XL_Select_Range(XL,"A1:A4")
-XL_Select_Range(PXL,Range,Sheet_Name=""){
- if (Sheet_Name="")
- PXL.Application.ActiveSheet.Range(Range).Select
- Else {
- XL_Select_Sheet(PXL,Sheet_Name)
- PXL.Sheets(Sheet_Name).Range(Range).Select
- }
+XL_Select_Range(XL,RG := ""){
+	XL.Application.ActiveSheet.Range(RG).Select
 }
 
+/*	original
+;~ XL_Select_Range(XL,"A1:A4")
+XL_Select_Range(XL,Range,Sheet_Name=""){
+ if (Sheet_Name="")
+	XL.Application.ActiveSheet.Range(Range).Select
+ Else {
+	XL_Select_Sheet(XL,Sheet_Name)
+	XL.Sheets(Sheet_Name).Range(Range).Select
+ }
+}
+*/
 ;====================================================================================================
 ;	27.	Deselect Cells Function
 ;====================================================================================================
