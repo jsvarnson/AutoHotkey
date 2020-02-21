@@ -1,6 +1,7 @@
 ;====================================================================================================
-;	Universal Subroutines v5.05
+;	Universal Subroutines v6.09
 ;====================================================================================================
+{{
 /*
 -------------------------
 |	Main Directory		|
@@ -17,6 +18,7 @@
 |		  END			|
 -------------------------
 */
+}}
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
@@ -37,55 +39,42 @@ SetControlDelay, -1						; Recommended to set sendinput as the default send meth
 SendMode Input							; Recommended to set sendinput as the default send method
 #Persistent								; Script will stay running after the auto-execute section
 }}
-;====================================================================================================
+;=======================================================================
 ;	AutoExecute
-;====================================================================================================
+;=======================================================================
 {{
-;--------------------------------------------------
-;	Activate Universal GUI on MouseOver		
-;--------------------------------------------------
-/*
-;#Persistent
-;SetTimer, ActivateUGUI, 100
-SetTimer, WatchCursor, 100
-return
+;-----------------------------------------------------------------------
+;	Color Scheme
+;-----------------------------------------------------------------------
 
+;-----------------------------------------------------------------------
+;	Universal Includes
+;-----------------------------------------------------------------------
 
-#If MouseIsOver("ahk_class AutoHotkeyGUI")
-	WinActivate, Universal
-	;~ RButton::msgbox UGUI Activated
-#If   ; finish definition of context-sensitive hotkeys
+; Include DashMail
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
 
-MouseIsOver(Universal) {
-    MouseGetPos,,, Win
-    return WinExist(Universal . " ahk_id " . Win)
-}
-*/
-;--------------------------------------------------
-;	Watch Cursor
-;--------------------------------------------------
-/*
-; Display window information under mouse
+; Include Outlook Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Outlook Automation.ahk
 
-; #Persistent
-; SetTimer, WatchCursor, 100
-; return
+; Include Reference Tables
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Reference Tables.ahk
 
-WatchCursor:
-MouseGetPos, , , id, control
-WinGetTitle, title, ahk_id %id%
-WinGetClass, class, ahk_id %id%
-ToolTip, ahk_id %id%`nahk_class %class%`n%title%`nControl: %control%
-return
-*/
-;--------------------------------------------------
-;	AutoExecute End
-;--------------------------------------------------
-}}
+; Include SAP Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\SAP Automation.ahk
+
+; Include Stay Active
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Stay Active.ahk
+
+; Include TM Automation
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\TM Automation.ahk
+
+;gosub, UNIVERSAL_LAUNCH	; launch Universal GUI
+
 ;====================================================================================================
 ;	Universal	
 ;====================================================================================================
-{{
+
 #Ifwinactive, ahk_class AutoHotkeyGUI
 ~Esc::
 	gosub, Save_Universal_Notes
@@ -109,7 +98,10 @@ return
 	Pause, off
 	SetTimer,UPDATEDSCRIPT,1000
 	return	
-	
+;--------------------------------------------------
+;	GUI Specific Hotkeys
+;--------------------------------------------------
+#Ifwinactive, ahk_class AutoHotkeyGUI
 ~^s::						; Reloads scipt upon save
 	Gui, Submit, NoHide
 	SetTimer,UPDATEDSCRIPT,1000
@@ -122,14 +114,39 @@ return
 		}
 	return
 
+:*:[[::
+	TodayDateUniversal1 := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min				; gets current date time stamp formatting
+	send, %TodayDateUniversal1%
+	return
+	
+:*:]]::
+	TodayDateUniversal2 := A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min										; gets current date time stamp formatting
+	send, %TodayDateUniversal2%
+	return
+
+:*:[]::
+	TodayDateUniversal3 := A_MM . "-" . A_DD . "-" . A_YYYY																	; gets current date time stamp formatting
+	send, %TodayDateUniversal3%
+	return
+	
+:*:--::
+	send, {space 4}{-}{space}
+	return
+
+^WheelUp::
+	send, ^{PgUp}
+	return
+
+^WheelDown::
+	send, ^{PgDn}
+	return	
+#Ifwinactive
 ;---------------------------------------------------------------------------
 ;	Main
 ;---------------------------------------------------------------------------
-
 ;---------------------------------------------------------------------------
 ;	Universal GUI
 ;---------------------------------------------------------------------------
-
 ^!#+u::
 	if WinExist("Universal") 
 	{																				; check if the GUI is already open, then coses it
@@ -144,7 +161,6 @@ return
 			Time := A_LoopFileTimeModified, UNotesFile := A_LoopFileLongPath
 		}	
 		FileRead, UNotesText, %UNotesFile%
-
 ;--------------------------------------------------
 ;	SF Alien Encounters Style GUI
 ;--------------------------------------------------	
@@ -155,128 +171,347 @@ return
 ; Standard Window Size
 UguiHgt	= 640
 UguiWdt	= 985
+UHdrBar	= 90
 UhdrXPos	= 30
-UhdrYPos	= 28
+UhdrYPos	= 11
+UhdrYPos2	:= ((UHdrBar / 2) - (77.25 / 4))
 ; Standard Window Position #1 - x0 y0
 ; Standard Window Position #2 - x0 y641
 ; Standard Window Position #3 - x0 y1281
+;----------------------- Alarms ----------------------------
+;----- Alarm Times -----
+UDefTime1 = 0930
+UDefTime2 = 1000
+UDefTime3 = 1100
+UDefTime4 = 1430
+UDefTime5 = 1600
+;----- Alarm Names -----
+UDefName1 := " Task Call"
+UDefName2 := " Import Group"
+UDefName3 := " Brand Call"
+UDefName4 := " Tap Talk"
+UDefName5 := " General"
 ;----------------------- Colors ----------------------------
-; c33DCBD - synth blue
-; cDC33A6 - synth purple
-; 
-; cf0c674 - gold
+; 33DCBD	- synth blue
+; DC33A6	- synth purple
+; f0c674	- gold
+; 1d1f21	- background black
+; 282a2e	- background slate
+;------ MolsonCoors Colors ---------------------------------------------
+; HEX		- NAME			- PMS		- RGB			- CMYK
+; 091F3F	- NAVY BLUE	- 282C		- 9 31 64		- 100 87 42 52
+; FFB000	- GOLD			- 7549C	- 255 175 0	- 0 35 100 0
+; FF6912	- ORANGE		- 1585C	- 255 105 20	- 0 75 100 0
+; 1496FF	- LIGHT BLUE	- 279C		- 20 150 255	- 70 35 0 0
+; FFFFFF	- WHITE		- White	- 255 255 255	- 0 0 0 0 		
+; D8E0E4	- GRAY			- 7541C	- 215 225 225	- 14 7 8 0
 ;----------------------- Gui Calc Var ----------------------
 UclockXPos := UguiWdt - 330
 UcalXPos	:= UguiWdt - 170
-OutSunPos	:= (UguiWdt - 70) / 2
+HdrPicture	:= (UguiWdt - 70) / 2 
 ;----------------------- Gui Settings ----------------------
 		Gui, Margin, 16, 16
-		Gui, Color, 1d1f21, 282a2e												; colors the background dark gray
+		Gui, Color, c091F3F, c091F3F
 		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border +HwndUGUI		; removes the toolbar
-		Gui, Font, s42 c33DCBD , SF Alien Encounters 							; choses font size and color for title bar
-		GUI, Add, Text, x%UhdrXPos% y%UhdrYPos%, Universal						; sets the title of the GUI	
-		UguiHdrPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\vaporhead3.png
-		SplitPath, UguiHdrPic, , , , UguiHdrPic1																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
+		Gui, Font, s42 c1496FF , Tuno	;SF Alien Encounters 						; choses font size and color for title bar
+		GUI, Add, Text, x%UhdrXPos% y%UhdrYPos%, UNIVERSAL						; sets the title of the GUI	
+		UguiHdrPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\Molson Coors bad logo.png
+		SplitPath, UguiHdrPic, , , , UguiHdrPic1		
 		FileInstall, UguiHdrPic1.png, %UguiHdrPic%, 1
-		Gui, Add, Picture, x%OutSunPos% y10 w70 h90, %UguiHdrPic%
+		;~ Gui, Add, Picture, x%HdrPicture% y10 w70 h90 +BackgroundTrans, %UguiHdrPic%	; for synth head picture
+		Gui, Add, Picture, x%HdrPicture% y%UhdrYPos2% w60.75 h77.25  +BackgroundTrans, %UguiHdrPic%		; for molsoncoors logo scaled to 75% - original 81 x 103
 ;--------------- Clock ---------------				
 		Gui, Add, Text, x%UclockXPos% y%UhdrYPos% vClockTime1, 00:00:00		; set transparency	; set color	; select output variable	; cOrange
 ;----------------------- Tab Settings ----------------------		
-		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
-		Gui, Add, Tab3, x0 y90 w984 h550, Main|System|Calendar|Alarms|Settings			; creates tabs 
+		Gui, Font, s12 c1496FF, Tuno
+		Gui, Add, Tab3, x0 y%UHdrBar% w984 h550, MAIN|SYSTEM|CALENDAR|ALARMS|SETTINGS	; creates tabs 
 ;-------------------------- Tab 1 --------------------------
 		Gui, Tab, 1																	; sets below controls to tab		
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, w600 h190 , PROGRAMS									; create groupbox
 ;--------------- Row 1 ---------------		
-		Gui, Font, s12 w400 cf0c674, SF Alien Encounters						; sets font for the bottom half of the GUI
-		GUI, Add, Button, default w80 h35 xs y+16 gSub1, Dates
-		GUI, Add, Button, w80 h35 x+7 gSub2, WinS
-		GUI, Add, Button, w80 h35 x+7 gSub3, &Orders
-		GUI, Add, Button, w80 h35 x+7 gSub4, &Directs
-		GUI, Add, Button, w80 h35 x+7 gSub5, &Claims
-		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
-		GUI, Add, Text, x+6 , Emails
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, default w80 h35 xs y164 gSub1, Dates
+		GUI, Add, Button, w80 h35 x+5 gSub2, WinS
+		GUI, Add, Button, w80 h35 x+5 gSub3, &Orders
+		GUI, Add, Button, w80 h35 x+5 gSub4, &Directs
+		GUI, Add, Button, w80 h35 x+5 gSub5, &Claims
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6 , EMAILS
 ;--------------- Row 2 ---------------				
-		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+18 gSub6, &ECC
-		GUI, Add, Button, w80 h35 x+7 gSub7, WsDE
-		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
-		GUI, Add, Button, w80 h35 x+7 gSub9, PlayBK
-		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
-		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
-		GUI, Add, Text, x+6, Files
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub6, &ECC * 
+		GUI, Add, Button, w80 h35 x+5 gSub7, WsDE
+		GUI, Add, Button, w80 h35 x+5 gSub8, IBDs
+		GUI, Add, Button, w80 h35 x+5 gSub9, PlayBK *
+		GUI, Add, Button, w80 h35 x+5 gSub10, Ws BK * 
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, FILES
 ;--------------- Row 3 ---------------				
-		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+18 gSub21, Ship
-		GUI, Add, Button, w80 h35 x+7 gSub22, Sail
-		GUI, Add, Button, w80 h35 x+7 gSub23, ETA
-		GUI, Add, Button, w80 h35 x+7 gSub24, ATA
-		GUI, Add, Button, w80 h35 x+7 gSub25, Unexp
-		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub21, Ship
+		GUI, Add, Button, w80 h35 x+5 gSub22, Sail
+		GUI, Add, Button, w80 h35 x+5 gSub23, ETA
+		GUI, Add, Button, w80 h35 x+5 gSub24, ATA
+		GUI, Add, Button, w80 h35 x+5 gSub25, Unexp
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
 		GUI, Add, Text, x+6, TM
 ;--------------- Row 4 ---------------				
-		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+18 gSub16, Dash
-		GUI, Add, Button, w80 h35 x+7 gSub17, Sub17
-		GUI, Add, Button, w80 h35 x+7 gSub18, Sub18
-		GUI, Add, Button, w80 h35 x+7 gSub19, &Stay
-		GUI, Add, Button, w80 h35 x+7 gSub20, &Back
-		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
-		GUI, Add, Text, x+6, System
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub16, Dash
+		GUI, Add, Button, w80 h35 x+5 gSub17, Sub17
+		GUI, Add, Button, w80 h35 x+5 gSub18, Sub18
+		GUI, Add, Button, w80 h35 x+5 gSub19, Orbit
+		GUI, Add, Button, w80 h35 x+5 gSub20, Dock
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, SYSTEM
 ;-------------- Calendar -------------			
-		Gui, Font, S4, SF Alien Encounters										; select font and size		
-		Gui, Add, MonthCal, x%UclockXPos% y120 0x4 0x8 0x16 Background1d1f21	; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, x660 y134 w280 h190 , CALENDAR						; create groupbox
+		Gui, Font, S4, Tuno														; select font and size		
+		Gui, Add, MonthCal, x675 y164 0x4 0x8 0x16 Background1d1f21			; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
 		GuiControl, Show, MonthCal, 
 ;--------------- Notes ---------------				
-		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
-		Gui, Add, Edit, R20 xm y295 w950 vUTextBox, 
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, R18 xm y335 w950 vUTextBox, 
 		GuiControl, , UTextBox, %UNotesText%
 		GuiControl, Focus, UTextBox
 ;-------------------------- Tab 2 --------------------------
 		Gui, Tab, 2																	; sets below controls to tab
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, w600 h190 , DATA										; create groupbox
 ;--------------- Row 1 ---------------				
-		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
-		GUI, Add, Button, w80 h35 xs y+18 gSub11, Dists
-		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
-		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
-		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
-		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
-		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
-		GUI, Add, Text, x+6, Tables
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, default w80 h35 xs y164 gSub11, Dist
+		GUI, Add, Button, w80 h35 x+5 gSub12, Cust [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub13, Cust MD
+		GUI, Add, Button, w80 h35 x+5 gSub14, Map [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub15, Carrier
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, CUSTOMER
+;--------------- Row 2 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub26, Prod [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub27, SKU
+		GUI, Add, Button, w80 h35 x+5 gSub28, RV [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub29, BPA
+		GUI, Add, Button, w80 h35 x+5 gSub30, OSKU
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, PRODUCTS
+;--------------- Row 3 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub31, Plant
+		GUI, Add, Button, w80 h35 x+5 gSub32, zPlant [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub33, 2020
+		GUI, Add, Button, w80 h35 x+5 gSub34, Cycle [ ! ]
+		GUI, Add, Button, w80 h35 x+5 gSub35, Sub35
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, NETWORK
+;--------------- Row 4 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub36, Sub36
+		GUI, Add, Button, w80 h35 x+5 gSub37, Sub37
+		GUI, Add, Button, w80 h35 x+5 gSub38, Sub38
+		GUI, Add, Button, w80 h35 x+5 gSub39, Sub39
+		GUI, Add, Button, w80 h35 x+5 gSub40, Sub40
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, TABLES		
+;--------------- EMAILS ---------------	
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, xm y332 w600 h190 , COMS								; create groupbox
+;--------------- Row 1 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y359 gSub41, Email 1
+		GUI, Add, Button, w80 h35 x+5 gSub42, Email 2
+		GUI, Add, Button, w80 h35 x+5 gSub43, Email 3
+		GUI, Add, Button, w80 h35 x+5 gSub44, Email 4
+		GUI, Add, Button, w80 h35 x+5 gSub45, Email 5
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, EMAILS
+;--------------- Row 2 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub46, Email 6
+		GUI, Add, Button, w80 h35 x+5 gSub47, Email 7
+		GUI, Add, Button, w80 h35 x+5 gSub48, Email 8
+		GUI, Add, Button, w80 h35 x+5 gSub49, Email 9
+		GUI, Add, Button, w80 h35 x+5 gSub50, Email 10
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, EMAILS
+;--------------- Row 3 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub51, Email 11
+		GUI, Add, Button, w80 h35 x+5 gSub52, Email 12
+		GUI, Add, Button, w80 h35 x+5 gSub53, Email 13
+		GUI, Add, Button, w80 h35 x+5 gSub54, Email 14
+		GUI, Add, Button, w80 h35 x+5 gSub55, Email 15
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, EMAILS
+;--------------- Row 4 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y+5 gSub56, Email 16
+		GUI, Add, Button, w80 h35 x+5 gSub57, Email 17
+		GUI, Add, Button, w80 h35 x+5 gSub58, Email 18
+		GUI, Add, Button, w80 h35 x+5 gSub59, Email 19
+		GUI, Add, Button, w80 h35 x+5 gSub60, Email 20
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, EMAILS	
+;--------------- Folders ---------------	
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, xm y529 w600 h77 , ARCHIVES							; create groupbox
+;--------------- Row 1 ---------------				
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		GUI, Add, Button, w80 h35 xs y558 gSub61, AHK
+		GUI, Add, Button, w80 h35 x+5 gSub62, Import *
+		GUI, Add, Button, w80 h35 x+5 gSub63, FM36 *
+		GUI, Add, Button, w80 h35 x+5 gSub64, Main
+		GUI, Add, Button, w80 h35 x+5 gSub65, Reports *
+		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
+		GUI, Add, Text, x+6, FOLDERS		
+;--------------- Logo Icon ---------------	
+		Gui, Tab, 2																	; sets below controls to tab
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, x652 y135 w294 h471 , LOGO									; create groupbox
+		SystemPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\Molson_Coors_beer_glass_2.png	; original h469 w283 ratio=1.657243816254417
+		SplitPath, SystemPic, , , , SystemPic1	
+		FileInstall, SystemPic1.png, %SystemPic%, 1
+		SystemPicX :=	616 + ((UguiWdt - 616 - 261.278) / 2)	
+		SystemPicY := 	164		
+		Gui, Add, Picture, x%SystemPicX% y%SystemPicY% h433 w261.278 +BackgroundTrans, %SystemPic%		; for molsoncoors logo scaled to 75% - original 81 x 103
 ;-------------------------- Tab 3 --------------------------
 		Gui, Tab, 3																	; sets below controls to tab
 ;-------------- Calendar -------------			
-		Gui, Font, S4, SF Alien Encounters										; select font and size		
-		Gui, Add, MonthCal, W-3 R3 multi x15 y120 0x4 vUDateRange gUDateRange1 ; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
-		;GuiControl, Move , MonthCal, w750 h560
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, y+5 w525 h500, CALENDAR
+		Gui, Font, s10 cFFB000, Tuno												; choses font size and color
+		Gui, Add, MonthCal, W-2 R3 multi x30 y155 0x4 vUDateRange gUDateRange1 ; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
 		GuiControl, Show, MonthCal, 
-		Gui, Font, S12, SF Alien Encounters										; select font and size		
-		GUI, Add, Button, w190 h35 x780 y120 gUDateRange, Range
-		Gui, Font, s11 cDC33A6, Inconsolata										; choses font size and color for title bar
-		GUI, Add, Edit, w190 x780 y165 vUDateDisplay, 
-		GUI, Add, Edit, w190 x780 y200 vUDateDist, 
+;-------------- Range Finder ---------
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, x555 y124 w410 h100, RANGE FINDER
+		Gui, Font, s11 c1496FF, Inconsolata										; choses font size and color for title bar
+		GUI, Add, Edit, w190 x570 y155 vUDateDisplay, 
+		Gui, Font, s12 cFFB000, Tuno												; choses font size and color
+		gui, Add, Text, x+7 y156, DATE RANGE 
+		Gui, Font, s11 c1496FF, Inconsolata										; choses font size and color for title bar
+		GUI, Add, Edit, w190 x570 y185 vUDateDist, 
+		Gui, Font, s12 cFFB000, Tuno												; choses font size and color
+		gui, Add, Text, x+7 y186, DAYS COUNT 
 ;-------------------------- Tab 4 --------------------------
 		Gui, Tab, 4																	; sets below controls to tab		
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, w485 h180, EVENTS
 ;-------------- Alarms ----------------
-		
+;-------------- G Check ---------------
+;---------- Picture 1 ----------
+		UGCheckPic1 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc1.png
+		SplitPath, UGCheckPic1, , , , UGCheckPic1A		
+		FileInstall, UGCheckPic1A.png, %UGCheckPic1%, 1
+;---------- Picture 2 ----------
+		UGCheckPic2 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc2.png
+		SplitPath, UGCheckPic2, , , , UGCheckPic2A	
+		FileInstall, UGCheckPic2A.png, %UGCheckPic2%, 1
+;---------- Picture 3 ----------		
+		UGCheckPic3 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc3.png
+		SplitPath, UGCheckPic3, , , , UGCheckPic3A	
+		FileInstall, UGCheckPic3A.png, %UGCheckPic3%, 1
+;---------- Picture 4 ----------		
+		UGCheckPic4 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc4.png
+		SplitPath, UGCheckPic4, , , , UGCheckPic4A	
+		FileInstall, UGCheckPic4A.png, %UGCheckPic4%, 1
+;---------- Picture 5 ----------	
+		UGCheckPic5 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc5.png
+		SplitPath, UGCheckPic5, , , , UGCheckPic5A	
+		FileInstall, UGCheckPic5A.png, %UGCheckPic5%, 1
+;-------------- Red X ----------------
+;---------- Picture 1 ----------
+		URedExPic1 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx1.png
+		SplitPath, URedExPic1, , , , URedExPic1A									
+		FileInstall, URedExPic1A.png, %URedExPic1%, 1
+;---------- Picture 2 ----------
+		URedExPic2 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx2.png
+		SplitPath, URedExPic2, , , , URedExPic2A									
+		FileInstall, URedExPic2A.png, %URedExPic2%, 1
+;---------- Picture 3 ----------				
+		URedExPic3 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx3.png
+		SplitPath, URedExPic3, , , , URedExPic3A									
+		FileInstall, URedExPic3A.png, %URedExPic3%, 1
+;---------- Picture 4 ----------				
+		URedExPic4 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx4.png
+		SplitPath, URedExPic4, , , , URedExPic4A									
+		FileInstall, URedExPic4A.png, %URedExPic4%, 1
+;---------- Picture 5 ----------			
+		URedExPic5 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx5.png
+		SplitPath, URedExPic5, , , , URedExPic5A									
+		FileInstall, URedExPic5A.png, %URedExPic5%, 1
+;---------- Alarm 1 ----------		
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit,		x30 y165 w50 +Center vUTimeAlarm1, %UDefTime1%
+		Gui, Add, Edit,		x+10 y165 w150 vUAlarmName1, %UDefName1%
+		Gui, Font, s10 cFFB000, Tuno								; choses font size and color
+		GUI, Add, Button,	x+10 y165 w100 h23 gUAlarm1, SET ALARM
+		GUI, Add, Button,	x+10 y165 w100 h23 gUAlarmKill1, RESET
+		Gui, Add, Picture, x470 y165 w23 h23 +BackgroundTrans, %UGCheckPic1%
+		Gui, Add, Picture, x470 y165 w23 h23 +BackgroundTrans, %URedExPic1%
+;---------- Alarm 2 ----------
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y195 w50 +Center vUTimeAlarm2, %UDefTime2%
+		Gui, Add, Edit, 	x+10 y195 w150 vUAlarmName2, %UDefName2%
+		Gui, Font, s10 cFFB000, Tuno								; choses font size and color
+		GUI, Add, Button, 	x+10 y195 w100 h23 gUAlarm2, SET ALARM
+		GUI, Add, Button, 	x+10 y195 w100 h23 gUAlarmKill2, RESET
+		Gui, Add, Picture, x470 y195 w23 h23 +BackgroundTrans, %UGCheckPic2%
+		Gui, Add, Picture, x470 y195 w23 h23 +BackgroundTrans, %URedExPic2%
+;---------- Alarm 3 ----------		
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y225 w50 +Center vUTimeAlarm3, %UDefTime3%
+		Gui, Add, Edit, 	x+10 y225 w150 vUAlarmName3, %UDefName3%
+		Gui, Font, s10 cFFB000, Tuno								; choses font size and color
+		GUI, Add, Button, 	x+10 y225 w100 h23 gUAlarm3, SET ALARM
+		GUI, Add, Button, 	x+10 y225 w100 h23 gUAlarmKill3, RESET
+		Gui, Add, Picture, x470 y225 w23 h23 +BackgroundTrans, %UGCheckPic3%
+		Gui, Add, Picture, x470 y225 w23 h23 +BackgroundTrans, %URedExPic3%
+;---------- Alarm 4 ----------		
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y255 w50 +Center vUTimeAlarm4, %UDefTime4%
+		Gui, Add, Edit, 	x+10 y255 w150 vUAlarmName4,%UDefName4%
+		Gui, Font, s10 cFFB000, Tuno								; choses font size and color
+		GUI, Add, Button, 	x+10 y255 w100 h23 gUAlarm4, SET ALARM
+		GUI, Add, Button, 	x+10 y255 w100 h23 gUAlarmKill4, RESET
+		Gui, Add, Picture, x470 y255 w23 h23 +BackgroundTrans, %UGCheckPic4%
+		Gui, Add, Picture, x470 y255 w23 h23 +BackgroundTrans, %URedExPic4%
+;---------- Alarm 5 ----------		
+		Gui, Font, s11 cFFB000, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y285 w50 +Center vUTimeAlarm5, %UDefTime5%
+		Gui, Add, Edit, 	x+10 y285 w150 vUAlarmName5, %UDefName5%
+		Gui, Font, s10 cFFB000, Tuno								; choses font size and color
+		GUI, Add, Button, 	x+10 y285 w100 h23 gUAlarm5, SET ALARM
+		GUI, Add, Button, 	x+10 y285 w100 h23 gUAlarmKill5, RESET
+		Gui, Add, Picture, x470 y285 w23 h23 +BackgroundTrans, %UGCheckPic5%
+		Gui, Add, Picture, x470 y285 w23 h23 +BackgroundTrans, %URedExPic5%
+;-------------- Timer ---------------
+		Gui, Font, s14 cFF6912, Tuno												; choses font size and color
+		Gui, Add, GroupBox, x+16 y136 w98 h180, TIMER
+		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
+		Gui, Add, Button, x518 y165 w80 h43 +Center gU_Timer_Shuttle, LAUNCH
+		Gui, Add, Button, x518 y+7 w80 h43 +Center gU_Timer_Stop, STOW
+		Gui, Add, Button, x518 y+7 w80 h43 +Center gU_Timer_Exit, DOCK
 ;-------------------------- Tab 5 --------------------------
 		Gui, Tab, 5																	; sets below controls to tab		
+;-------------------------- Tab 6 --------------------------
+		Gui, Tab, 6																	; sets below controls to tab				
 ;-------------------------- Show ---------------------------		
 		GUI, Show, x0 y0 w%UguiWdt% h%UguiHgt%, Universal						; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old1 settings	x0 y0 w983 h320 -> old1 settings
 	}
 	return
-
 ;--------------------------------------------------
-;	Universal Clock
+;	Universal Header Clock
 ;--------------------------------------------------
-
 UpdateClock:
 	GuiControl, , ClockTime1, % A_Hour ":" A_Min ":" A_Sec
 	return	
-
 ;--------------------------------------------------
 ;	Universal Calendar
 ;--------------------------------------------------
-
 UDateRange1:	
 UDateRange:
 	gui, submit, nohide ; submit variables
@@ -301,11 +536,9 @@ UDateRange:
 	UDateDistStr := " "UEndDate1 " days"	; format variable
 	GuiControl, Text, UDateDist, %UDateDistStr%	; set Edit box
 	return
-
 ;--------------------------------------------------
 ;	Universal Notes
 ;--------------------------------------------------
-
 Save_Universal_Notes:
 	Gui, Submit, NoHide
 	UFilePath = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes\
@@ -325,47 +558,201 @@ Save_Universal_Notes:
 		FileAppend, %UTextBox2%, %UFileName%				; %UNotesFile% -> input file		; `n								; saves Edit box Text as a new file
 	}
 	return
-
-#Ifwinactive, ahk_class AutoHotkeyGUI
-:*:[[::
-	TodayDateUniversal1 := A_DDDD . ", " . A_MMMM . " " . A_DD . ", " . A_YYYY . " at " . A_Hour . ":" . A_Min				; gets current date time stamp formatting
-	send, %TodayDateUniversal1%
+;---------------------------------------------------------------------------
+;	Alarms
+;---------------------------------------------------------------------------
+;--------------- Alarm 1 ---------------
+UAlarm1:							
+	gui, submit, nohide
+	GuiControl Hide, %URedExPic1%
+	GuiControl Show, %UGCheckPic1%
+	guicontrolget, UTimeAlarm1
+	Unow1 := A_Now
+	U_Time_Alarm1 = %UTimeAlarm1%
+	UAlarmtarget1 = %A_YYYY%%A_MM%%A_DD%%U_Time_Alarm1%00
+	if (UAlarmtarget1 < Unow1)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, UAlarmtarget1, 1, d
+	}
+	EnvSub, UAlarmtarget1, Unow1, Seconds
+	SetTimer, UAlarm1Reached, % UAlarmtarget1 * -1000
+	TrayTip, %UAlarmName1%, % vUAlarmName1 " set for " UTimeAlarm1,3
+	Menu, Tray, Tip, % vUAlarmName1 " set for " UTimeAlarm1
+	return	
+;--------------- Alarm 2 ---------------	
+UAlarm2:							
+	gui, submit, nohide
+	GuiControl Hide, %URedExPic2%
+	GuiControl Show, %UGCheckPic2%	
+	guicontrolget, UTimeAlarm2
+	Unow2 := A_Now
+	U_Time_Alarm2 = %UTimeAlarm2%
+	UAlarmtarget2 = %A_YYYY%%A_MM%%A_DD%%U_Time_Alarm2%00
+	if (UAlarmtarget2 < Unow2)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, UAlarmtarget2, 1, d
+	}
+	EnvSub, UAlarmtarget2, Unow2, Seconds
+	SetTimer, UAlarm2Reached, % UAlarmtarget2 * -1000
+	TrayTip, %UAlarmName2%, % vUAlarmName2 " set for " UTimeAlarm2,3
+	Menu, Tray, Tip, % vUAlarmName2 " set for " UTimeAlarm2
 	return
-	
-:*:]]::
-	TodayDateUniversal2 := A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min										; gets current date time stamp formatting
-	send, %TodayDateUniversal2%
+;--------------- Alarm 3 ---------------
+UAlarm3:							
+	gui, submit, nohide
+	GuiControl Hide, %URedExPic3%
+	GuiControl Show, %UGCheckPic3%
+	guicontrolget, UTimeAlarm3
+	Unow3 := A_Now
+	U_Time_Alarm3 = %UTimeAlarm3%
+	UAlarmtarget3 = %A_YYYY%%A_MM%%A_DD%%U_Time_Alarm3%00
+	if (UAlarmtarget3 < Unow3)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, UAlarmtarget3, 1, d
+	}
+	EnvSub, UAlarmtarget3, Unow3, Seconds
+	SetTimer, UAlarm3Reached, % UAlarmtarget3 * -1000
+	TrayTip, %UAlarmName3%, % vUAlarmName3 " set for " UTimeAlarm3,3
+	Menu, Tray, Tip, % vUAlarmName3 " set for " UTimeAlarm3
+	return	
+;--------------- Alarm 4 ---------------	
+UAlarm4:							
+	gui, submit, nohide
+	GuiControl Hide, %URedExPic4%
+	GuiControl Show, %UGCheckPic4%
+	guicontrolget, UTimeAlarm4
+	Unow4 := A_Now
+	U_Time_Alarm4 = %UTimeAlarm4%
+	UAlarmtarget4 = %A_YYYY%%A_MM%%A_DD%%U_Time_Alarm4%00
+	if (UAlarmtarget4 < Unow4)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, UAlarmtarget4, 1, d
+	}
+	EnvSub, UAlarmtarget4, Unow4, Seconds
+	SetTimer, UAlarm4Reached, % UAlarmtarget4 * -1000
+	TrayTip, %UAlarmName4%, % vUAlarmName4 " set for " UTimeAlarm4,3
+	Menu, Tray, Tip, % vUAlarmName4 " set for " UTimeAlarm4
+	return	
+;--------------- Alarm 5 ---------------
+UAlarm5:							
+	gui, submit, nohide
+	GuiControl Hide, %URedExPic5%
+	GuiControl Show, %UGCheckPic5%
+	guicontrolget, UTimeAlarm5
+	Unow5 := A_Now
+	U_Time_Alarm5 = %UTimeAlarm5%
+	UAlarmtarget5 = %A_YYYY%%A_MM%%A_DD%%U_Time_Alarm5%00
+	if (UAlarmtarget5 < Unow5)
+	{   ; time(today) has passed already, so use time(tomorrow)
+		EnvAdd, UAlarmtarget5, 1, d
+	}
+	EnvSub, UAlarmtarget5, Unow5, Seconds
+	SetTimer, UAlarm5Reached, % UAlarmtarget5 * -1000
+	TrayTip, %UAlarmName5%, % vUAlarmName5 " set for " UTimeAlarm5,3
+	Menu, Tray, Tip, % vUAlarmName5 " set for " UTimeAlarm5
+	return	
+;---------- Tooltip Removal ------------	
+RemoveToolTip:
+	ToolTip
 	return
-#Ifwinactive
-
+;---------- Alarm 1 Reached ------------	
+UAlarm1Reached:
+	TrayTip,, %UAlarmName1% alarm reached, 2, 16	
+	GuiControl Hide, %UGCheckPic1%
+	GuiControl Show, %URedExPic1%
+	ToolTip, %UAlarmName1% alarm reached
+	SetTimer, RemoveToolTip, -3000
+	msgbox, %UAlarmName1% alarm reached
+	GuiControl, Text, UTimeAlarm1, %UDefTime1%
+	GuiControl, Text, UAlarmName1, %UDefName1%
+	return
+;---------- Alarm 2 Reached ------------	
+UAlarm2Reached:
+	TrayTip,, %UAlarmName2% alarm reached, 2, 16	
+	GuiControl Hide, %UGCheckPic2%
+	GuiControl Show, %URedExPic2%
+	ToolTip, %UAlarmName2% alarm reached
+	SetTimer, RemoveToolTip, -3000
+	msgbox, %UAlarmName2% alarm reached
+	GuiControl, Text, UTimeAlarm2, %UDefTime2%
+	GuiControl, Text, UAlarmName2, %UDefName2%
+	return
+;---------- Alarm 3 Reached ------------	
+UAlarm3Reached:
+	TrayTip,, %UAlarmName3% alarm reached, 2, 16	
+	GuiControl Hide, %UGCheckPic3%
+	GuiControl Show, %URedExPic3%
+	ToolTip, %UAlarmName3% alarm reached
+	SetTimer, RemoveToolTip, -3000	
+	msgbox, %UAlarmName3% alarm reached
+	GuiControl, Text, UTimeAlarm3, %UDefTime3%
+	GuiControl, Text, UAlarmName3, %UDefName3%
+	return
+;---------- Alarm 4 Reached ------------	
+UAlarm4Reached:
+	TrayTip,, %UAlarmName4% alarm reached, 2, 16	
+	GuiControl Hide, %UGCheckPic4%
+	GuiControl Show, %URedExPic4%
+	ToolTip, %UAlarmName4% alarm reached
+	SetTimer, RemoveToolTip, -3000
+	msgbox, %UAlarmName4% alarm reached
+	GuiControl, Text, UTimeAlarm4, %UDefTime4%
+	GuiControl, Text, UAlarmName4, %UDefName4%
+	return
+;---------- Alarm 5 Reached ------------	
+UAlarm5Reached:
+	TrayTip,, %UAlarmName5% alarm reached, 2, 16	
+	GuiControl Hide, %UGCheckPic5%
+	GuiControl Show, %URedExPic5%
+	ToolTip, %UAlarmName5% alarm reached
+	SetTimer, RemoveToolTip, -3000
+	msgbox, %UAlarmName5% alarm reached
+	GuiControl, Text, UTimeAlarm5, %UDefTime5%
+	GuiControl, Text, UAlarmName5, %UDefName5%
+	return
+;---------- Alarm 1 Reset ------------
+UAlarmKill1:
+	SetTimer, UAlarm1Reached, Off
+	GuiControl Hide, %UGCheckPic1%
+	GuiControl Show, %URedExPic1%
+	GuiControl, Text, UTimeAlarm1, %UDefTime1%
+	GuiControl, Text, UAlarmName1, %UDefName1%
+	return
+;---------- Alarm 2 Reset ------------
+UAlarmKill2:
+	SetTimer, UAlarm2Reached, Off
+	GuiControl Hide, %UGCheckPic2%
+	GuiControl Show, %URedExPic2%
+	GuiControl, Text, UTimeAlarm2, %UDefTime2%
+	GuiControl, Text, UAlarmName2, %UDefName2%
+	return
+;---------- Alarm 3 Reset ------------
+UAlarmKill3:
+	SetTimer, UAlarm3Reached, Off
+	GuiControl Hide, %UGCheckPic3%
+	GuiControl Show, %URedExPic3%
+	GuiControl, Text, UTimeAlarm3, %UDefTime3%
+	GuiControl, Text, UAlarmName3, %UDefName3%
+	return
+;---------- Alarm 4 Reset ------------
+UAlarmKill4:
+	SetTimer, UAlarm4Reached, Off
+	GuiControl Hide, %UGCheckPic4%
+	GuiControl Show, %URedExPic4%
+	GuiControl, Text, UTimeAlarm4, %UDefTime4%
+	GuiControl, Text, UAlarmName4, %UDefName4%
+	return
+;---------- Alarm 5 Reset ------------
+UAlarmKill5:
+	SetTimer, UAlarm5Reached, Off
+	GuiControl Hide, %UGCheckPic5%
+	GuiControl Show, %URedExPic5%
+	GuiControl, Text, UTimeAlarm5, %UDefTime5%
+	GuiControl, Text, UAlarmName5, %UDefName5%
+	return	
 ;---------------------------------------------------------------------------
 ;	Universal GUI Subroutines
 ;---------------------------------------------------------------------------
-
-;---------------------------------------------------------------------------
-;	Universal Includes
-;---------------------------------------------------------------------------
-
-; Include DashMail
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\DashMail.ahk
-
-; Include Outlook Automation
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Outlook Automation.ahk
-
-; Include Reference Tables
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Reference Tables.ahk
-
-; Include SAP Automation
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\SAP Automation.ahk
-
-; Include Script Controls
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Script Controls.ahk
-
-; Include Stay Active
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Stay Active.ahk
-
-; Include TM Automation
-#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\TM Automation.ahk
 
 ;---------------------------------------------------------------------------
 ;	Email Buttons
@@ -373,7 +760,6 @@ Save_Universal_Notes:
 
 Sub1:
 	gosub, Save_Universal_Notes
-	gui, destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -393,7 +779,6 @@ Sub1:
 
 Sub2:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -413,30 +798,8 @@ Sub2:
 		}
 	return
 
-/*	
-Sub2:
-	Gui, Destroy
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		gosub, ws_update_email
-		gosub, ws_update_email2
-		gosub, email_signature
-		;gosub, email_bold_highlight_ws_update
-		}
-	Else {
-		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		sleep, 3000
-		gosub, ws_update_email
-		gosub, ws_update_email2
-		gosub, email_signature
-		}
-	return
-*/	
 Sub3:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -456,7 +819,6 @@ Sub3:
 	
 Sub4:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -518,7 +880,6 @@ Sub4:
 	
 Sub5:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
 		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
 		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
@@ -542,7 +903,6 @@ Sub5:
 
 Sub6:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("ECC-TM Import Shipment Report") {
 		winactivate, ECC-TM Import Shipment Report
 		winwaitactive, ECC-TM Import Shipment Report
@@ -557,13 +917,11 @@ Sub6:
 	
 Sub7:				; WDone
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	gosub, Ws_Processing_completed_email
 	return
 	
 Sub8:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Ws IBD Creation - FM36 - Template") {
 		winactivate, Ws IBD Creation - FM36 - Template
 		winwaitactive, Ws IBD Creation - FM36 - Template
@@ -576,8 +934,6 @@ Sub8:
 	
 Sub9:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	
 	if WinExist("Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word") {
 		winactivate, Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word
 		winwaitactive, Import_Over_the_Ocean-Indirect_Playbook  -  Compatibility Mode - Word
@@ -590,7 +946,6 @@ Sub9:
 	
 Sub10:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	if WinExist("Winshuttle Import Playbook") {
 		winactivate, Winshuttle Import Playbook
 		winwaitactive, Winshuttle Import Playbook
@@ -607,32 +962,98 @@ Sub10:
 
 Sub11:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, ref_table_distributors
+	;gosub, ref_table_distributors
+	dist_ref_excel:
+		SetTitleMatchMode, 2													; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+		if winexist, Distributor_Ref ahk_exe EXCEL.EXE {
+			winactivate, Distributor_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Distributor_Ref ahk_exe EXCEL.EXE
+			WinMove, Distributor_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Distributor_Ref.xlsx
+			winactivate, Distributor_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Distributor_Ref ahk_exe EXCEL.EXE
+			WinMove, Distributor_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
 	return
 	
 Sub12:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, ref_table_plants
+	cust_ref_excel:
+		SetTitleMatchMode, 2													; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+		if winexist, Customer_Ref ahk_exe EXCEL.EXE {
+			winactivate, Customer_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Customer_Ref ahk_exe EXCEL.EXE
+			WinMove, Customer_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Customer_Ref.xlsx
+			winactivate, Customer_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Customer_Ref ahk_exe EXCEL.EXE
+			WinMove, Customer_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
 	return
 	
 Sub13:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, ref_table_SKUs
+	Dist_MD_ref_excel:
+		SetTitleMatchMode, 2													; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+		if winexist, DIM_Customer_Ref ahk_exe EXCEL.EXE {
+			winactivate, DIM_Customer_Ref ahk_exe EXCEL.EXE
+			winwaitactive, DIM_Customer_Ref ahk_exe EXCEL.EXE
+			WinMove, DIM_Customer_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\DIM_Customer_Ref.xlsx
+			winactivate, DIM_Customer_Ref ahk_exe EXCEL.EXE
+			winwaitactive, DIM_Customer_Ref ahk_exe EXCEL.EXE
+			WinMove, DIM_Customer_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
 	return
 	
 Sub14:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, ref_table_lanes
+	Dist_Map_ref_excel:
+		SetTitleMatchMode, 2													; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+		if winexist, Dist_Map_Ref ahk_exe EXCEL.EXE {
+			winactivate, Dist_Map_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Dist_Map_Ref ahk_exe EXCEL.EXE
+			WinMove, Dist_Map_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Dist_Map_Ref.xlsx
+			winactivate, Dist_Map_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Dist_Map_Ref ahk_exe EXCEL.EXE
+			WinMove, Dist_Map_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
 	return
 	
 Sub15:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, ref_table_MSKUs
+	Carrier_ref_excel:
+		SetTitleMatchMode, 2													; MatchMode 2: A window's title can contain WinTitle anywhere inside it to be a match. 
+		if winexist, Carrier_Ref ahk_exe EXCEL.EXE {
+			winactivate, Carrier_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Carrier_Ref ahk_exe EXCEL.EXE
+			WinMove, Carrier_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Carrier_Ref.xlsx
+			winactivate, Carrier_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Carrier_Ref ahk_exe EXCEL.EXE
+			WinMove, Carrier_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
 	return	
 
 ;---------------------------------------------------------------------------
@@ -641,31 +1062,26 @@ Sub15:
 
 Sub16:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	gosub, dashmail_activator
 	return
 
 Sub17:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub18:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	msgbox, Subroutine here
 	return
 	
 Sub19:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	Gosub, stayactive
 	return
 	
 Sub20:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
 	Gosub, imback
 	return		
 
@@ -675,57 +1091,544 @@ Sub20:
 
 Sub21:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, TM_Containers
+	;gosub, TM_Containers\
+	msgbox, Button removed.
 	return
 
 Sub22:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, TM_Sail
+	;gosub, TM_Sail
+	msgbox, Button removed.
 	return
 	
 Sub23:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, TM_ETA
+	;gosub, TM_ETA
+	msgbox, Button removed.
 	return
 	
 Sub24:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, TM_ATA
+	;gosub, TM_ATA
+	msgbox, Button removed.
 	return
 	
 Sub25:
 	gosub, Save_Universal_Notes
-	Gui, Destroy
-	gosub, TM_Unexp
+	;gosub, TM_Unexp
+	msgbox, Button removed.
 	return		
 
 ;---------------------------------------------------------------------------
-;	GUI Controls
+;	System Buttons
 ;---------------------------------------------------------------------------	
+
+Sub26:
+	gosub, Save_Universal_Notes
+	Products_ref_excel:
+		SetTitleMatchMode, 2												
+		if winexist, Products_Ref ahk_exe EXCEL.EXE {
+			winactivate, Products_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Products_Ref ahk_exe EXCEL.EXE
+			WinMove, Products_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Products_Ref.xlsx
+			winactivate, Products_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Products_Ref ahk_exe EXCEL.EXE
+			WinMove, Products_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
+	return
+
+Sub27:
+	gosub, Save_Universal_Notes
+	sku_ref_excel:
+		SetTitleMatchMode, 2	
+		if winexist, SKU_Ref ahk_exe EXCEL.EXE {
+			winactivate, SKU_Ref ahk_exe EXCEL.EXE
+			winactivate, SKU_Ref ahk_exe EXCEL.EXE
+			winwaitactive, SKU_Ref ahk_exe EXCEL.EXE
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\SKU_Ref.xlsx
+			winactivate, SKU_Ref ahk_exe EXCEL.EXE
+			winwaitactive, SKU_Ref ahk_exe EXCEL.EXE
+			WinMove, SKU_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3	
+		return	
+	return
+	
+Sub28:
+	gosub, Save_Universal_Notes
+	RV_ref_excel:
+		SetTitleMatchMode, 2												
+		if winexist, RV_Ref ahk_exe EXCEL.EXE {
+			winactivate, RV_Ref ahk_exe EXCEL.EXE
+			winwaitactive, RV_Ref ahk_exe EXCEL.EXE
+			WinMove, RV_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\RV_Ref.XLSX
+			winactivate, RV_Ref ahk_exe EXCEL.EXE
+			winwaitactive, RV_Ref ahk_exe EXCEL.EXE
+			WinMove, RV_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
+	return
+	
+Sub29:
+	gosub, Save_Universal_Notes
+	BPACLL_ref_excel:
+		SetTitleMatchMode, 2												
+		if winexist, BPACLL_Ref ahk_exe EXCEL.EXE {
+			winactivate, BPACLL_Ref ahk_exe EXCEL.EXE
+			winwaitactive, BPACLL_Ref ahk_exe EXCEL.EXE
+			WinMove, BPACLL_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\BPACLL_Ref.xlsx
+			winactivate, BPACLL_Ref ahk_exe EXCEL.EXE
+			winwaitactive, BPACLL_Ref ahk_exe EXCEL.EXE
+			WinMove, BPACLL_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
+	return
+	
+Sub30:
+	gosub, Save_Universal_Notes
+	OSKU_ref_excel:
+		SetTitleMatchMode, 2												
+		if winexist, OSKU_Ref ahk_exe EXCEL.EXE {
+			winactivate, OSKU_Ref ahk_exe EXCEL.EXE
+			winwaitactive, OSKU_Ref ahk_exe EXCEL.EXE
+			WinMove, OSKU_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\OSKU_Ref.xlsx
+			winactivate, OSKU_Ref ahk_exe EXCEL.EXE
+			winwaitactive, OSKU_Ref ahk_exe EXCEL.EXE
+			WinMove, OSKU_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3
+		return
+	return		
+
+Sub31:
+	gosub, Save_Universal_Notes
+	plant_ref_excel:
+		SetTitleMatchMode, 2	
+		if winexist, Plant_Ref ahk_exe EXCEL.EXE {
+			winactivate, Plant_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Plant_Ref ahk_exe EXCEL.EXE
+			WinMove, Plant_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Plant_Ref.xlsx
+			winactivate, Plant_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Plant_Ref ahk_exe EXCEL.EXE
+			WinMove, Plant_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3	
+		return
+	return
+
+Sub32:
+	gosub, Save_Universal_Notes
+	zPlant_ref_excel:
+		SetTitleMatchMode, 2	
+		if winexist, Plant_Zip_Ref ahk_exe EXCEL.EXE {
+			winactivate, Plant_Zip_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Plant_Zip_Ref ahk_exe EXCEL.EXE
+			WinMove, Plant_Zip_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Plant_Zip_Ref.xlsx
+			winactivate, Plant_Zip_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Plant_Zip_Ref ahk_exe EXCEL.EXE
+			WinMove, Plant_Zip_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3	
+		return
+	return
+	
+Sub33:
+	gosub, Save_Universal_Notes
+	2020WK_ref_excel:
+		SetTitleMatchMode, 2	
+		if winexist, 2020_Weeks_Ref ahk_exe EXCEL.EXE {
+			winactivate, 2020_Weeks_Ref ahk_exe EXCEL.EXE
+			winwaitactive, 2020_Weeks_Ref ahk_exe EXCEL.EXE
+			WinMove, 2020_Weeks_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\2020_Weeks_Ref.xlsx
+			winactivate, 2020_Weeks_Ref ahk_exe EXCEL.EXE
+			winwaitactive, 2020_Weeks_Ref ahk_exe EXCEL.EXE
+			WinMove, 2020_Weeks_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3	
+		return
+	return
+	
+Sub34:
+	gosub, Save_Universal_Notes
+	cycle_ref_excel:
+		SetTitleMatchMode, 2	
+		if winexist, Cycle_Ref ahk_exe EXCEL.EXE {
+			winactivate, Cycle_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Cycle_Ref ahk_exe EXCEL.EXE
+			WinMove, Cycle_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\Ref Tables\Cycle_Ref.xlsx
+			winactivate, Cycle_Ref ahk_exe EXCEL.EXE
+			winwaitactive, Cycle_Ref ahk_exe EXCEL.EXE
+			WinMove, Cycle_Ref ahk_exe EXCEL.EXE, , 0, 640 , 987, 640 
+		}
+		SetTitleMatchMode, 3	
+		return
+	return
+	
+Sub35:
+	msgbox, Subroutine here
+	return		
+
+Sub36:
+	msgbox, Subroutine here
+	return
+
+Sub37:
+	msgbox, Subroutine here
+	return
+	
+Sub38:
+	msgbox, Subroutine here
+	return
+	
+Sub39:
+	msgbox, Subroutine here
+	return
+	
+Sub40:
+	msgbox, Subroutine here
+	return	
+
+Sub41:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub42:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub43:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub44:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub45:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub46:			
+	gosub, Save_Universal_Notes		
+	return		
+Sub47:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub48:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub49:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub50:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub51:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub52:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub53:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub54:			
+	gosub, Save_Universal_Notes		
+	return		
+Sub55:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub56:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub57:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub58:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub59:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub60:			
+	gosub, Save_Universal_Notes		
+	return		
+
+Sub61:			
+	gosub, Save_Universal_Notes	
+	open_fold_AHK:
+	SetTitleMatchMode, 2
+		if winexist, AHK ahk_exe Explorer.EXE {
+			winactivate, AHK ahk_exe Explorer.EXE
+			winwaitactive, AHK ahk_exe Explorer.EXE
+			WinMove, AHK ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK
+			winactivate, AHK ahk_exe Explorer.EXE
+			winwaitactive, AHK ahk_exe Explorer.EXE
+			WinMove, AHK ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		return	
+	SetTitleMatchMode, 3
+	return		
+	
+Sub62:			
+	gosub, Save_Universal_Notes
+	open_fold_IMP:
+	SetTitleMatchMode, 2
+		if winexist, Ws Import Shared ahk_exe Explorer.EXE {
+			winactivate, Ws Import Shared ahk_exe Explorer.EXE
+			winwaitactive, Ws Import Shared ahk_exe Explorer.EXE
+			WinMove, Ws Import Shared ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		else {
+			run, \\mbsus238\trfshare\Import Reference Materials\Ws Import Shared
+			winactivate, Ws Import Shared ahk_exe Explorer.EXE
+			winwaitactive, Ws Import Shared ahk_exe Explorer.EXE
+			WinMove, Ws Import Shared ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		return	
+	SetTitleMatchMode, 3
+	return		
+	
+Sub63:			
+	gosub, Save_Universal_Notes	
+	open_fold_FM36:
+		SetTitleMatchMode, 2
+		if winexist, FM36 ahk_exe Explorer.EXE {
+			winactivate, FM36 ahk_exe Explorer.EXE
+			winwaitactive, FM36 ahk_exe Explorer.EXE
+			WinMove, FM36 ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		else {
+			run, \\mbsus238\trfshare\FM36
+			winactivate, FM36 ahk_exe Explorer.EXE
+			winwaitactive, FM36 ahk_exe Explorer.EXE
+			WinMove, FM36 ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		return
+	SetTitleMatchMode, 3
+	return		
+	
+Sub64:			
+	gosub, Save_Universal_Notes
+	open_fold_MAIN:
+		SetTitleMatchMode, 2
+		if winexist, MAIN ahk_exe Explorer.EXE {
+			winactivate, MAIN ahk_exe Explorer.EXE
+			winwaitactive, MAIN ahk_exe Explorer.EXE
+			WinMove, MAIN ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		else {
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN
+			winactivate, MAIN ahk_exe Explorer.EXE
+			winwaitactive, MAIN ahk_exe Explorer.EXE
+			WinMove, MAIN ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		return	
+	SetTitleMatchMode, 3
+	return		
+	
+Sub65:			
+	gosub, Save_Universal_Notes	
+	open_fold_Reports:
+		SetTitleMatchMode, 2
+		if winexist, Reports ahk_exe Explorer.EXE {
+			winactivate, Reports ahk_exe Explorer.EXE
+			winwaitactive, Reports ahk_exe Explorer.EXE
+			WinMove, Reports ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		else {
+			run, \\mbsus238\trfshare\FM36\Reports
+			winactivate, Reports ahk_exe Explorer.EXE
+			winwaitactive, Reports ahk_exe Explorer.EXE
+			WinMove, Reports ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		}
+		return	
+	SetTitleMatchMode, 3
+	return		
+/*	
+Sub66:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub67:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub68:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub69:			
+	gosub, Save_Universal_Notes		
+	return		
+	
+Sub70:			
+	gosub, Save_Universal_Notes		
+	return		
+*/	
+;-----------------------------------------------------------------------
+;	GUI Controls
+;-----------------------------------------------------------------------	
 
 Close:
 	Gui, Submit, NoHide
 	gosub, Save_Universal_Notes
 	GUI, Destroy
 	return	
+;=======================================================================
+;	Universal Timer
+;=======================================================================
 
-;---------------------------------------------------------------------------
+; AdjTime = 3595000 	; changes hours	; starts at 1 hour?? fix
+
+;------ UGUI Button Starts Timer ---------------------------------------
+U_Timer_Shuttle:
+	gosub, U_Timer_LAUNCH
+	;gosub, U_Timer_Start
+	return
+;------ Timer Start ----------------------------------------------------
+U_Timer_LAUNCH:
+	Menu, Tray, NoStandard                                ; clear the tray menu for customizing
+	Menu, Tray, Add, Quit, U_Timer_Exit                        ; add item "Quit" to call AppExit
+	Menu, Tray, Default, Quit                             ; double-click on the tray icon will call "Quit"
+	Menu, Tray, Tip, % " AHK short-time Stopwatch "       ; add a nice tool tip 
+	Gui , Timer:Color, White
+	Gui , Timer:+LastFound -Caption +AlwaysOnTop              ; +ToolWindow
+	WinSet, TransColor, White 150 
+	Gui , Timer:Margin, 0, 0                                     ; http://l.autohotkey....ui.htm#Position
+	Gui , Timer:Font, S42 cDefault , Inconsolata
+	Gui , Timer:Add , Text , Center vDisplayTime x+16 y+16 w250 , 00:00:00:000
+	Gui , Timer:Font, S12, TUNO
+	Gui , Timer:Add , Button , x400 yp w75 h60 gU_Timer_Stop Section , STOP
+	Gui , Timer:Add , Button , x400 yp w75 h60 gU_Timer_Start, START
+	Gui , Timer:Add , Button , x+0 yp w75 h60 gU_Timer_Copy, COPY
+	Gui , Timer:Add , Button , x+0 yp w75 h60 gU_Timer_Reset , RESET
+	Gui , Timer:Add , Button , x+0 yp w75 h60 gU_Timer_Exit , QUIT
+	Gui , Timer:Show , x-862	y162 w734	h94 , Timer
+	Control , Hide , , Button1 , Timer
+	gosub, U_Timer_Start
+	Exit
+;------ Timer Exit -----------------------------------------------------
+U_Timer_Exit:
+	;gui, Timer:Submit
+	gui, Timer:Destroy
+	return
+;------ Timer Start ---------------------------------------------------- 
+U_Timer_Start:
+	AdjTime = 0
+	Control , Hide , , Button2 , Timer
+	Control , Show , , Button1 , Timer
+	GuiControl , Focus , Button1
+	StopClock = 0	
+	ControlGetText , DisplayTime , Static1
+	ST := A_TickCount ; Start Time
+	While StopClock = 0
+		ControlSetText 	, Static1 , % FormatCT((A_TickCount - ST)) ; + AdjTime)
+	StopClock = 0
+	Exit
+;------ Timer Stop Reset -----------------------------------------------
+U_Timer_Stop:
+U_Timer_Reset:
+	Control , Show , , Button2 , Timer
+	Control , Hide , , Button1 , Timer
+	GuiControl , Focus , Button2
+	StopClock = 1
+	IF (A_ThisLabel = "U_Timer_Reset")
+	{
+		AdjTime = 0
+		ControlSetText , Button2 , START
+		ControlSetText 	, Static1 , 00:00:00:000
+	}else{
+		AdjTime := ((A_TickCount - ST)) ; + AdjTime)
+		ControlSetText , Button2 , COUNT
+	}
+	Exit
+;------ Timer Copy -----------------------------------------------------
+U_Timer_Copy:
+	ControlGetText , Clipboard , Static1
+	MsgBox, 262192, Time Copied to Clipboard, Copied to Clipboard: %Clipboard%, 1
+	Exit
+;------ Timer Close ----------------------------------------------------
+TimerGuiClose:
+	ExitApp
+;------ Format Millisecond ---------------------------------------------
+FormatCT(ms)  ;  Formats milliseconds into 00:00:00:000 (last three digits are milliseconds)
+{
+	StringRight , mil , ms , 3
+	StringTrimRight , sec , ms , 3
+	min := Floor(sec/60)
+	sec := sec-(min*60)
+	hrs := Floor(min/60)
+	min := min-(hrs*60)
+	While StrLen(sec) <> 2
+		sec := "0" . sec
+	While StrLen(mil) <> 3
+		mil := "0" . mil
+	While StrLen(min) <> 2
+		min := "0" . min
+	While StrLen(hrs) <> 2
+		hrs := "0" . hrs 
+	return , hrs . ":" . min . ":" . sec . ":" . mil
+}
+
+;=======================================================================
 ;	Email
-;---------------------------------------------------------------------------
-
+;=======================================================================
 ;--------------------------------------------------
 ;	Ws Processing Complete Email
 ;--------------------------------------------------
-
 Ws_Processing_completed_email:
 	InputBox, WsDoneNumCompleted, Number of Files Completed, , , 300, 100, center, center, , , 2					; InputBox	; default -> 2
 	if WsDoneNumCompleted = 1 
 	{
 		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		if ErrorLevel   ; cancel run if inputbox is cancelled
+			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
 		StringRight, WsDoneName1, WsDoneFile2, 17
 		StringLeft, WsDoneName2, WsDoneName1, 4
@@ -733,6 +1636,8 @@ Ws_Processing_completed_email:
 	else if WsDoneNumCompleted = 2 
 	{
 		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		if ErrorLevel   ; cancel run if inputbox is cancelled
+			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
 		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		StringRight, WsDoneName1, WsDoneFile2, 17
@@ -741,6 +1646,8 @@ Ws_Processing_completed_email:
 	else if WsDoneNumCompleted = 3
 	{
 		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		if ErrorLevel   ; cancel run if inputbox is cancelled
+			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
 		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
@@ -796,7 +1703,6 @@ Cheers,
 		sleep, 100
 		return
 	}
-
 ;--------------------------------------------------
 ;	Universal End
 ;--------------------------------------------------
@@ -917,7 +1823,6 @@ Loop {
       state =
    }
 }
-
 ~LButton::
 ~RButton::
 ~MButton::
@@ -1037,6 +1942,7 @@ ctrl + alt + win + shift + q		->  picking - temp
 ;--------------------------------------------------
 {{
 ^!#+Space::  Winset, Alwaysontop, , A
+	;msgbox, is this working?
 	return
 }}	
 ;--------------------------------------------------
@@ -1054,12 +1960,18 @@ ctrl + alt + win + shift + q		->  picking - temp
 ;-------------------------------------------------------------------------------------
 ;	File Explorer
 ;-------------------------------------------------------------------------------------
-
 #IfWinActive, ahk_exe Explorer.exe
+;--------------------------------------------------
+;	Get File Path
+;--------------------------------------------------
+{{
+F1::
+	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
+	Clipboard := FullPath
+	return
 ;--------------------------------------------------
 ;	Explorer Get Selection Handler
 ;--------------------------------------------------
-
 Explorer_GetSelection(hwnd="") {
 	hwnd := hwnd ? hwnd : WinExist("A")
 	WinGetClass class, ahk_id %hwnd%
@@ -1070,22 +1982,12 @@ Explorer_GetSelection(hwnd="") {
 	for item in sel
 	ToReturn .= item.path "`n"
 	return Trim(ToReturn,"`n")
-}
-
-;--------------------------------------------------
-;	Get File Path
-;--------------------------------------------------
-{{
-F1::
-	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
-	Clipboard := FullPath
-	return
+}	
 }}	
 ;---------------------------------------------------------------------------
 ;	End File Explorer
 ;---------------------------------------------------------------------------
 #IfWinActive
-
 ;--------------------------------------------------
 ;	Global End
 ;--------------------------------------------------
@@ -1101,7 +2003,6 @@ F1::
  * @author Andrew Moore <andrew+github@awmoore.com>
  * @version 1.0
  */
-
 /**
  * SnapActiveWindow resizes and moves (snaps) the active window to a given position.
  * @param {string} winPlaceVertical   The vertical placement of the active window.
@@ -1114,23 +2015,18 @@ F1::
  *                                    the active monitor's height. Expecting "half" size,
  *                                    otherwise will resize window to a "third".
  */
-
 ;---------------------------------------------------------------------------
 ;	Sizing
 ;---------------------------------------------------------------------------
-
 SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
     WinGet activeWin, ID, A
     activeMon := GetMonitorIndexFromWindow(activeWin)
-
     SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
-
     if (winSizeHeight == "half") {
         height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
     } else {
         height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
     }
-
     if (winPlaceHorizontal == "left") {
         posX  := MonitorWorkAreaLeft
         width := (MonitorWorkAreaRight - MonitorWorkAreaLeft)/2
@@ -1141,7 +2037,6 @@ SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
         posX  := MonitorWorkAreaLeft
         width := MonitorWorkAreaRight - MonitorWorkAreaLeft
     }
-
     if (winPlaceVertical == "bottom") {
         posY := MonitorWorkAreaBottom - height
     } else if (winPlaceVertical == "middle") {
@@ -1149,14 +2044,11 @@ SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
     } else {
         posY := MonitorWorkAreaTop
     }
-
     WinMove,A,,%posX%,%posY%,%width%,%height%
 }
-
 ;---------------------------------------------------------------------------
 ;	Positioning
 ;---------------------------------------------------------------------------
-
 /**
  * GetMonitorIndexFromWindow retrieves the HWND (unique ID) of a given window.
  * @param {Uint} windowHandle
@@ -1166,10 +2058,8 @@ SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
 GetMonitorIndexFromWindow(windowHandle) {
     ; Starts with 1.
     monitorIndex := 1
-
     VarSetCapacity(monitorInfo, 40)
     NumPut(40, monitorInfo)
-
     if (monitorHandle := DllCall("MonitorFromWindow", "uint", windowHandle, "uint", 0x2))
         && DllCall("GetMonitorInfo", "uint", monitorHandle, "uint", &monitorInfo) {
         monitorLeft   := NumGet(monitorInfo,  4, "Int")
@@ -1195,14 +2085,11 @@ GetMonitorIndexFromWindow(windowHandle) {
             }
         }
     }
-
     return %monitorIndex%
 }
-
 ;---------------------------------------------------------------------------
 ;	Hotkeys
 ;---------------------------------------------------------------------------
-
 ; Directional Arrow Hotkeys
 #!Up::SnapActiveWindow("top","full","half")
 #!Down::SnapActiveWindow("bottom","full","half")
@@ -1221,6 +2108,8 @@ GetMonitorIndexFromWindow(windowHandle) {
 ^#!Numpad8::SnapActiveWindow("top","full","third")
 ^#!Numpad5::SnapActiveWindow("middle","full","third")
 ^#!Numpad2::SnapActiveWindow("bottom","full","third")
+^#!Numpad4::SnapActiveWindow("bottom","left","third")  ; my custom addition
+^#!Numpad6::SnapActiveWindow("bottom","right","third") ; my custom addition
 
 ;--------------------------------------------------
 ;	Advanced Window Snapping End
@@ -1234,135 +2123,235 @@ GetMonitorIndexFromWindow(windowHandle) {
 ;	Archive
 ;====================================================================================================
 {{
-;--------------------------------------------------
-;	Fonts and downlaods
-;--------------------------------------------------
-/*
-; VCR OSD Mono download https://www.hipsthetic.com/vcr-osd-mono-free-pixel-font/
-; Lazer84 download https://www.dafont.com/lazer84.font
-; Indelible download https://indieground.net/product/indelible-font/
-; Px437 VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
-; PxPlus VGA SquarePx download https://int10h.org/oldschool-pc-fonts/fontlist/#dos_software_fonts
-*/
-;--------------------------------------------------
-;	Rage Italic Style GUI
-;--------------------------------------------------	
-/*	
-		Gui, Margin, 16, 16
-		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
-		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
-		Gui, Font, s38 cf0c674, Rage Italic																		; choses font size and color for title bar	; Rage Italic Style
-		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub1, Dates
-		GUI, Add, Button, w75 x+10 gSub2, WinS
-		GUI, Add, Button, w75 x+10 gSub3, Orders
-		GUI, Add, Button, w75 x+10 gSub4, Directs
-		GUI, Add, Button, w75 x+10 gSub5, Claims
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Emails
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub6, ECC
-		GUI, Add, Button, w75 x+10 gSub7, Batch
-		GUI, Add, Button, w75 x+10 gSub8, IBDs
-		GUI, Add, Button, w75 x+10 gSub9, OBDs
-		GUI, Add, Button, w75 x+10 gSub10, Ws Book
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Files
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub11, Dists
-		GUI, Add, Button, w75 x+10 gSub12, Plants
-		GUI, Add, Button, w75 x+10 gSub13, SKUs
-		GUI, Add, Button, w75 x+10 gSub14, Lanes
-		GUI, Add, Button, w75 x+10 gSub15, Sub15
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Tables
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub21, Ship
-		GUI, Add, Button, w75 x+10 gSub22, Sail
-		GUI, Add, Button, w75 x+10 gSub23, ETA
-		GUI, Add, Button, w75 x+10 gSub24, ATA
-		GUI, Add, Button, w75 x+10 gSub25, Unexp
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, TM
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub16, Dash
-		GUI, Add, Button, w75 x+10 gSub17, Sub17
-		GUI, Add, Button, w75 x+10 gSub18, Sub18
-		GUI, Add, Button, w75 x+10 gSub19, Stay
-		GUI, Add, Button, w75 x+10 gSub20, Back
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, System
-		Gui, Font, S80, Rage Italic																				; select font and size	; Rage Italic		
-		Gui, Add, Text, x+36 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
-		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old settings
 
-
-;--------------------------------------------------
-;	??? Style GUI
-;--------------------------------------------------	
-
-; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/
-	
-		Gui, Margin, 16, 16
-		Gui, Color, 1d1f21, 282a2e																				; colors the background dark gray
-		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border													; removes the toolbar
-		Gui, Font, s38 cf0c674, SF Alien Encounters																; choses font size and color for title bar
-		; Gui, Font, s38 cf0c674, Rage Italic																	; choses font size and color for title bar	; Rage Italic Style
-		GUI, Add, Text, x+15 y+28, Universal																	; sets the title of the GUI	; x+15 y+10 for Rage Italic Style
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub1, Dates
-		GUI, Add, Button, w75 x+10 gSub2, WinS
-		GUI, Add, Button, w75 x+10 gSub3, Orders
-		GUI, Add, Button, w75 x+10 gSub4, Directs
-		GUI, Add, Button, w75 x+10 gSub5, Claims
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Emails
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub6, ECC
-		GUI, Add, Button, w75 x+10 gSub7, Batch
-		GUI, Add, Button, w75 x+10 gSub8, IBDs
-		GUI, Add, Button, w75 x+10 gSub9, OBDs
-		GUI, Add, Button, w75 x+10 gSub10, Ws Book
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Files
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub11, Dists
-		GUI, Add, Button, w75 x+10 gSub12, Plants
-		GUI, Add, Button, w75 x+10 gSub13, SKUs
-		GUI, Add, Button, w75 x+10 gSub14, Lanes
-		GUI, Add, Button, w75 x+10 gSub15, Sub15
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, Tables
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub21, Ship
-		GUI, Add, Button, w75 x+10 gSub22, Sail
-		GUI, Add, Button, w75 x+10 gSub23, ETA
-		GUI, Add, Button, w75 x+10 gSub24, ATA
-		GUI, Add, Button, w75 x+10 gSub25, Unexp
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, TM
-		Gui, Font, s11 cf0c674, Segoe UI																		; sets font for the bottom half of the GUI
-		GUI, Add, Button, w75 xs y+10 gSub16, Dash
-		GUI, Add, Button, w75 x+10 gSub17, Sub17
-		GUI, Add, Button, w75 x+10 gSub18, Sub18
-		GUI, Add, Button, w75 x+10 gSub19, Stay
-		GUI, Add, Button, w75 x+10 gSub20, Back
-		Gui, Font, s20 cf0c674, Rage Italic																		; choses font size and color for title bar
-		GUI, Add, Text, x+10, System
-		Gui, Font, S42, SF Alien Encounters																		; select font and size	; Rage Italic		; SF Alien Encounters download https://www.pixartprinting.co.uk/blog/best-80s-fonts/
-		Gui, Add, Text, x+36 ys+16 vClockTime1, 00:00:00														; set transparency	; set color	; select output variable	; cOrange
-		GUI, Show, x0 y0 w983 h320, Universal																	; displays and names GUI	; top portion of right vertical monitor	; x0 y0 w550 h320 -> old settings
-
-;--------------------------------------------------
-;	GUI End
-;--------------------------------------------------
-*/
 }}
 ;====================================================================================================
 ;	Archive End	
 ;====================================================================================================
+/* SF Alien Encounters Styled
 
+;----------------------- Gui Settings ----------------------
+		Gui, Margin, 16, 16
+		Gui, Color, c091F3F, c091F3F
+		Gui, +AlwaysOnTop -SysMenu +ToolWindow -caption +Border +HwndUGUI		; removes the toolbar
+		Gui, Font, s42 c1496FF , Tuno	;SF Alien Encounters 							; choses font size and color for title bar
+		GUI, Add, Text, x%UhdrXPos% y%UhdrYPos%, Universal						; sets the title of the GUI	
+		;~ UguiHdrPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\vaporhead3.png
+		UguiHdrPic = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\Molson Coors-Preferred Logo-01-cropped.png
+		SplitPath, UguiHdrPic, , , , UguiHdrPic1																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
+		FileInstall, UguiHdrPic1.png, %UguiHdrPic%, 1
+		;~ Gui, Add, Picture, x%HdrPicture% y10 w70 h90 +BackgroundTrans, %UguiHdrPic%	; for synth head picture
+		Gui, Add, Picture, x%HdrPicture% y10 +BackgroundTrans, %UguiHdrPic%		; for molsoncoors logo
+;--------------- Clock ---------------				
+		Gui, Add, Text, x%UclockXPos% y%UhdrYPos% vClockTime1, 00:00:00		; set transparency	; set color	; select output variable	; cOrange
+;----------------------- Tab Settings ----------------------		
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, Tab3, x0 y90 w984 h550, Main|System|Calendar|Alarms|Settings			; creates tabs 
+;-------------------------- Tab 1 --------------------------
+		Gui, Tab, 1																	; sets below controls to tab		
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, w600 h190 , Programs									; create groupbox
+;--------------- Row 1 ---------------		
+		Gui, Font, s12 w400 cf0c674, SF Alien Encounters						; sets font for the bottom half of the GUI
+		GUI, Add, Button, default w80 h35 xs y150 gSub1, Dates
+		GUI, Add, Button, w80 h35 x+7 gSub2, WinS
+		GUI, Add, Button, w80 h35 x+7 gSub3, &Orders
+		GUI, Add, Button, w80 h35 x+7 gSub4, &Directs
+		GUI, Add, Button, w80 h35 x+7 gSub5, &Claims
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6 , Emails
+;--------------- Row 2 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub6, &ECC
+		GUI, Add, Button, w80 h35 x+7 gSub7, WsDE
+		GUI, Add, Button, w80 h35 x+7 gSub8, IBDs
+		GUI, Add, Button, w80 h35 x+7 gSub9, PlayBK
+		GUI, Add, Button, w80 h35 x+7 gSub10, Ws BK
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Files
+;--------------- Row 3 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub21, Ship
+		GUI, Add, Button, w80 h35 x+7 gSub22, Sail
+		GUI, Add, Button, w80 h35 x+7 gSub23, ETA
+		GUI, Add, Button, w80 h35 x+7 gSub24, ATA
+		GUI, Add, Button, w80 h35 x+7 gSub25, Unexp
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, TM
+;--------------- Row 4 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub16, Dash
+		GUI, Add, Button, w80 h35 x+7 gSub17, Sub17
+		GUI, Add, Button, w80 h35 x+7 gSub18, Sub18
+		GUI, Add, Button, w80 h35 x+7 gSub19, &Stay
+		GUI, Add, Button, w80 h35 x+7 gSub20, &Back
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, System
+;-------------- Calendar -------------			
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, x660 y126 w280 h190 , Calendar									; create groupbox
+		Gui, Font, S4, SF Alien Encounters										; select font and size		
+		Gui, Add, MonthCal, x675 y150 0x4 0x8 0x16 Background1d1f21			; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		GuiControl, Show, MonthCal, 
+;--------------- Notes ---------------				
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, R18 xm y330 w950 vUTextBox, 
+		GuiControl, , UTextBox, %UNotesText%
+		GuiControl, Focus, UTextBox
+;-------------------------- Tab 2 --------------------------
+		Gui, Tab, 2																	; sets below controls to tab
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, w600 h190 , Programs									; create groupbox
+;--------------- Row 1 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y150 gSub11, Dists
+		GUI, Add, Button, w80 h35 x+7 gSub12, &Plants
+		GUI, Add, Button, w80 h35 x+7 gSub13, S&KUs
+		GUI, Add, Button, w80 h35 x+7 gSub14, Lanes
+		GUI, Add, Button, w80 h35 x+7 gSub15, MSKU
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Tables
+;--------------- Row 2 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub26, Sub26
+		GUI, Add, Button, w80 h35 x+7 gSub27, Sub27
+		GUI, Add, Button, w80 h35 x+7 gSub28, Sub28
+		GUI, Add, Button, w80 h35 x+7 gSub29, Sub29
+		GUI, Add, Button, w80 h35 x+7 gSub30, Sub30
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Unkwn 2
+;--------------- Row 3 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub31, Sub31
+		GUI, Add, Button, w80 h35 x+7 gSub32, Sub32
+		GUI, Add, Button, w80 h35 x+7 gSub33, Sub33
+		GUI, Add, Button, w80 h35 x+7 gSub34, Sub34
+		GUI, Add, Button, w80 h35 x+7 gSub35, Sub35
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Unkwn 3
+;--------------- Row 4 ---------------				
+		Gui, Font, s12 cf0c674, SF Alien Encounters								; sets font for the bottom half of the GUI
+		GUI, Add, Button, w80 h35 xs y+18 gSub36, Sub36
+		GUI, Add, Button, w80 h35 x+7 gSub37, Sub37
+		GUI, Add, Button, w80 h35 x+7 gSub38, Sub38
+		GUI, Add, Button, w80 h35 x+7 gSub39, Sub39
+		GUI, Add, Button, w80 h35 x+7 gSub40, Sub40
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color for title bar
+		GUI, Add, Text, x+6, Unkwn 4		
+;-------------------------- Tab 3 --------------------------
+		Gui, Tab, 3																	; sets below controls to tab
+;-------------- Calendar -------------			
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, w525 h500, Calendar
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		Gui, Add, MonthCal, W-2 R3 multi x30 y150 0x4 vUDateRange gUDateRange1 ; displays monthly calendar window	 ; w-2 displays two months horizontally	; 4 displays week numbers	; 16 removes today's date at bottom ; w280 h170 
+		GuiControl, Show, MonthCal, 
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, x555 y126 w410 h100, Range Finder
+		Gui, Font, s20 cDC33A6, SF Alien Encounters								; choses font size and color
+		; GUI, Add, Text, w190 h35 x780 y120 , Range								; gUDateRange
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		GUI, Add, Edit, w190 x570 y150 vUDateDisplay, 
+		Gui, Font, s12 cDC33A6, SF Alien Encounters								; choses font size and color
+		gui, Add, Text, x+7 y150, Date Range 
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		GUI, Add, Edit, w190 x570 y185 vUDateDist, 
+		Gui, Font, s12 cDC33A6, SF Alien Encounters								; choses font size and color
+		gui, Add, Text, x+7 y185, Days Count 
+;-------------------------- Tab 4 --------------------------
+		Gui, Tab, 4																	; sets below controls to tab		
+;-------------- Alarms ----------------
+		Gui, Font, s10 cDC33A6, SF Alien Encounters								; choses font size and color
+		Gui, Add, GroupBox, w485 h180, Event Alarms
+;-------------- G Check ---------------
+;---------- Picture 1 ----------
+		UGCheckPic1 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc1.png
+		SplitPath, UGCheckPic1, , , , UGCheckPic1A		
+		FileInstall, UGCheckPic1A.png, %UGCheckPic1%, 1
+;---------- Picture 2 ----------
+		UGCheckPic2 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc2.png
+		SplitPath, UGCheckPic2, , , , UGCheckPic2A	
+		FileInstall, UGCheckPic2A.png, %UGCheckPic2%, 1
+;---------- Picture 3 ----------		
+		UGCheckPic3 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc3.png
+		SplitPath, UGCheckPic3, , , , UGCheckPic3A	
+		FileInstall, UGCheckPic3A.png, %UGCheckPic3%, 1
+;---------- Picture 4 ----------		
+		UGCheckPic4 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc4.png
+		SplitPath, UGCheckPic4, , , , UGCheckPic4A	
+		FileInstall, UGCheckPic4A.png, %UGCheckPic4%, 1
+;---------- Picture 5 ----------	
+		UGCheckPic5 = C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\gc5.png
+		SplitPath, UGCheckPic5, , , , UGCheckPic5A	
+		FileInstall, UGCheckPic5A.png, %UGCheckPic5%, 1
+;-------------- Red X ----------------
+;---------- Picture 1 ----------
+		URedExPic1 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx1.png
+		SplitPath, URedExPic1, , , , URedExPic1A									
+		FileInstall, URedExPic1A.png, %URedExPic1%, 1
+;---------- Picture 2 ----------
+		URedExPic2 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx2.png
+		SplitPath, URedExPic2, , , , URedExPic2A									
+		FileInstall, URedExPic2A.png, %URedExPic2%, 1
+;---------- Picture 3 ----------				
+		URedExPic3 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx3.png
+		SplitPath, URedExPic3, , , , URedExPic3A									
+		FileInstall, URedExPic3A.png, %URedExPic3%, 1
+;---------- Picture 4 ----------				
+		URedExPic4 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx4.png
+		SplitPath, URedExPic4, , , , URedExPic4A									
+		FileInstall, URedExPic4A.png, %URedExPic4%, 1
+;---------- Picture 5 ----------			
+		URedExPic5 =  C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Resources\Pictures\rx5.png
+		SplitPath, URedExPic5, , , , URedExPic5A									
+		FileInstall, URedExPic5A.png, %URedExPic5%, 1
+;---------- Alarm 1 ----------		
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit,		x30 y150 w50 +Center vUTimeAlarm1, %UDefTime1%
+		Gui, Add, Edit,		x+10 y150 w150 vUAlarmName1, %UDefName1%
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		GUI, Add, Button,	x+10 y150 w100 h23 gUAlarm1, Set Alarm
+		GUI, Add, Button,	x+10 y150 w100 h23 gUAlarmKill1, Reset
+		Gui, Add, Picture, x470 y150 w23 h23 +BackgroundTrans, %UGCheckPic1%
+		Gui, Add, Picture, x470 y150 w23 h23 +BackgroundTrans, %URedExPic1%
+;---------- Alarm 2 ----------
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y180 w50 +Center vUTimeAlarm2, %UDefTime2%
+		Gui, Add, Edit, 	x+10 y180 w150 vUAlarmName2, %UDefName2%
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		GUI, Add, Button, 	x+10 y180 w100 h23 gUAlarm2, Set Alarm
+		GUI, Add, Button, 	x+10 y180 w100 h23 gUAlarmKill2, Reset
+		Gui, Add, Picture, x470 y180 w23 h23 +BackgroundTrans, %UGCheckPic2%
+		Gui, Add, Picture, x470 y180 w23 h23 +BackgroundTrans, %URedExPic2%
+;---------- Alarm 3 ----------		
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y210 w50 +Center vUTimeAlarm3, %UDefTime3%
+		Gui, Add, Edit, 	x+10 y210 w150 vUAlarmName3, %UDefName3%
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		GUI, Add, Button, 	x+10 y210 w100 h23 gUAlarm3, Set Alarm
+		GUI, Add, Button, 	x+10 y210 w100 h23 gUAlarmKill3, Reset
+		Gui, Add, Picture, x470 y210 w23 h23 +BackgroundTrans, %UGCheckPic3%
+		Gui, Add, Picture, x470 y210 w23 h23 +BackgroundTrans, %URedExPic3%
+;---------- Alarm 4 ----------		
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y240 w50 +Center vUTimeAlarm4, %UDefTime4%
+		Gui, Add, Edit, 	x+10 y240 w150 vUAlarmName4,%UDefName4%
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		GUI, Add, Button, 	x+10 y240 w100 h23 gUAlarm4, Set Alarm
+		GUI, Add, Button, 	x+10 y240 w100 h23 gUAlarmKill4, Reset
+		Gui, Add, Picture, x470 y240 w23 h23 +BackgroundTrans, %UGCheckPic4%
+		Gui, Add, Picture, x470 y240 w23 h23 +BackgroundTrans, %URedExPic4%
+;---------- Alarm 5 ----------		
+		Gui, Font, s11 c33DCBD, Inconsolata										; choses font size and color for title bar
+		Gui, Add, Edit, 	x30 y270 w50 +Center vUTimeAlarm5, %UDefTime5%
+		Gui, Add, Edit, 	x+10 y270 w150 vUAlarmName5, %UDefName5%
+		Gui, Font, s10 c33DCBD, SF Alien Encounters								; choses font size and color
+		GUI, Add, Button, 	x+10 y270 w100 h23 gUAlarm5, Set Alarm
+		GUI, Add, Button, 	x+10 y270 w100 h23 gUAlarmKill5, Reset
+		Gui, Add, Picture, x470 y270 w23 h23 +BackgroundTrans, %UGCheckPic5%
+		Gui, Add, Picture, x470 y270 w23 h23 +BackgroundTrans, %URedExPic5%
+;-------------------------- Tab 5 --------------------------
+		Gui, Tab, 5																	; sets below controls to tab		
 
 
 
