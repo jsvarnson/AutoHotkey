@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v6.09
+;	Universal Subroutines v6.10
 ;====================================================================================================
 {{
 /*
@@ -131,6 +131,10 @@ SendMode Input							; Recommended to set sendinput as the default send method
 	
 :*:--::
 	send, {space 4}{-}{space}
+	return
+
+:*:++::
+	send, {space 6}{+}{space}
 	return
 
 ^WheelUp::
@@ -364,7 +368,7 @@ HdrPicture	:= (UguiWdt - 70) / 2
 		GUI, Add, Button, w80 h35 x+5 gSub62, Import *
 		GUI, Add, Button, w80 h35 x+5 gSub63, FM36 *
 		GUI, Add, Button, w80 h35 x+5 gSub64, Main
-		GUI, Add, Button, w80 h35 x+5 gSub65, Reports *
+		GUI, Add, Button, w80 h35 x+5 gSub65, UNotes
 		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
 		GUI, Add, Text, x+6, FOLDERS		
 ;--------------- Logo Icon ---------------	
@@ -760,28 +764,28 @@ UAlarmKill5:
 
 Sub1:
 	gosub, Save_Universal_Notes
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		gosub, date_change_email1
 		gosub, date_change_email2
-		; gosub, email_signature
+		gosub, email_signature
 		}
 	Else {
 		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		sleep, 3000
 		gosub, date_change_email1
 		gosub, date_change_email2
-		; gosub, email_signature
+		gosub, email_signature
 		}
 	return
 
 Sub2:
 	gosub, Save_Universal_Notes
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		gosub, Ws_Processing_schedule_mail1
 		gosub, Ws_Processing_schedule_mail2
 		sleep, 500
@@ -789,7 +793,7 @@ Sub2:
 		}
 	Else {
 		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		sleep, 3000
 		gosub, Ws_Processing_schedule_mail1
 		gosub, Ws_Processing_schedule_mail2
@@ -800,16 +804,16 @@ Sub2:
 
 Sub3:
 	gosub, Save_Universal_Notes
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		gosub, import_orders_email
 		gosub, import_orders_email2
 		gosub, email_signature
 		}
 	Else {
 		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		sleep, 3000
 		gosub, import_orders_email
 		gosub, import_orders_email2
@@ -819,9 +823,9 @@ Sub3:
 	
 Sub4:
 	gosub, Save_Universal_Notes
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		gosub, orders_timeline
 		gosub, mbd_directs_email
 		gosub, mbd_directs_email2
@@ -849,7 +853,7 @@ Sub4:
 		}
 	Else {
 		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		sleep, 3000	
 		gosub, orders_timeline
 		gosub, mbd_directs_email
@@ -880,16 +884,16 @@ Sub4:
 	
 Sub5:
 	gosub, Save_Universal_Notes
-	if WinExist("Inbox - Joseph.Arnson@millercoors.com - Outlook") {
-		winactivate, Inbox - Joseph.Arnson@millercoors.com - Outlook
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		gosub, peroni_claim_email
 		gosub, peroni_claim_email2
 		gosub, email_signature
 		}
 	Else {
 		run, outlook.exe
-		winwaitactive, Inbox - Joseph.Arnson@millercoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
 		sleep, 3000
 		gosub, peroni_claim_email
 		gosub, peroni_claim_email2
@@ -897,9 +901,9 @@ Sub5:
 		}
 	return
 
-;---------------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;	File Buttons
-;---------------------------------------------------------------------------	
+;-----------------------------------------------------------------------	
 
 Sub6:
 	gosub, Save_Universal_Notes
@@ -1474,18 +1478,18 @@ Sub64:
 	
 Sub65:			
 	gosub, Save_Universal_Notes	
-	open_fold_Reports:
+	open_fold_UNotes:
 		SetTitleMatchMode, 2
-		if winexist, Reports ahk_exe Explorer.EXE {
-			winactivate, Reports ahk_exe Explorer.EXE
-			winwaitactive, Reports ahk_exe Explorer.EXE
-			WinMove, Reports ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+		if winexist, UNotes ahk_exe Explorer.EXE {
+			winactivate, UNotes ahk_exe Explorer.EXE
+			winwaitactive, UNotes ahk_exe Explorer.EXE
+			WinMove, UNotes ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
 		}
 		else {
-			run, \\mbsus238\trfshare\FM36\Reports
-			winactivate, Reports ahk_exe Explorer.EXE
-			winwaitactive, Reports ahk_exe Explorer.EXE
-			WinMove, Reports ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
+			run, C:\Users\fm36\OneDrive - Molson Coors Brewing Company\Desktop\UNotes
+			winactivate, UNotes ahk_exe Explorer.EXE
+			winwaitactive, UNotes ahk_exe Explorer.EXE
+			WinMove, UNotes ahk_exe Explorer.EXE, , 0, 1280 , 987, 640, 
 		}
 		return	
 	SetTitleMatchMode, 3
@@ -1623,10 +1627,11 @@ FormatCT(ms)  ;  Formats milliseconds into 00:00:00:000 (last three digits are m
 ;	Ws Processing Complete Email
 ;--------------------------------------------------
 Ws_Processing_completed_email:
+	InputBox, WsDonePTime, Ws Processing Time,,, 300, 100, center, center,,, 00:00:00
 	InputBox, WsDoneNumCompleted, Number of Files Completed, , , 300, 100, center, center, , , 2					; InputBox	; default -> 2
 	if WsDoneNumCompleted = 1 
 	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		if ErrorLevel   ; cancel run if inputbox is cancelled
 			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, 
@@ -1635,22 +1640,22 @@ Ws_Processing_completed_email:
 	}
 	else if WsDoneNumCompleted = 2 
 	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		if ErrorLevel   ; cancel run if inputbox is cancelled
 			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		StringRight, WsDoneName1, WsDoneFile2, 17
 		StringLeft, WsDoneName2, WsDoneName1, 4
 	}
 	else if WsDoneNumCompleted = 3
 	{
-		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile1, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		if ErrorLevel   ; cancel run if inputbox is cancelled
 			exitapp
 		SplitPath, WsDoneFile1, , , , WsDoneFile2																	; SplitPath, InputVar [, OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive]
-		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
-		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared			; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile3, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
+		FileSelectFile, WsDoneFile4, 1 2,\\mbsus238\trfshare\Import Reference Materials\Ws Import Shared		; Select file	; 1: File Must Exist	; 2: Path Must Exist
 		StringRight, WsDoneName1, WsDoneFile2, 17
 		StringLeft, WsDoneName2, WsDoneName1, 4
 	}
@@ -1660,10 +1665,10 @@ Ws_Processing_completed_email:
 		exitapp
 	}				
 	olMailItem := 0	
-	o:= ComObjActive("Outlook.Application").Session()															; connect to outlook ComObject
+	o:= ComObjActive("Outlook.Application").Session()																; connect to outlook ComObject
 	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)										; create new email
-	MailItem.BodyFormat := 2 																					; olFormatHTML	
-	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"															; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
+	MailItem.BodyFormat := 2 																							; olFormatHTML	
+	;~ MailItem.To := WsDoneName2 "@millercoors.com`;"																; Add To line recipients 	; commented out to prevent @ mention from including the recipient twice
 	MailItem.CC := "importmgmt@millercoors.com`;"
 	if (WsDoneFile1 != "")
 		MailItem.Attachments.Add(WsDoneFile1)
@@ -1671,9 +1676,9 @@ Ws_Processing_completed_email:
 		MailItem.Attachments.Add(WsDoneFile3)
 	if (WsDoneFile4 != "")
 		MailItem.Attachments.Add(WsDoneFile4)
-	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY ;storing pretty version of date
+	TodayDateWsDone := A_DDDD . ", " . A_MMM . " " . A_DD . ", " . A_YYYY 										;storing pretty version of date
 	MailItem.Subject := "Ws Processing Completed on " TodayDateWsDone 
-	MailItem.Display 																							; Make email visible
+	MailItem.Display 																									; Make email visible
 	sleep, 100
 	send, {tab 4}
 	sleep, 100
@@ -1684,6 +1689,8 @@ Ws_Processing_completed_email:
 Hello @%WsDoneName2%{tab},
 
 I have completed your Winshuttle processing and attached the file here for your convenience. As always, please make sure to review the file for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
+
+Total Process Time -- %WsDonePTime%
 
 Cheers,
 )
@@ -1698,11 +1705,14 @@ Hello @%WsDoneName2%{tab},
 
 I have completed your Winshuttle processing and attached the files here for your convenience. As always, please make sure to review the files for completeness and correctness and let me know if you have any other questions so we may discuss them further. If anything was missed, or you believe something was processed incorrectly, please let me know as soon as possible so we may resolve the issue.
 
+Total Process Time -- %WsDonePTime%
+
 Cheers,
 )
 		sleep, 100
 		return
 	}
+	return
 ;--------------------------------------------------
 ;	Universal End
 ;--------------------------------------------------
