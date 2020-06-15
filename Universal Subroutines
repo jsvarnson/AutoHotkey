@@ -1,5 +1,5 @@
 ;====================================================================================================
-;	Universal Subroutines v6.10
+;	Universal Subroutines v6.12
 ;====================================================================================================
 {{
 /*
@@ -68,6 +68,12 @@ SendMode Input							; Recommended to set sendinput as the default send method
 
 ; Include TM Automation
 #Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\TM Automation.ahk
+
+; Include WinClipAPI
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\WinClip\WinClipAPI.ahk
+
+; Include WinClip
+#Include C:\Users\fm36\OneDrive - Molson Coors Brewing Company\MAIN\AHK\Single Modules\WinClip\WinClip.ahk
 
 ;gosub, UNIVERSAL_LAUNCH	; launch Universal GUI
 
@@ -325,18 +331,18 @@ HdrPicture	:= (UguiWdt - 70) / 2
 		Gui, Add, GroupBox, xm y332 w600 h190 , COMS								; create groupbox
 ;--------------- Row 1 ---------------				
 		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
-		GUI, Add, Button, w80 h35 xs y359 gSub41, Email 1
-		GUI, Add, Button, w80 h35 x+5 gSub42, Email 2
-		GUI, Add, Button, w80 h35 x+5 gSub43, Email 3
-		GUI, Add, Button, w80 h35 x+5 gSub44, Email 4
-		GUI, Add, Button, w80 h35 x+5 gSub45, Email 5
+		GUI, Add, Button, w80 h35 xs y359 gSub41, ExOOS
+		GUI, Add, Button, w80 h35 x+5 gSub42, ExUPD
+		GUI, Add, Button, w80 h35 x+5 gSub43, ExFGL
+		GUI, Add, Button, w80 h35 x+5 gSub44, ExDOI
+		GUI, Add, Button, w80 h35 x+5 gSub45, ExSOC
 		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
 		GUI, Add, Text, x+6, EMAILS
 ;--------------- Row 2 ---------------				
 		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
-		GUI, Add, Button, w80 h35 xs y+5 gSub46, Email 6
-		GUI, Add, Button, w80 h35 x+5 gSub47, Email 7
-		GUI, Add, Button, w80 h35 x+5 gSub48, Email 8
+		GUI, Add, Button, w80 h35 xs y+5 gSub46, ExFCA
+		GUI, Add, Button, w80 h35 x+5 gSub47, ExINV
+		GUI, Add, Button, w80 h35 x+5 gSub48, DFAnom
 		GUI, Add, Button, w80 h35 x+5 gSub49, Email 9
 		GUI, Add, Button, w80 h35 x+5 gSub50, Email 10
 		Gui, Font, s20 cFFB000, Tuno												; choses font size and color for title bar
@@ -1322,35 +1328,140 @@ Sub40:
 	msgbox, Subroutine here
 	return	
 
-Sub41:			
-	gosub, Save_Universal_Notes		
-	return		
+Sub41:                                  
+	gosub, Save_Universal_Notes    
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, oos_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, oos_exec_email
+		gosub, email_signature
+		}
+	return
 	
 Sub42:			
-	gosub, Save_Universal_Notes		
-	return		
+	gosub, Save_Universal_Notes    
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, upd_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, upd_exec_email
+		gosub, email_signature
+		}
+	return	
 	
 Sub43:			
 	gosub, Save_Universal_Notes		
-	return		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, fgl_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, fgl_exec_email
+		gosub, email_signature
+		}
+	return			
 	
 Sub44:			
 	gosub, Save_Universal_Notes		
-	return		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, doi_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, doi_exec_email
+		gosub, email_signature
+		}
+	return			
 	
 Sub45:			
 	gosub, Save_Universal_Notes		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, soc_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, soc_exec_email
+		gosub, email_signature
+		}
 	return		
 	
 Sub46:			
 	gosub, Save_Universal_Notes		
-	return		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, fca_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, fca_exec_email
+		gosub, email_signature
+		}
+	return	
+	
 Sub47:			
 	gosub, Save_Universal_Notes		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, inv_exec_email
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, inv_exec_email
+		gosub, email_signature
+		}
 	return		
 	
 Sub48:			
 	gosub, Save_Universal_Notes		
+	if WinExist("Inbox - Joseph.Arnson@molsoncoors.com - Outlook") {
+		winactivate, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		gosub, dfanom_email1
+		gosub, email_signature
+		}
+	Else {
+		run, outlook.exe
+		winwaitactive, Inbox - Joseph.Arnson@molsoncoors.com - Outlook
+		sleep, 3000
+		gosub, dfanom_email1
+		gosub, email_signature
+		}
 	return		
 	
 Sub49:			
@@ -1623,6 +1734,308 @@ FormatCT(ms)  ;  Formats milliseconds into 00:00:00:000 (last three digits are m
 ;=======================================================================
 ;	Email
 ;=======================================================================
+
+;--------------------------------------------------
+;	OOS Executive Summary Email
+;--------------------------------------------------
+
+oos_exec_email:
+	FileSelectFile, ExOOSFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExOOSFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecOOSEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecOOSEmailWeek2, ExecOOSEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecOOSEmailWeek3 := ExecOOSEmailWeek2 - 1
+		;ExecOOSEmailSubject := "OOS Executive  - Week " ExecOOSEmailWeek3                                                                                                                ; creates the subject line               ; Adds autocalculated weeknum 
+		ExecOOSEmailBody := "Please find attached the Out of Stock Executive Summary report for week " ExecOOSEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"                                     ; Add recipients                 -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                                     ; Add recipients                 -> use ; between email names inside the outer quotes
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;"            ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExOOSFile1)
+		MailItem.Subject := "OOS Executive Summary - Week " ExecOOSEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecOOSEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	UPD Executive Summary Email
+;--------------------------------------------------
+
+upd_exec_email:
+	FileSelectFile, ExUPDFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExUPDFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecUPDEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecUPDEmailWeek2, ExecUPDEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecUPDEmailWeek3 := ExecUPDEmailWeek2 - 1
+		ExecUPDEmailBody := "Please find attached the Unplanned Demand Executive Summary report for week " ExecUPDEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients                 -> use ; between email names inside the outer quotes
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExUPDFile1)
+		MailItem.Subject := "UPD Executive Summary - Week " ExecUPDEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecUPDEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	FGL Executive Summary Email
+;--------------------------------------------------
+
+fgl_exec_email:
+	FileSelectFile, ExFGLFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExFGLFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecFGLEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecFGLEmailWeek2, ExecFGLEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecFGLEmailWeek3 := ExecFGLEmailWeek2 - 1
+		ExecFGLEmailBody := "Please find attached the Finished Goods Lost Executive Summary report for week " ExecFGLEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients                 -> use ; between email names inside the outer quotes
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExFGLFile1)
+		MailItem.Subject := "FGL Executive Summary - Week " ExecFGLEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecFGLEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	DOI Executive Summary Email
+;--------------------------------------------------
+
+doi_exec_email:
+	FileSelectFile, ExDOIFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExDOIFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecDOIEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecDOIEmailWeek2, ExecDOIEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecDOIEmailWeek3 := ExecDOIEmailWeek2 - 1
+		ExecDOIEmailBody := "Please find attached the Days of Inventory Executive Summary report for week " ExecDOIEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients 
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExDOIFile1)
+		MailItem.Subject := "DOI Executive Summary - Week " ExecDOIEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecDOIEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	SOC Executive Summary Email (Suggest Order Confirm)
+;--------------------------------------------------
+
+soc_exec_email:
+	FileSelectFile, ExSOCFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExSOCFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecSOCEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecSOCEmailWeek2, ExecSOCEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecSOCEmailWeek3 := ExecSOCEmailWeek2 - 1
+		ExecSOCEmailBody := "Please find attached the Suggest Order Confirm Executive Summary report for week " ExecSOCEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients 
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExSOCFile1)
+		MailItem.Subject := "SOC Executive Summary - Week " ExecSOCEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecSOCEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	FCA Executive Summary Email (Forecast Accuracy)
+;--------------------------------------------------
+
+fca_exec_email:
+	FileSelectFile, ExFCAFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExFCAFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecFCAEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecFCAEmailWeek2, ExecFCAEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecFCAEmailWeek3 := ExecFCAEmailWeek2 - 1
+		ExecFCAEmailBody := "Please find attached the Forecast Accuracy Executive Summary report for week " ExecFCAEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients 
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExFCAFile1)
+		MailItem.Subject := "FCA Executive Summary - Week " ExecFCAEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecFCAEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	INV Executive Summary Email
+;--------------------------------------------------
+
+inv_exec_email:
+	FileSelectFile, ExINVFile1, 1 2,C:\Users\JSVAR\OneDrive - Molson Coors Brewing Company\Desktop\Reports\Executive Reports                   ; Select file          ; 1: File Must Exist            ; 2: Path Must Exist
+	if (ExINVFile1 = "")
+		MsgBox, No file selected.
+	else	
+		ExecINVEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+		StringRight, ExecINVEmailWeek2, ExecINVEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+		ExecINVEmailWeek3 := ExecINVEmailWeek2 - 1
+		ExecINVEmailBody := "Please find attached the National Inventory Executive Summary report for week " ExecINVEmailWeek3 " and let me know if you have any questions or concerns."
+		olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+		o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+		MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+		MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+		;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+		MailItem.TO := "Cesar.Belmontes@molsoncoors.com`; javier.hernandez@molsoncoors.com;"                         ; Add recipients 
+		MailItem.CC := "Robert.Girardi@molsoncoors.com`; Kyle.Kubasa@molsoncoors.com`; kim.weyker@molsoncoors.com`;" ; Add recipients to the CC line
+		MailItem.Attachments.Add(ExINVFile1)
+		MailItem.Subject := "INV Executive  - Week " ExecINVEmailWeek3 
+		MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+		sleep, 10	
+		send, 
+		(
+Hello team,
+
+%ExecINVEmailBody%
+
+Cheers,
+)
+return
+
+;--------------------------------------------------
+;	DFAnom Email
+;--------------------------------------------------
+
+dfanom_email1:
+	DFAnomEmailWeek1 := A_YWeek                                                                                                                                                                                                                                                                                                           ; gets current year weeknum                ;yyyyww format
+	StringRight, DFAnomEmailWeek2, DFAnomEmailWeek1, 2                                                                                                                                                                                           ; returns only right 2 chars            ; gets only weeknum
+	DFAnomEmailWeek3 := DFAnomEmailWeek2 . " (" . A_DDDD . " Edition)"
+	;DFAnomEmailBody := "Please find attached the Froecast Accuracy Executive Summary report for week " DFAnomEmailWeek3 " and let me know if you have any questions or concerns."
+	olMailItem := 0                                                                                                                                                                                                                                                                                                                                                  ; set object
+	o:= ComObjActive("Outlook.Application").Session()                                                                                                                                                                                                         ; connect to outlook ComObject
+	MailItem := ComObjActive("Outlook.Application").CreateItem(olMailItem)                                                                                                            ; create new email
+	MailItem.BodyFormat := 2                                                                                                                                                                                                                                                                                                            ; olFormatHTML                
+	;MailItem.TO := "Joseph.Arnson@molsoncoors.com`;"          ; Add recipients -> use ; between email names inside the outer quotes
+	MailItem.TO := "USCustomerService@molsoncoors.com`;"           ; Add recipients 
+	MailItem.CC := "SCDigital@molsoncoors.com`;" 					; Add recipients to the CC line
+	MailItem.Subject := "Distributor Forecast Anomalies  - Wk " DFAnomEmailWeek3 
+	MailItem.Display                                                                                                                                                                                                                                                                                                                                                              ; Make email visible
+	sleep, 10	
+	send, 
+	(
+Good morning,
+
+Please see the Drive Forecast Anomalies that I have identified as being the most out of pattern below. 
+
+Please reply to the SC Digital Management team through the link below and let them know if these forecasts are correct or if they are anomalies and have been adjusted.
+
+
+
+The file can be viewed through the link below. The Distributor Forecast Anomalies file can also be used to review weekly forecasts for all distributor OSKU pairs. Please let me know if you have any questions or concerns on the report, including any potential enhancements.
+
+
+
+SC Digital Management
+
+Cheers,
+)
+	sleep, 10
+	send, {up 4}
+	WinClip.Clear()
+	WinClip.SetText("https://nam05.safelinks.protection.outlook.com/ap/x-59584e83/?url=https%3A%2F%2Fmolsoncoors.sharepoint.com%2F%3Ax%3A%2Fr%2Fsites%2FResources%2FToolsFormsDocuments%2FCSC%2520Reporting-Customer%2520Service%2FDistributor%2520Forecast%2520Anomalies.xlsx%3Fd%3Dw3ac566b6f5e144b9949b8682e925cb3f%26csf%3D1%26web%3D1%26e%3DE9hjWj&data=02%7C01%7CJoseph.Arnson%40molsoncoors.com%7C5c4acd00d53e483788da08d7fcdfe703%7C9d22fedaa32c4757aa1db6208426fd0e%7C0%7C0%7C637255911174207636&sdata=qRB4ava3%2F8XMR8olQGzd5MsHlTexzySsHCVR%2B2HvJeI%3D&reserved=0")
+	WinClip.SetHTML("<a href=""https://nam05.safelinks.protection.outlook.com/ap/x-59584e83/?url=https%3A%2F%2Fmolsoncoors.sharepoint.com%2F%3Ax%3A%2Fr%2Fsites%2FResources%2FToolsFormsDocuments%2FCSC%2520Reporting-Customer%2520Service%2FDistributor%2520Forecast%2520Anomalies.xlsx%3Fd%3Dw3ac566b6f5e144b9949b8682e925cb3f%26csf%3D1%26web%3D1%26e%3DE9hjWj&data=02%7C01%7CJoseph.Arnson%40molsoncoors.com%7C5c4acd00d53e483788da08d7fcdfe703%7C9d22fedaa32c4757aa1db6208426fd0e%7C0%7C0%7C637255911174207636&sdata=qRB4ava3%2F8XMR8olQGzd5MsHlTexzySsHCVR%2B2HvJeI%3D&reserved=0"">Distributor Forecast Anomalies</a>")
+	WinClip.Paste()
+	sleep, 100
+	send, {down 2}
+	send, {end}
+	send, {shift down}{home}{shift up}
+	send, ^k
+	sleep, 5
+	Send, {Blind}{Text} SCDigital@molsoncoors.com; kevin.mccrea2@millercoors.com; joseph.arnson@MolsonCoors.com;
+	sleep, 5
+	send, {tab}
+	sleep, 5
+	Send, {Blind}{Text} Drive Forecast Anomalies
+	sleep, 5
+	send, {enter}
+	sleep, 10
+	send, {up 100}
+	sleep, 10
+	send, {down 7}
+return
+
 ;--------------------------------------------------
 ;	Ws Processing Complete Email
 ;--------------------------------------------------
@@ -2002,9 +2415,37 @@ Explorer_GetSelection(hwnd="") {
 ;	Global End
 ;--------------------------------------------------
 }}
-;====================================================================================================
+;=======================================================================
+;	Paste Function
+;=======================================================================
+
+UPaste(Text) {
+	ClipboardBack := Clipboard
+	Clipboard = ""
+	Clipboard := Text
+	ClipWait, 1
+	Send, ^v
+	Clipboard := ClipboardBack
+return
+}
+
+;=======================================================================
+;	HTML Paste Function
+;=======================================================================
+/*
+UHTMLPaste(Text) {
+	ClipboardBack := Clipboard
+	Clipboard = ""
+	Clipboard := "<" . Text . ">"
+	ClipWait, 1
+	Send, ^v
+	Clipboard := ClipboardBack
+return
+}
+*/
+;=======================================================================
 ;	Advanced Window Snap
-;====================================================================================================
+;=======================================================================
 {{
 /**
  * Advanced Window Snap
@@ -2034,6 +2475,8 @@ SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
     SysGet, MonitorWorkArea, MonitorWorkArea, %activeMon%
     if (winSizeHeight == "half") {
         height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/2
+    } else if (winSizeHeight == "midhalf") {
+        height := ((MonitorWorkAreaBottom - MonitorWorkAreaTop)/3)*2
     } else {
         height := (MonitorWorkAreaBottom - MonitorWorkAreaTop)/3
     }
@@ -2053,7 +2496,7 @@ SnapActiveWindow(winPlaceVertical, winPlaceHorizontal, winSizeHeight) {
         posY := MonitorWorkAreaTop + height
     } else {
         posY := MonitorWorkAreaTop
-    }
+    }    
     WinMove,A,,%posX%,%posY%,%width%,%height%
 }
 ;---------------------------------------------------------------------------
@@ -2078,7 +2521,7 @@ GetMonitorIndexFromWindow(windowHandle) {
         monitorBottom := NumGet(monitorInfo, 16, "Int")
         workLeft      := NumGet(monitorInfo, 20, "Int")
         workTop       := NumGet(monitorInfo, 24, "Int")
-        workRight     := NumGet(monitorInfo, 28, "Int")○
+        workRight     := NumGet(monitorInfo, 28, "Int")?
         workBottom    := NumGet(monitorInfo, 32, "Int")
         isPrimary     := NumGet(monitorInfo, 36, "Int") & 1
 
@@ -2118,8 +2561,9 @@ GetMonitorIndexFromWindow(windowHandle) {
 ^#!Numpad8::SnapActiveWindow("top","full","third")
 ^#!Numpad5::SnapActiveWindow("middle","full","third")
 ^#!Numpad2::SnapActiveWindow("bottom","full","third")
-^#!Numpad4::SnapActiveWindow("bottom","left","third")  ; my custom addition
-^#!Numpad6::SnapActiveWindow("bottom","right","third") ; my custom addition
+^#!Numpad4::SnapActiveWindow("bottom","left","third")		; my custom addition
+^#!Numpad6::SnapActiveWindow("bottom","right","third")	; my custom addition
+^!+h::SnapActiveWindow("bottom","full","midhalf")		; my custom addition
 
 ;--------------------------------------------------
 ;	Advanced Window Snapping End
@@ -2362,16 +2806,4 @@ GetMonitorIndexFromWindow(windowHandle) {
 		Gui, Add, Picture, x470 y270 w23 h23 +BackgroundTrans, %URedExPic5%
 ;-------------------------- Tab 5 --------------------------
 		Gui, Tab, 5																	; sets below controls to tab		
-
-
-
-
-
-
-
-
-
-
-
-
 
