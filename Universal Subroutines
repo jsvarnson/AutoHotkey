@@ -1,7 +1,7 @@
 ;====================================================================================================
-;	Universal Subroutines v6.12
+;	Universal Subroutines v6.15
 ;====================================================================================================
-{{
+
 /*
 -------------------------
 |	Main Directory		|
@@ -18,11 +18,11 @@
 |		  END			|
 -------------------------
 */
-}}
+
 ;====================================================================================================
 ;	Settings
 ;====================================================================================================
-{{
+
 #Singleinstance, Force					; Recommended for all scripts to prevent old instances
 #NoEnv									; Recommended for all scripts to disable environment variables
 #MaxHotkeysPerInterval 99000000			; Recommended for all scripts to prevent error messages
@@ -38,11 +38,11 @@ SetWinDelay, -1							; Recommended to set sendinput as the default send method
 SetControlDelay, -1						; Recommended to set sendinput as the default send method
 SendMode Input							; Recommended to set sendinput as the default send method
 #Persistent								; Script will stay running after the auto-execute section
-}}
+
 ;=======================================================================
 ;	AutoExecute
 ;=======================================================================
-{{
+
 ;-----------------------------------------------------------------------
 ;	Color Scheme
 ;-----------------------------------------------------------------------
@@ -141,6 +141,66 @@ SendMode Input							; Recommended to set sendinput as the default send method
 
 :*:++::
 	send, {space 6}{+}{space}
+	return
+	
+:*b0:1/::
+:*b0:2/::
+:*b0:3/::
+:*b0:4/::
+:*b0:5/::
+:*b0:6/::
+:*b0:7/::
+:*b0:8/::
+:*b0:9/::
+:*b0:10/::
+:*b0:11/::
+:*b0:12/::
+:*b0:13/::
+:*b0:14/::
+:*b0:15/::
+:*b0:16/::
+:*b0:17/::
+:*b0:18/::
+:*b0:19/::
+:*b0:20/::
+	send, {Shift down}{home}{shift up}
+	oldclipboard:= clipboard
+	clipboard:=""
+	send, ^c ; copies selected text
+	ClipWait
+	if ErrorLevel
+	{
+		MsgBox, The attempt to copy text onto the clipboard failed.
+		return
+	}
+	UBoxNum := Clipboard
+	UBoxes := StrReplace(UBoxNum, "/", "")
+	if UBoxes = "" 
+	{
+		msgbox, blank
+		return
+	}
+	else
+	{
+		send, ////////////////////////////////////////
+		send, {enter}
+		UBoxTaskTitle := "    Task List: " . A_MM . "-" . A_DD . "-" . A_YYYY . " @ " A_Hour . ":" . A_Min                                                       ; gets current date time stamp formatting
+		send, %UBoxTaskTitle%
+		send, {enter}
+		send, ////////////////////////////////////////
+		send, {enter}
+		Loop, %UBoxes%
+		{
+			send, {space 4}{[}{_}{]}{space}{:}{space}
+			send, {enter}     
+		}
+		Loop, %UBoxes%
+		{
+			send, {up}
+		}
+		send, {end}
+	clipboard:= oldclipboard
+	}
 	return
 
 ^WheelUp::
@@ -319,7 +379,7 @@ HdrPicture	:= (UguiWdt - 70) / 2
 		GUI, Add, Text, x+6, NETWORK
 ;--------------- Row 4 ---------------				
 		Gui, Font, s13 w400, Tuno													; sets font for the below Buttons
-		GUI, Add, Button, w80 h35 xs y+5 gSub36, Sub36
+		GUI, Add, Button, w80 h35 xs y+5 gSub36, UpdGeo
 		GUI, Add, Button, w80 h35 x+5 gSub37, Sub37
 		GUI, Add, Button, w80 h35 x+5 gSub38, Sub38
 		GUI, Add, Button, w80 h35 x+5 gSub39, Sub39
@@ -1305,26 +1365,32 @@ Sub34:
 	return
 	
 Sub35:
+	gosub, Save_Universal_Notes
 	msgbox, Subroutine here
 	return		
 
 Sub36:
-	msgbox, Subroutine here
+	gosub, Save_Universal_Notes
+	gosub, update_geoffrey
 	return
 
 Sub37:
+	gosub, Save_Universal_Notes
 	msgbox, Subroutine here
 	return
 	
 Sub38:
+	gosub, Save_Universal_Notes
 	msgbox, Subroutine here
 	return
 	
 Sub39:
+	gosub, Save_Universal_Notes
 	msgbox, Subroutine here
 	return
 	
 Sub40:
+	gosub, Save_Universal_Notes
 	msgbox, Subroutine here
 	return	
 
@@ -2129,11 +2195,11 @@ Cheers,
 ;--------------------------------------------------
 ;	Universal End
 ;--------------------------------------------------
-}}
+
 ;====================================================================================================
 ;	Global
 ;====================================================================================================	
-{{
+
 ;-------------------------------------------------------------------------------------
 ;	Key Mapping
 ;-------------------------------------------------------------------------------------
@@ -2146,15 +2212,15 @@ Numlock Always On
 ;--------------------------------------------------
 ;	Capslock as Enter
 ;--------------------------------------------------
-{{
+
 Capslock::
 	send, {enter}
 	return
-}}
+
 ;--------------------------------------------------
 ;	Set Capslock
 ;--------------------------------------------------	
-{{	
+	
 ^CapsLock::
     GetKeyState, capsstate, CapsLock, T ;(T indicates a Toggle. capsstate is an arbitrary varible name)
     if capsstate = U
@@ -2162,28 +2228,28 @@ Capslock::
     else
         SetCapsLockState, AlwaysOff
     return
-}}	
+	
 ;--------------------------------------------------
 ;	Tilde as Backwards Tab
 ;--------------------------------------------------
-{{
+
 `::
 	send, {shift down}
 	send, {tab}
 	send, {shift up}
 	return
-}}
+
 ;--------------------------------------------------
 ;	Numlock Always On
 ;--------------------------------------------------
-{{
+
 SetNumLockState , on
 return
-}}
+
 ;---------------------------------------------------------------------------
 ;	Activate Window Under Mouse
 ;---------------------------------------------------------------------------
-{{
+
 /*
 #Persistent
 SetTimer, ActivateUGUI, 100
@@ -2199,11 +2265,11 @@ if UGUIUMID = 0x2a0638 {
 }
 return
 */
-}}
+
 ;---------------------------------------------------------------------------
 ;	Activate Window Under Mouse
 ;---------------------------------------------------------------------------
-{{
+
 /*						; interrupts Ditto window
 #Persistent
 SetTimer, ActivateWinUM, 100
@@ -2214,11 +2280,11 @@ MouseGetPos,,, WinUMID
 WinActivate, ahk_id %WinUMID%
 return
 */
-}}
+
 ;---------------------------------------------------------------------------
 ;	AutoCapitalize
 ;---------------------------------------------------------------------------
-{{
+
 /*
 #SingleInstance force
 #NoEnv
@@ -2253,11 +2319,11 @@ Loop {
 ~WheelUp::
 ~XButton1::
 ~XButton2::State =
-}}
+
 ;---------------------------------------------------------------------------
 ;	Expo
 ;---------------------------------------------------------------------------
-{{
+
 ^!#+z::			
 	oldclipboard:= clipboard
 	clipboard:=""
@@ -2267,11 +2333,11 @@ Loop {
 	winactivate
 	clipboard:= oldclipboard
 Return
-}}
+
 ;---------------------------------------------------------------------------
 ;	Systems
 ;---------------------------------------------------------------------------
-{{
+
 /*
 ctrl + alt + win + shift + b		->	Run File Explorer
 ctrl + alt + win + shift + i		->	Run/Cycle Excel
@@ -2285,7 +2351,7 @@ ctrl + alt + win + shift + q		->  picking - temp
 ;--------------------------------------------------
 ;	Run Explorer
 ;--------------------------------------------------
-{{
+
 ^!#+b::
 	if WinExist("File Explorer") {
 		WinClose
@@ -2296,11 +2362,11 @@ ctrl + alt + win + shift + q		->  picking - temp
 		WinActivate
 		}
 	return
-}}	
+	
 ;--------------------------------------------------
 ;	Excel Cycler
 ;--------------------------------------------------
-{{
+
 ^!#+i::
 	if winexist("ahk_class XLMAIN") {
 		winactivate
@@ -2312,11 +2378,11 @@ ctrl + alt + win + shift + q		->  picking - temp
 		winactivate
 		}
 	return	
-}}
+
 ;--------------------------------------------------
 ;	Run Calculator
 ;--------------------------------------------------
-{{
+
 ^!#+/::
 	if WinExist("ahk_exe ApplicationFrameHost.exe") {
 		WinClose
@@ -2327,11 +2393,11 @@ ctrl + alt + win + shift + q		->  picking - temp
 		WinActivate
 		}
 	return
-}}	
+	
 ;--------------------------------------------------
 ;	Run Notepad++
 ;--------------------------------------------------	
-{{	
+	
 ^!#+n::
 	if WinExist("ahk_class Notepad++") {
 		WinClose
@@ -2342,11 +2408,11 @@ ctrl + alt + win + shift + q		->  picking - temp
 		WinActivate
 		}
 	return
-}}
+
 ;--------------------------------------------------
 ;	Run Notepad
 ;--------------------------------------------------
-{{
+
 /*
 ^!#+d::
 	if WinExist("ahk_class Notepad") {
@@ -2359,27 +2425,27 @@ ctrl + alt + win + shift + q		->  picking - temp
 		}
 	return
 */	
-}}	
+	
 ;--------------------------------------------------
 ;	Always On Top
 ;--------------------------------------------------
-{{
+
 ^!#+Space::  Winset, Alwaysontop, , A
 	;msgbox, is this working?
 	return
-}}	
+	
 ;--------------------------------------------------
 ;	Protect
 ;--------------------------------------------------
-{{
+
 ^!#+F1::
 	send, Josecian13
 	return	
-}}
+
 ;--------------------------------------------------
 ;	Systems End
 ;--------------------------------------------------
-}}
+
 ;-------------------------------------------------------------------------------------
 ;	File Explorer
 ;-------------------------------------------------------------------------------------
@@ -2387,7 +2453,7 @@ ctrl + alt + win + shift + q		->  picking - temp
 ;--------------------------------------------------
 ;	Get File Path
 ;--------------------------------------------------
-{{
+
 F1::
 	InputBox, FullPath, File Full Path,,, 700, 100, center, center,, 1, % Explorer_GetSelection()	
 	Clipboard := FullPath
@@ -2406,7 +2472,7 @@ Explorer_GetSelection(hwnd="") {
 	ToReturn .= item.path "`n"
 	return Trim(ToReturn,"`n")
 }	
-}}	
+	
 ;---------------------------------------------------------------------------
 ;	End File Explorer
 ;---------------------------------------------------------------------------
@@ -2414,7 +2480,7 @@ Explorer_GetSelection(hwnd="") {
 ;--------------------------------------------------
 ;	Global End
 ;--------------------------------------------------
-}}
+
 ;=======================================================================
 ;	Paste Function
 ;=======================================================================
@@ -2446,7 +2512,7 @@ return
 ;=======================================================================
 ;	Advanced Window Snap
 ;=======================================================================
-{{
+
 /**
  * Advanced Window Snap
  * Snaps the Active Window to one of nine different window positions.
@@ -2568,7 +2634,66 @@ GetMonitorIndexFromWindow(windowHandle) {
 ;--------------------------------------------------
 ;	Advanced Window Snapping End
 ;--------------------------------------------------
-}}
+
+;==================================================================================================
+;               File Auto Updates and Opening Routines
+;==================================================================================================
+
+update_geoffrey:
+	filegettime, GeoffTimeCheck, M:\1 Team\Metrics\Geoffrey.xlsx, M		; get modification time -> Geoffrey
+	formattime, GeoffTimeCheck, %GeoffTimeCheck%, yyyyMMddHHmmss			; format time
+	filegettime, GeoffreyUpdated, M:\1 Team\Metrics\Geoffrey.xlsx, M		; get modification time -> Geoffrey
+	formattime, GeoffreyUpdated, %GeoffreyUpdated%, MM/dd/yyyy   HH:mm		; format time
+	filegettime, MITToolupdated, M:\1 Team\Metrics\MIT Tool.xlsx, M		; get modification time -> MIT Tool
+	formattime, MITToolupdated, %MITToolupdated%, MM/dd/yyyy   HH:mm		; format time
+	filegettime, Productupdated, M:\1 Team\Metrics\Product.xlsx, M			; get modification time -> Product
+	formattime, Productupdated, %Productupdated%, MM/dd/yyyy   HH:mm		; format time
+	UMidnightToday := A_YYYY . A_MM . A_DD . 000000							; today at midnight exactly
+	if (GeoffTimeCheck > UMidnightToday)
+	{
+		msgbox, 4, Geoffrey Updated Today, Geoffrey was already updated today`n`r`n`rGeoffrey:	   %GeoffreyUpdated%`n`rMIT Tool:	   %MITToolupdated%`n`rProduct:	   %Productupdated%`n`r`n`rWould you still like to update Geoffrey?
+		ifmsgbox, yes
+		{
+			gosub, GeoffreyUpdater
+		}
+		ifmsgbox, no
+		{
+			msgbox, 0, Geoffrey, Geoffrey update cancelled, 1   
+		}
+	}
+	else
+	{
+		msgbox, 4, Geoffrey, Geoffrey:	   %GeoffreyUpdated%`n`rMIT Tool:	   %MITToolupdated%`n`rProduct:	   %Productupdated%`n`r`n`rWould you like to update Geoffrey?
+		ifmsgbox, yes
+		{
+			gosub, GeoffreyUpdater
+		}
+		ifmsgbox, no
+		{
+			msgbox, 0, Geoffrey, Geoffrey update cancelled, 1   
+		}
+        
+	}
+	return
+	
+GeoffreyUpdater:
+	run, M:\1 Team\Metrics\Geoffrey.xlsx
+	winwaitactive, ahk_class bosa_sdm_XL9
+	winactivate, ahk_class bosa_sdm_XL9
+	send, jordy                       											; password for Geoffrey
+	send, {enter}
+	sleep, 10                                            						; wait to load
+	send, !ara                                            						; excel shortcut -> refresh all data
+	TrayTip, Updating Geoffrey
+	Menu, Tray, Tip, Updating Geoffrey
+	sleep, 500
+	gosub, RemoveToolTip2
+	return		
+	
+RemoveToolTip2:
+	ToolTip
+	return
+
 ;====================================================================================================
 ;	END
 ;====================================================================================================	
@@ -2576,9 +2701,9 @@ GetMonitorIndexFromWindow(windowHandle) {
 ;====================================================================================================
 ;	Archive
 ;====================================================================================================
-{{
 
-}}
+
+
 ;====================================================================================================
 ;	Archive End	
 ;====================================================================================================
